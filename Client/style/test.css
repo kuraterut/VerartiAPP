@@ -1,6 +1,6 @@
 .button:hover {
-	-fx-text-fill: blue;
-	-fx-background-color: yellow;
+/*	-fx-text-fill: blue;*/
+/*	-fx-background-color: yellow;*/
 	-fx-focus-traversable: true;
 	-fx-background-radius: 20px 20px 20px 20px;
 	-fx-cursor: hand;

@@ -7,7 +7,7 @@ Path_to_javaFX = /home/kuraterut/Desktop/HSE/my_projects/JavaProjects/javafx-sdk
 JDBC_DRIVER = ./sources/mysql-connector-java-9.0.0.jar
 Main_class = Main
 Bin_dir = ./bin
-Files = src/Main.java src/DB.java src/HelpFuncs.java
+Files = src/Main.java src/HelpFuncs.java src/Connection.java
 # CSS = /home/kuraterut/Desktop/HSE/my_projects/JavaProjects/VeronichkaNails_App/src
 CSS = style
 Mail_JAR = ./sources/javax.mail-1.6.2.jar
@@ -39,7 +39,7 @@ run: $(Main_class) Makefile
 
 
 
-Help: src/Help.java src/DB.java Makefile
+Help: src/Help.java Makefile
 	@mkdir -p $(Bin_dir)
 	$(Compiler) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -d $(Bin_dir)  src/Help.java 
 
