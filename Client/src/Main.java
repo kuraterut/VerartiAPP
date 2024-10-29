@@ -324,7 +324,7 @@ public class Main extends Application{
 
 
     public BorderPane loadMasterResourcesListWindow(){
-        ArrayList<String[]> resourceList = ParseJSON.parseMasterResourceList(Connection.getMasterResourcesListJSON());
+        ArrayList<String[]> resourceList = Connection.getMasterResourcesListJSON(token);
         
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = buildMasterSideMenu(1);
@@ -627,6 +627,18 @@ public class Main extends Application{
                     return;
                 }
 
+                String[] checkResponse = Connection.checkAuthAndGetToken(login, password);
+                if(checkResponse == null){
+                    lbl_err.setText("Ошибка подключения к серверу");
+                    HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
+                    return;
+                }
+                if(checkResponse[0].equals("-1")){
+                    lbl_err.setText(checkResponse[1]);
+                    return;
+                }
+
+                token = checkResponse[0];
                 HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
             }
         });

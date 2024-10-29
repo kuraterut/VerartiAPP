@@ -15,13 +15,28 @@ public class Connection{
         connection = (HttpURLConnection) url.openConnection();
 	}
 
-	public static JSONObject getMasterResourcesListJSON() {
+	public static ArrayList<String[]> getMasterResourcesListJSON(String token) {
 		try{
 			getConnection("http://localhost:8000/api/master/resource");
 
 			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", token);
 
-	        return getJsonWithoutOut();
+	        JSONObject data = getJsonWithoutOut();
+
+	        ArrayList<String[]> result = new ArrayList<>();
+
+			JSONArray jsonArr = (JSONArray) data.get("data");
+	        Iterator itr = jsonArr.iterator();
+	        while (itr.hasNext()) {
+	            JSONObject jsonObjArr = (JSONObject) itr.next();
+	            String[] strArr = new String[2];
+	            strArr[0] = (String)jsonObjArr.get("name");
+	            strArr[1] = (String)jsonObjArr.get("description");
+	            result.add(strArr);
+	        }
+	        return result;
+
 	    }
 	    catch(Exception ex){
 	    	System.out.println(ex);
@@ -29,14 +44,43 @@ public class Connection{
 	    }
 	}
 
-	public static JSONObject checkAuthAndGetToken(String login, String password){
+	public static String[] checkAuthAndGetToken(String login, String password){
 		try{
-			getConnection("http://localhost:8000/api/master/resource");
+			getConnection("http://localhost:8000/auth/signIn");
 
 			connection.setRequestMethod("GET");
 			connection.setDoOutput(true);
 
-			return null;        
+			JSONObject outJson = new JSONObject();
+			outJson.put("login", login);
+			outJson.put("password", password);
+
+			JSONObject data = getJson(outJson);  
+			String text, token;
+			String[] result = new String[2];
+	        int status = connection.getResponseCode();
+	        switch(status){
+	        	case 401:
+	        		text = "Неверный логин или пароль";
+	        		token = "-1";
+	        		result[0] = token;
+	        		result[1] = text;
+	        		return result;
+	        		
+	        	case 500:
+	        		text = "Неверный формат ввода";
+	        		token = "-1";
+	        		result[0] = token;
+	        		result[1] = text;
+	        		return result;
+	        		
+	        }
+	        text = "";
+	        token = (String)data.get("token");
+
+	        result[0] = token;
+	        result[1] = text;
+	        return result;
 	    }
 	    catch(Exception ex){
 	    	System.out.println(ex);
@@ -44,9 +88,9 @@ public class Connection{
 	    }
 	}
 
-	public static JSONObject getTimetableByYM(int year, int month, String token){
+	public static ArrayList<String[]> getTimetableByYM(int year, int month, String token){
 		try{
-			getConnection("http://localhost:8000/api/master/resource");
+			getConnection("http://localhost:8000/api/master/shedule/month");
 
 			connection.setRequestMethod("GET");
 
@@ -57,7 +101,22 @@ public class Connection{
 			outJson.put("year", year);
 			outJson.put("month", month);
 
-	        return getJson(outJson);
+	        JSONObject data = getJson(outJson);
+
+
+	        ArrayList<String[]> result = new ArrayList<>();
+
+	        JSONArray jsonArr = (JSONArray) data.get("data");
+	        Iterator itr = jsonArr.iterator();
+	        while (itr.hasNext()) {
+	            JSONObject jsonObjArr = (JSONObject) itr.next();
+	            String[] strArr = new String[2];
+	            strArr[0] = (String)jsonObjArr.get("count");
+	            strArr[1] = (String)jsonObjArr.get("time");
+	            result.add(strArr);
+	        }
+	        return result;
+
 	    }
 	    catch(Exception ex){
 	    	System.out.println(ex);
@@ -67,7 +126,7 @@ public class Connection{
 
 	public static JSONObject getTimetableByDate(int year, int month, int day, String token){
 		try{
-			getConnection("http://localhost:8000/api/master/resource");
+			getConnection("http://localhost:8000/api/master/shedule/day");
 
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Authorization", token);
@@ -134,5 +193,6 @@ public class Connection{
 	    	return null;
 	    }
 	}
+
 	
 }
