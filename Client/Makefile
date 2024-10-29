@@ -7,11 +7,12 @@ Path_to_javaFX = /home/kuraterut/Desktop/HSE/my_projects/JavaProjects/javafx-sdk
 JDBC_DRIVER = ./sources/mysql-connector-java-9.0.0.jar
 Main_class = Main
 Bin_dir = ./bin
-Files = src/Main.java src/HelpFuncs.java src/Connection.java
+Files = src/Main.java src/HelpFuncs.java src/Connection.java src/ParseJSON.java
 # CSS = /home/kuraterut/Desktop/HSE/my_projects/JavaProjects/VeronichkaNails_App/src
 CSS = style
 Mail_JAR = ./sources/javax.mail-1.6.2.jar
 Activation_JAR = ./sources/activation.jar
+Json_JAR = ./sources/json-simple-1.1.1.jar
 
 
 
@@ -31,20 +32,20 @@ default: $(Main_class)
 # NOTE: all object files will be built first.
 $(Main_class): $(Files) Makefile
 	@mkdir -p $(Bin_dir)
-	$(Compiler) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -cp $(Mail_JAR):$(Activation_JAR) -d $(Bin_dir) $(Files)
+	$(Compiler) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -cp $(Json_JAR) -d $(Bin_dir) $(Files)
 
 run: $(Main_class) Makefile
-	$(Runner) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -classpath $(Bin_dir):$(JDBC_DRIVER):$(CSS):$(Mail_JAR):$(Activation_JAR) $(Main_class)
+	$(Runner) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -classpath $(Bin_dir):$(CSS):$(Json_JAR) $(Main_class)
 
 
 
 
 Help: src/Help.java Makefile
 	@mkdir -p $(Bin_dir)
-	$(Compiler) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -d $(Bin_dir)  src/Help.java 
+	$(Compiler) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -d $(Bin_dir) -cp $(Json_JAR)  src/Help.java 
 
 help: Help Makefile
-	$(Runner) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -classpath $(Bin_dir):$(JDBC_DRIVER) Help
+	$(Runner) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -classpath $(Bin_dir):$(Json_JAR) Help
 
 
 
