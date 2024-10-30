@@ -6,6 +6,8 @@ import (
 )
 
 type Authorization interface {
+	CreateUser(user models.Users, roleId int) (int, error)
+	GetUser(phone, password string) (models.Users, error)
 }
 
 type Appointment interface {
@@ -40,6 +42,7 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Resource: NewResourcePostgres(db),
+		Resource:      NewResourcePostgres(db),
+		Authorization: NewAuthPostgres(db),
 	}
 }
