@@ -33,3 +33,11 @@ func (r *ResourcePostgres) GetAll() ([]models.Resource, error) {
 
 	return resources, err
 }
+
+func (r *ResourcePostgres) GetById(resourceId int) (models.Resource, error) {
+	var resource models.Resource
+	query := fmt.Sprintf("Select * from %s WHERE id = $1", resourceTable)
+	err := r.db.Get(&resource, query, resourceId)
+
+	return resource, err
+}

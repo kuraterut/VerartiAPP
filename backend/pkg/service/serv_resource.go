@@ -20,3 +20,7 @@ func (s *ResourceService) Create(resource models.Resource) (int, error) {
 func (s *ResourceService) GetAll() ([]models.Resource, error) {
 	return s.repo.GetAll()
 }
+
+func (s *ResourceService) GetById(resourceId int) (models.Resource, error) {
+	return s.repo.GetById(resourceId)
+}
