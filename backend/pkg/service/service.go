@@ -6,6 +6,9 @@ import (
 )
 
 type Authorization interface {
+	CreateUser(user models.Users, roleId int) (int, error)
+	GenerateToken(phone, password string) (string, string, error)
+	ParseToken(token string) (int, string, error)
 }
 
 type Appointment interface {
@@ -40,6 +43,7 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Resource: NewResourceService(repos),
+		Resource:      NewResourceService(repos),
+		Authorization: NewAuthService(repos),
 	}
 }

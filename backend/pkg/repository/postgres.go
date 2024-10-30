@@ -7,6 +7,8 @@ import (
 
 const (
 	resourceTable = "resource"
+	userTable     = "users"
+	roleTable     = "role"
 )
 
 type Config struct {
