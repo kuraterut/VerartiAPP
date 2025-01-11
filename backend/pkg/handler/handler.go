@@ -21,7 +21,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/signin", h.signIn)
 	}
 
-	api := router.Group("/api")
+	api := router.Group("/api", h.userIdentity)
 	{
 		master := api.Group("/master", h.masterIdentity)
 		{
@@ -34,8 +34,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			resource := master.Group("/resource")
 			{
-				resource.GET("/", h.getAllResources)
+				resource.GET("/", h.getResourcesByMasterId)
+				resource.GET("/all", h.getAllResources)
 				resource.GET("/:id", h.getResourceById)
+				resource.POST("/:id", h.addResource)
 				resource.POST("/request", h.createRequest)
 				resource.GET("/request", h.getRequests)
 				resource.GET("/response", h.getResponseByRequestId)

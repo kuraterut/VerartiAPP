@@ -6,6 +6,8 @@ import (
 )
 
 type Authorization interface {
+	CreateUser(user models.Users, roleId int) (int, error)
+	GetUser(phone, password string) (models.Users, error)
 }
 
 type Appointment interface {
@@ -20,6 +22,9 @@ type Feedback interface {
 type Resource interface {
 	Create(resource models.Resource) (int, error)
 	GetAll() ([]models.Resource, error)
+	GetById(resourceId int) (models.Resource, error)
+	GetByMasterId(masterId int) ([]models.Resource, error)
+	Add(masterId, resourceId int) (int, error)
 }
 
 type Schedule interface {
@@ -40,6 +45,7 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Resource: NewResourcePostgres(db),
+		Resource:      NewResourcePostgres(db),
+		Authorization: NewAuthPostgres(db),
 	}
 }

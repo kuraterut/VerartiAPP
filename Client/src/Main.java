@@ -1,8 +1,12 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import javax.mail.*;
-// import java.text.*;
+import java.io.*;
+import java.net.*;
+import org.json.simple.*;
+import org.json.simple.parser.*;
+import java.util.*;
+
 
 import javafx.scene.Scene;
 import javafx.scene.Group;
@@ -69,11 +73,6 @@ import java.awt.*;
 
 
 
-
- 
-
-
-
 public class Main extends Application{
     String role;
     String token; 
@@ -87,6 +86,8 @@ public class Main extends Application{
     }
 
     private GridPane buildCalendarByYM(int year, int month){
+        // ArrayList<String[]>
+
         GridPane calendar           = new GridPane();
         
         int lastDayOfMonth          = YearMonth.of(year, month).lengthOfMonth();
@@ -204,8 +205,31 @@ public class Main extends Application{
         alert.showAndWait();
     }
 
+    private void toggleMenu(VBox sideMenu) {
+        TranslateTransition transition = new TranslateTransition(Duration.millis(100), sideMenu);        
+        if (isMenuVisible) {
+            transition.setToX(0);
+            sideMenu.setVisible(true);
+            sideMenu.setOpacity(0.0);
+            FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.1), sideMenu);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        } 
 
-
+        else {
+            transition.setToX(-(MENU_WIDTH));
+            FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.1), sideMenu);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setOnFinished(event ->sideMenu.setVisible(false));
+            fadeOut.play();
+            
+        }
+        
+        transition.play();
+        isMenuVisible = !isMenuVisible;
+    }
 
 
     private StackPane buildMasterSideMenu(int state){
@@ -302,14 +326,54 @@ public class Main extends Application{
 
 
     public BorderPane loadMasterResourcesListWindow(){
+        ArrayList<String[]> resourceList = Connection.getMasterResourcesListJSON(token);
+        
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = buildMasterSideMenu(1);
         
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();
 
-        Label title = new Label();
+        Label title                 = new Label();
         
+
+        javafx.scene.control.ScrollPane scrollTable = new javafx.scene.control.ScrollPane();
+        GridPane tableResourceList = new GridPane();
+        
+        Label nameHead = new Label("Название");
+        Label descriptionHead = new Label("Описание");
+
+        tableResourceList.addRow(0, nameHead, descriptionHead);
+        GridPane.setHalignment(nameHead, HPos.CENTER);
+        GridPane.setValignment(nameHead, VPos.CENTER);
+        GridPane.setHalignment(descriptionHead, HPos.CENTER);
+        GridPane.setValignment(descriptionHead, VPos.CENTER);
+
+        for (int i = 0; i < resourceList.size(); i++){
+            Label name = new Label(resourceList.get(i)[0]);
+            Label description = new Label(resourceList.get(i)[1]);
+            tableResourceList.addRow(i+1, name, description);
+            GridPane.setHalignment(name, HPos.CENTER);
+            GridPane.setValignment(name, VPos.CENTER);
+            GridPane.setHalignment(description, HPos.CENTER);
+            GridPane.setValignment(description, VPos.CENTER);
+        }
+
+        tableResourceList.getColumnConstraints().add(new ColumnConstraints(150));
+        tableResourceList.getColumnConstraints().add(new ColumnConstraints(150));
+
+        // tableResourceList.getRowConstraints().add(new RowConstraints(100));
+        // tableResourceList.getRowConstraints().add(new RowConstraints(100));
+        tableResourceList.setAlignment(Pos.CENTER);
+        tableResourceList.setGridLinesVisible(true);
+
+        // scrollTable.setPrefViewportHeight(200);
+        // scrollTable.setPrefViewportWidth(100);
+        scrollTable.setFitToWidth(true);
+        scrollTable.setFitToHeight(true);
+        scrollTable.setContent(tableResourceList);
+        
+
         title.setText("Список Ресурсов");
         
         rightBox.setPrefWidth(MENU_WIDTH);
@@ -318,7 +382,7 @@ public class Main extends Application{
         centerBox.setMargin(title, new Insets(50, 10, 10, 10));
         centerBox.setSpacing(50);
 
-        centerBox.getChildren().addAll(title);
+        centerBox.getChildren().addAll(title, scrollTable);
         root.setCenter(centerBox);
         root.setLeft(sideMenuStack);
         root.setRight(rightBox);
@@ -502,39 +566,149 @@ public class Main extends Application{
         return root;
     }
 
-    private void toggleMenu(VBox sideMenu) {
-        
-        TranslateTransition transition = new TranslateTransition(Duration.millis(100), sideMenu);        
-        if (isMenuVisible) {
-            transition.setToX(0);
-            sideMenu.setVisible(true); // Сначала делаем меню видимым
-            sideMenu.setOpacity(0.0); // Устанавливаем начальную непрозрачность в 0
-            FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.1), sideMenu);
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
+    
 
-            fadeIn.play();
-             // Скрыть меню
-        } 
 
-        else {
-            transition.setToX(-(MENU_WIDTH));
-            FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.1), sideMenu);
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(event ->sideMenu.setVisible(false)); // Скрыть меню после анимации
-            fadeOut.play();
-             // Показать меню
-        }
+
+    public VBox loadAuthorizationWindow(){
+        VBox root                       = new VBox();
+        HBox buttons                    = new HBox();
+        GridPane table                  = new GridPane();
         
-        transition.play();
-        isMenuVisible = !isMenuVisible; // Переключаем состояние видимости
+        Label head_lbl                  = new Label();
+        Label lbl_err                   = new Label();
+        Label login_lbl                 = new Label();
+        Label password_lbl              = new Label();
+        
+        TextField login_field           = new TextField();
+        PasswordField password_field    = new PasswordField();
+        
+        Button authorization_btn        = new Button();
+
+
+        root.setSpacing(25);
+        buttons.setSpacing(50);
+
+        lbl_err.setText("");
+        head_lbl.setText("АВТОРИЗАЦИЯ");
+        login_lbl.setText("Логин");
+        password_lbl.setText("Пароль");
+        authorization_btn.setText("Авторизация");
+
+        root.setAlignment(Pos.CENTER);
+        table.setAlignment(Pos.CENTER);
+        buttons.setAlignment(Pos.CENTER);
+        
+        table.setVgap(15);
+        table.setHgap(50);
+    
+        login_lbl.setTooltip(new Tooltip("Номер телефона"));
+        
+        login_field.setPrefColumnCount(20);
+        password_field.setPrefColumnCount(20);
+
+        
+        authorization_btn.setPrefWidth(170);
+        
+        
+        authorization_btn.setPrefHeight(25);
+
+        Main main = this;
+        authorization_btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String login    = login_field.getText();
+                String password = password_field.getText();
+                try{long k = Long.parseLong(login.substring(1));}
+                catch(Exception ex){
+                    lbl_err.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
+                    return;
+                }
+
+                if(!login.startsWith("+7") || login.length() != 12){
+                    lbl_err.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
+                    return;
+                }
+
+                String[] checkResponse = Connection.checkAuthAndGetToken(login, password);
+                if(checkResponse == null){
+                    lbl_err.setText("Ошибка подключения к серверу");
+                    // HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
+                    return;
+                }
+                if(checkResponse[0].equals("-1")){
+                    lbl_err.setText(checkResponse[1]);
+                    return;
+                }
+
+                token = checkResponse[0];
+                Properties props = new Properties();
+                props.setProperty("token", token);   
+                try{
+                    OutputStream out = Files.newOutputStream(Paths.get("sources/client_props.properties"));
+                    props.store(out, "add info");
+                }
+                catch(Exception ex){System.out.println(ex);}
+                HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
+            }
+        });
+
+
+        table.add(login_lbl, 0, 0);
+        table.add(password_lbl, 0, 1);
+        table.add(login_field, 1, 0);
+        table.add(password_field, 1, 1);
+        
+        root.getChildren().addAll(head_lbl, table, lbl_err, buttons);
+        buttons.getChildren().addAll(authorization_btn);
+        return root;
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
     public void start(Stage stage) {
-        Scene scene = new Scene(loadMasterCalendarWindow());
+        Properties props = new Properties();
+        try(InputStream in = Files.newInputStream(Paths.get("sources/client_props.properties"))){
+                props.load(in);
+            }catch(Exception ex){System.out.println(ex);}
+            
+        String login = props.getProperty("token", "No");
+        // if(login.equals("No") )
+
+
+        Scene scene = new Scene(loadAuthorizationWindow());
         stage.setTitle("VerartiAPP");
         stage.setWidth(1920);
         stage.setHeight(1080);
