@@ -23,6 +23,9 @@ type Feedback interface {
 type Resource interface {
 	Create(resource models.Resource) (int, error)
 	GetAll() ([]models.Resource, error)
+	GetById(resourceId int) (models.Resource, error)
+	GetByMasterId(masterId int) ([]models.Resource, error)
+	Add(masterId, resourceId int) (int, error)
 }
 
 type Schedule interface {

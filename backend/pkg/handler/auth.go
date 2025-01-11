@@ -12,6 +12,8 @@ func checkRole(role string) (int, error) {
 		return 1, nil
 	} else if role == "admin" {
 		return 2, nil
+	} else if role == "director" {
+		return 3, nil
 	}
 
 	return 0, errors.New("invalid input.Role")
@@ -27,7 +29,7 @@ func (h *Handler) signUp(c *gin.Context) {
 
 	roleId, err := checkRole(input.Role)
 	if err != nil {
-		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 

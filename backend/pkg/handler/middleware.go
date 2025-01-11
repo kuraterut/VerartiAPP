@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -46,7 +47,11 @@ func (h *Handler) userIdentity(c *gin.Context) {
 }
 
 func (h *Handler) masterIdentity(c *gin.Context) {
-	role, _ := c.Get(roleCtx)
+	role, ok := c.Get(roleCtx)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "role not found")
+		return
+	}
 
 	if role != "master" {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
@@ -55,7 +60,11 @@ func (h *Handler) masterIdentity(c *gin.Context) {
 }
 
 func (h *Handler) adminIdentity(c *gin.Context) {
-	role, _ := c.Get(roleCtx)
+	role, ok := c.Get(roleCtx)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "role not found")
+		return
+	}
 
 	if role != "admin" {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
@@ -64,10 +73,30 @@ func (h *Handler) adminIdentity(c *gin.Context) {
 }
 
 func (h *Handler) directorIdentity(c *gin.Context) {
-	role, _ := c.Get(roleCtx)
+	role, ok := c.Get(roleCtx)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "role not found")
+		return
+	}
 
 	if role != "director" {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
 		return
 	}
+}
+
+func getUserId(c *gin.Context) (int, error) {
+	id, ok := c.Get(userCtx)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "user id not found")
+		return 0, errors.New("user id not found")
+	}
+
+	idInt, ok := id.(int)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")
+		return 0, errors.New("user id is of invalid type")
+	}
+
+	return idInt, nil
 }

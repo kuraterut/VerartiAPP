@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"verarti/models"
 )
 
@@ -40,9 +41,63 @@ func (h *Handler) getAllResources(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getResourceById(c *gin.Context) {}
+func (h *Handler) getResourceById(c *gin.Context) {
+	resourceId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
 
-func (h *Handler) createRequest(c *gin.Context) {}
+	resource, err := h.services.GetById(resourceId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, resource)
+}
+
+func (h *Handler) getResourcesByMasterId(c *gin.Context) {
+	masterId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	resources, err := h.services.Resource.GetByMasterId(masterId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, getAllResourcesResponse{
+		Data: resources,
+	})
+}
+
+func (h *Handler) addResource(c *gin.Context) {
+	masterId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	resourceId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	_, err = h.services.Resource.Add(masterId, resourceId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, struct{}{})
+}
+
+func (h *Handler) createRequest(c *gin.Context) {
+
+}
 
 func (h *Handler) getRequests(c *gin.Context) {}
 
