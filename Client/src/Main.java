@@ -569,6 +569,7 @@ public class Main extends Application{
     
 
 
+
     public VBox loadAuthorizationWindow(){
         VBox root                       = new VBox();
         HBox buttons                    = new HBox();
