@@ -86,6 +86,8 @@ public class Main extends Application{
     }
 
     private GridPane buildCalendarByYM(int year, int month){
+        // ArrayList<String[]>
+
         GridPane calendar           = new GridPane();
         
         int lastDayOfMonth          = YearMonth.of(year, month).lengthOfMonth();
@@ -630,7 +632,7 @@ public class Main extends Application{
                 String[] checkResponse = Connection.checkAuthAndGetToken(login, password);
                 if(checkResponse == null){
                     lbl_err.setText("Ошибка подключения к серверу");
-                    HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
+                    // HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
                     return;
                 }
                 if(checkResponse[0].equals("-1")){
@@ -639,6 +641,13 @@ public class Main extends Application{
                 }
 
                 token = checkResponse[0];
+                Properties props = new Properties();
+                props.setProperty("token", token);   
+                try{
+                    OutputStream out = Files.newOutputStream(Paths.get("sources/client_props.properties"));
+                    props.store(out, "add info");
+                }
+                catch(Exception ex){System.out.println(ex);}
                 HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
             }
         });
@@ -655,8 +664,49 @@ public class Main extends Application{
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @Override
     public void start(Stage stage) {
+        Properties props = new Properties();
+        try(InputStream in = Files.newInputStream(Paths.get("sources/client_props.properties"))){
+                props.load(in);
+            }catch(Exception ex){System.out.println(ex);}
+            
+        String login = props.getProperty("token", "No");
+        // if(login.equals("No") )
+
+
         Scene scene = new Scene(loadAuthorizationWindow());
         stage.setTitle("VerartiAPP");
         stage.setWidth(1920);

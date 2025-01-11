@@ -46,16 +46,20 @@ public class Connection{
 
 	public static String[] checkAuthAndGetToken(String login, String password){
 		try{
-			getConnection("http://localhost:8000/auth/signIn");
+			getConnection("http://localhost:8000/auth/signin");
 
-			connection.setRequestMethod("GET");
+			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);
 
 			JSONObject outJson = new JSONObject();
-			outJson.put("login", login);
+			outJson.put("phone", login);
 			outJson.put("password", password);
 
+			
 			JSONObject data = getJson(outJson);  
+			
+
+			
 			String text, token;
 			String[] result = new String[2];
 	        int status = connection.getResponseCode();
@@ -154,6 +158,7 @@ public class Connection{
 	        writer.flush();
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 	        
+
 	        String line;
 	        StringBuilder response = new StringBuilder();
 	        while ((line = reader.readLine()) != null) {
@@ -163,6 +168,7 @@ public class Connection{
 
 	        String responseStr = response.toString();
 
+	        System.out.println(outJson);
 	        Object obj = new JSONParser().parse(responseStr);
 	        return (JSONObject) obj;
 		}
@@ -196,3 +202,5 @@ public class Connection{
 
 	
 }
+
+//INSERT INTO users (name, surname, patronymic, password_hash, email, phone, role_id) VALUES ('Ilia', 'Kurylin', 'Artemovich', '6e73766e6a6e75347538393438767568323968726866656276383339346876756233758758c5deb39e2e1c2077a3999e1cc77b2ed109ea', 'kuraterut@yandex.ru', '+79092762462', 3);
