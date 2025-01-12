@@ -1,9 +1,12 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"verarti/models"
+	"verarti/pkg"
 )
 
 type AuthPostgres struct {
@@ -34,6 +37,9 @@ func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {
 		" FROM %s us INNER JOIN %s rl on us.role_id = rl.id"+
 		" WHERE phone = $1 AND password_hash = $2", userTable, roleTable)
 	err := r.db.Get(&user, query, phone, password)
+	if errors.Is(err, sql.ErrNoRows) {
+		return models.Users{}, pkg.NewErrorResponse(401, "incorrect login or password")
+	}
 
 	return user, err
 }

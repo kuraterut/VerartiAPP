@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"verarti/models"
+	"verarti/pkg"
 )
 
 func (h *Handler) createResource(c *gin.Context) {
@@ -50,6 +52,12 @@ func (h *Handler) getResourceById(c *gin.Context) {
 
 	resource, err := h.services.GetById(resourceId)
 	if err != nil {
+		var errResp *pkg.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -88,11 +96,21 @@ func (h *Handler) addResource(c *gin.Context) {
 
 	_, err = h.services.Resource.Add(masterId, resourceId)
 	if err != nil {
+		var errResp *pkg.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, struct{}{})
+	c.JSON(http.StatusOK, responseModel{
+		Response: map[string]interface{}{
+			"resourceId": resourceId,
+		},
+	})
 }
 
 func (h *Handler) createRequest(c *gin.Context) {

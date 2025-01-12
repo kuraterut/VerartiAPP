@@ -1,10 +1,12 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"verarti/models"
+	"verarti/pkg"
 )
 
 type ResourcePostgres struct {
@@ -39,6 +41,9 @@ func (r *ResourcePostgres) GetById(resourceId int) (models.Resource, error) {
 	var resource models.Resource
 	query := fmt.Sprintf("Select * from %s WHERE id = $1", resourceTable)
 	err := r.db.Get(&resource, query, resourceId)
+	if errors.Is(err, sql.ErrNoRows) {
+		return models.Resource{}, pkg.NewErrorResponse(404, "resource not found")
+	}
 
 	return resource, err
 }
@@ -57,10 +62,25 @@ func (r *ResourcePostgres) GetByMasterId(masterId int) ([]models.Resource, error
 func (r *ResourcePostgres) Add(masterId, resourceId int) (int, error) {
 	var id int
 
-	query := fmt.Sprintf("Select id from %s WHERE users_id = $1 AND resource_id = $2", userResourceTable)
-	err := r.db.Get(&id, query, masterId, resourceId)
+	var resource models.Resource
+	query := fmt.Sprintf("Select * from %s WHERE id = $1", resourceTable)
+	err := r.db.Get(&resource, query, resourceId)
 	if err != nil {
-		return 0, errors.New("")
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, pkg.NewErrorResponse(400, "adding a non-existent resource")
+		}
+
+		return 0, err
+	}
+
+	query = fmt.Sprintf("Select id from %s WHERE users_id = $1 AND resource_id = $2", userResourceTable)
+	err = r.db.Get(&id, query, masterId, resourceId)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return 0, err
+	}
+
+	if id != 0 {
+		return id, nil
 	}
 
 	addResourceQuery := fmt.Sprintf("INSERT INTO %s (users_id, resource_id)"+
