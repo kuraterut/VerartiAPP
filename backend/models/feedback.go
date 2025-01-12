@@ -4,8 +4,8 @@ import "time"
 
 type Feedback struct {
 	Id      int       `json:"-" db:"id"`
-	Client  Client    `json:"client"`
-	User    Users     `json:"user"`
-	Message string    `json:"message"`
-	Date    time.Time `json:"date"`
+	Client  Client    `json:"client" binding:"required"`
+	User    Users     `json:"user" binding:"required"`
+	Message string    `json:"message" binding:"required"`
+	Date    time.Time `json:"date" binding:"required"`
 }
