@@ -26,6 +26,7 @@ services:
     command: migrate -path ./schema -database 'postgres://postgres:qwerty@db:5432/postgres?sslmode=disable' up
 
   backend:
+    restart: always
     build: ./backend
     depends_on:
       - migrate
