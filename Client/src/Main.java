@@ -1,5 +1,6 @@
 import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.stage.*;
+
 
 import java.io.*;
 import java.net.*;
@@ -78,6 +79,10 @@ public class Main extends Application{
     String token; 
     GridPane calendar;
     boolean isMenuVisible = true;
+
+    static int year;
+    static int month;
+
     private static final double MENU_WIDTH = 250; // Ширина меню
     private static final double SIDEMENU_BTN_HEIGHT = 75;
 
@@ -222,7 +227,7 @@ public class Main extends Application{
             FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.1), sideMenu);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(event ->sideMenu.setVisible(false));
+            fadeOut.setOnFinished(event->sideMenu.setVisible(false));
             fadeOut.play();
             
         }
@@ -335,7 +340,6 @@ public class Main extends Application{
         VBox centerBox              = new VBox();
 
         Label title                 = new Label();
-        
 
         javafx.scene.control.ScrollPane scrollTable = new javafx.scene.control.ScrollPane();
         GridPane tableResourceList = new GridPane();
@@ -379,7 +383,7 @@ public class Main extends Application{
         rightBox.setPrefWidth(MENU_WIDTH);
 
         centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setMargin(title, new Insets(50, 10, 10, 10));
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
         centerBox.setSpacing(50);
 
         centerBox.getChildren().addAll(title, scrollTable);
@@ -405,10 +409,227 @@ public class Main extends Application{
         rightBox.setPrefWidth(MENU_WIDTH);
 
         centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setMargin(title, new Insets(50, 10, 10, 10));
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
         centerBox.setSpacing(50);
 
         centerBox.getChildren().addAll(title);
+        root.setCenter(centerBox);
+        root.setLeft(sideMenuStack);
+        root.setRight(rightBox);
+
+        return root;
+    }
+
+
+    public BorderPane loadChangeProfileWindow(){
+        BorderPane root                 = new BorderPane();
+        StackPane sideMenuStack         = buildMasterSideMenu(2);
+        GridPane table                  = new GridPane();
+
+        VBox rightBox                   = new VBox();
+        VBox centerBox                  = new VBox();
+
+        HBox btnsBox                    = new HBox();
+
+        TextField nameField             = new TextField();
+        TextField surnameField          = new TextField();
+        TextField patronymicField       = new TextField();
+        TextField emailField            = new TextField();
+        TextField phoneField            = new TextField();
+        TextField bioField              = new TextField();
+
+        Label title                     = new Label(); 
+        Label nameLbl                   = new Label();
+        Label surnameLbl                = new Label();
+        Label patronymicLbl             = new Label();
+        Label emailLbl                  = new Label();
+        Label phoneLbl                  = new Label();
+        Label bioLbl                    = new Label();
+        Label errorMsg                  = new Label();
+
+        Button cancel                   = new Button();
+        Button saveChanges              = new Button();
+
+        
+        title.setText("Изменение информации профиля");
+        nameLbl.setText("Имя");
+        surnameLbl.setText("Фамилия");
+        patronymicLbl.setText("Отчество");
+        emailLbl.setText("Email");
+        phoneLbl.setText("Телефон");
+        bioLbl.setText("Биография");
+        errorMsg.setText("");
+
+        cancel.setText("Отмена");
+        saveChanges.setText("Сохранить изменения");
+
+        rightBox.setPrefWidth(MENU_WIDTH);
+
+        Map<String, String> masterMap   = Connection.getMasterProfileInfo(token);
+        
+        nameField.setText("Имя");
+        surnameField.setText("Фамилия");
+        patronymicField.setText("Отчество");
+        emailField.setText("Email");
+        phoneField.setText("Телефон");
+        bioField.setText("Биография");
+
+        table.add(nameLbl, 0, 0);
+        table.add(nameField, 1, 0);
+        GridPane.setHalignment(nameLbl, HPos.CENTER);
+        GridPane.setValignment(nameLbl, VPos.CENTER);
+        GridPane.setHalignment(nameField, HPos.CENTER);
+        GridPane.setValignment(nameField, VPos.CENTER);
+
+        table.add(surnameLbl, 0, 1);
+        table.add(surnameField, 1, 1);
+        GridPane.setHalignment(surnameLbl, HPos.CENTER);
+        GridPane.setValignment(surnameLbl, VPos.CENTER);
+        GridPane.setHalignment(surnameField, HPos.CENTER);
+        GridPane.setValignment(surnameField, VPos.CENTER);
+
+        table.add(patronymicLbl, 0, 2);
+        table.add(patronymicField, 1, 2);
+        GridPane.setHalignment(patronymicLbl, HPos.CENTER);
+        GridPane.setValignment(patronymicLbl, VPos.CENTER);
+        GridPane.setHalignment(patronymicField, HPos.CENTER);
+        GridPane.setValignment(patronymicField, VPos.CENTER);
+
+        table.add(emailLbl, 0, 3);
+        table.add(emailField, 1, 3);
+        GridPane.setHalignment(emailLbl, HPos.CENTER);
+        GridPane.setValignment(emailLbl, VPos.CENTER);
+        GridPane.setHalignment(emailField, HPos.CENTER);
+        GridPane.setValignment(emailField, VPos.CENTER);
+
+        table.add(phoneLbl, 0, 4);
+        table.add(phoneField, 1, 4);
+        GridPane.setHalignment(phoneLbl, HPos.CENTER);
+        GridPane.setValignment(phoneLbl, VPos.CENTER);
+        GridPane.setHalignment(phoneField, HPos.CENTER);
+        GridPane.setValignment(phoneField, VPos.CENTER);
+        
+        table.add(bioLbl, 0, 5);
+        table.add(bioField, 1, 5);
+        GridPane.setHalignment(bioLbl, HPos.CENTER);
+        GridPane.setValignment(bioLbl, VPos.CENTER);
+        GridPane.setHalignment(bioField, HPos.CENTER);
+        GridPane.setValignment(bioField, VPos.CENTER);
+
+        table.setAlignment(Pos.CENTER);
+        table.setVgap(15);
+        table.setHgap(30);
+
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
+        centerBox.setAlignment(Pos.TOP_CENTER);
+        btnsBox.setAlignment(Pos.CENTER);
+
+        btnsBox.setSpacing(100);
+        centerBox.setSpacing(50);
+
+        cancel.setOnAction(event -> HelpFuncs.loadMasterProfileWindowFunc(cancel, this));
+        
+        Main main = this;
+        saveChanges.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String newName          = nameField.getText();
+                String newSurname       = surnameField.getText();
+                String newPatronymic    = patronymicField.getText();
+                String newEmail         = emailField.getText();
+                String newPhone         = phoneField.getText();
+                String newBio           = bioField.getText();
+
+                int status = Connection.changeMasterInfo(token, newName, newSurname, newPatronymic, newEmail, newPhone, newBio);
+                if(status == 200){HelpFuncs.loadMasterProfileWindowFunc(cancel, main);}
+                else {errorMsg.setText("Ошибка отправки данных на сервер");}
+            }
+        });
+
+
+        btnsBox.getChildren().addAll(cancel, saveChanges);
+        centerBox.getChildren().addAll(title, table, errorMsg, btnsBox);
+        root.setCenter(centerBox);
+        root.setLeft(sideMenuStack);
+        root.setRight(rightBox);
+
+        return root;
+    }
+
+    public BorderPane loadChangeProfilePasswordWindow(){
+        BorderPane root                 = new BorderPane();
+        StackPane sideMenuStack         = buildMasterSideMenu(2);
+        GridPane table                  = new GridPane();
+
+        VBox rightBox                   = new VBox();
+        VBox centerBox                  = new VBox();
+
+        HBox btnsBox                    = new HBox();
+
+        TextField oldPasswordField      = new TextField();
+        TextField newPasswordField      = new TextField();
+        
+        Label title                     = new Label(); 
+        Label oldPasswordLbl            = new Label();
+        Label newPasswordLbl            = new Label();
+        Label errorMsg                  = new Label();
+        
+        Button cancel                   = new Button();
+        Button saveChanges              = new Button();
+
+        
+        title.setText("Изменение пароля профиля");
+        errorMsg.setText("");
+        oldPasswordLbl.setText("Старый пароль");
+        newPasswordLbl.setText("Новый пароль");
+        
+        cancel.setText("Отмена");
+        saveChanges.setText("Сохранить изменения");
+
+        rightBox.setPrefWidth(MENU_WIDTH);
+
+        table.add(oldPasswordLbl, 0, 0);
+        table.add(oldPasswordField, 1, 0);
+        GridPane.setHalignment(oldPasswordLbl, HPos.CENTER);
+        GridPane.setValignment(oldPasswordLbl, VPos.CENTER);
+        GridPane.setHalignment(oldPasswordField, HPos.CENTER);
+        GridPane.setValignment(oldPasswordField, VPos.CENTER);
+
+        table.add(newPasswordLbl, 0, 1);
+        table.add(newPasswordField, 1, 1);
+        GridPane.setHalignment(newPasswordLbl, HPos.CENTER);
+        GridPane.setValignment(newPasswordLbl, VPos.CENTER);
+        GridPane.setHalignment(newPasswordField, HPos.CENTER);
+        GridPane.setValignment(newPasswordField, VPos.CENTER);
+
+        table.setAlignment(Pos.CENTER);
+        table.setVgap(15);
+        table.setHgap(30);
+
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
+        centerBox.setAlignment(Pos.TOP_CENTER);
+        btnsBox.setAlignment(Pos.CENTER);
+
+        btnsBox.setSpacing(100);
+        centerBox.setSpacing(50);
+
+        cancel.setOnAction(event -> HelpFuncs.loadMasterProfileWindowFunc(cancel, this));
+        
+        Main main = this;
+        saveChanges.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String oldPassword      = oldPasswordField.getText();
+                String newPassword       = newPasswordField.getText();
+                
+                int status = Connection.changeMasterPassword(token, oldPassword, newPassword);
+                if(status == 200){HelpFuncs.loadMasterProfileWindowFunc(cancel, main);}
+                else {errorMsg.setText("Ошибка отправки данных на сервер");}
+            }
+        });
+
+        btnsBox.getChildren().addAll(cancel, saveChanges);
+        centerBox.getChildren().addAll(title, table, errorMsg, btnsBox);
         root.setCenter(centerBox);
         root.setLeft(sideMenuStack);
         root.setRight(rightBox);
@@ -419,27 +640,206 @@ public class Main extends Application{
     public BorderPane loadMasterProfileWindow(){
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = buildMasterSideMenu(2);
+        GridPane table              = new GridPane();
         
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();
+        VBox avatarBox              = new VBox();
 
-        Label title = new Label();
+        HBox profileInfoBox         = new HBox();
+        HBox changeInfoBtnsBox      = new HBox();
+
+        Button changeAvatarBtn      = new Button();
+        Button changePasswordBtn    = new Button();
+        Button changeInfoBtn        = new Button();
+
+        Label nameLbl               = new Label();
+        Label surnameLbl            = new Label();
+        Label patronymicLbl         = new Label();
+        Label birthdayLbl           = new Label();
+        Label phoneLbl              = new Label();
+        Label emailLbl              = new Label();
+        Label bioLbl                = new Label();
+        Label roleLbl               = new Label();
+
+        Label name                  = new Label();
+        Label surname               = new Label();
+        Label patronymic            = new Label();
+        Label birthday              = new Label();
+        Label phone                 = new Label();
+        Label email                 = new Label();
+        Label bio                   = new Label();
+        Label role                  = new Label();        
+        
+        Label title                 = new Label();
+
         
         title.setText("Профиль");
+        nameLbl.setText("Имя");
+        surnameLbl.setText("Фамилия");
+        patronymicLbl.setText("Отчество");
+        birthdayLbl.setText("Дата рождения");
+        phoneLbl.setText("Телефон");
+        emailLbl.setText("Email");
+        bioLbl.setText("Биография");
+        roleLbl.setText("Роль");
+
+        Map<String, String> masterInfo = Connection.getMasterProfileInfo(token);
+        
+        Image avatarImage = null;
+        
+        if(masterInfo == null) {
+            avatarImage = Connection.getMasterPhoto(null);
+            name.setText("Ошибка получения данных");
+            surname.setText("Ошибка получения данных");
+            patronymic.setText("Ошибка получения данных");
+            birthday.setText("Ошибка получения данных");
+            phone.setText("Ошибка получения данных");
+            email.setText("Ошибка получения данных");
+            bio.setText("Ошибка получения данных");
+            role.setText("Ошибка получения данных");
+        }
+        else{
+            avatarImage = Connection.getMasterPhoto(masterInfo.get("photo"));
+            name.setText(masterInfo.get("name"));
+            surname.setText(masterInfo.get("surname"));
+            patronymic.setText(masterInfo.get("patronymic"));
+            birthday.setText(masterInfo.get("birthday"));
+            phone.setText(masterInfo.get("phone"));
+            email.setText(masterInfo.get("email"));
+            bio.setText(masterInfo.get("bio"));
+            role.setText(masterInfo.get("role"));
+        }
+        
+        ImageView avatarImageView = new ImageView(avatarImage);
+        Circle circle = new Circle(avatarImageView.getImage().getHeight()/20);
+        avatarImageView.setFitHeight(avatarImageView.getImage().getHeight()/10);
+        avatarImageView.setFitWidth(avatarImageView.getImage().getWidth()/10);
+        avatarImageView.setPreserveRatio(true);
+        avatarImageView.setClip(circle);
+        circle.setCenterX(avatarImageView.getImage().getWidth()/20);
+        circle.setCenterY(avatarImageView.getImage().getHeight()/20);
+
+        table.add(nameLbl, 0, 0);
+        table.add(name, 1, 0);
+        GridPane.setHalignment(nameLbl, HPos.CENTER);
+        GridPane.setValignment(nameLbl, VPos.CENTER);
+        GridPane.setHalignment(name, HPos.CENTER);
+        GridPane.setValignment(name, VPos.CENTER);
+
+        table.add(surnameLbl, 0, 1);
+        table.add(surname, 1, 1);
+        GridPane.setHalignment(surnameLbl, HPos.CENTER);
+        GridPane.setValignment(surnameLbl, VPos.CENTER);
+        GridPane.setHalignment(surname, HPos.CENTER);
+        GridPane.setValignment(surname, VPos.CENTER);
+
+        table.add(patronymicLbl, 0, 2);
+        table.add(patronymic, 1, 2);
+        GridPane.setHalignment(patronymicLbl, HPos.CENTER);
+        GridPane.setValignment(patronymicLbl, VPos.CENTER);
+        GridPane.setHalignment(patronymic, HPos.CENTER);
+        GridPane.setValignment(patronymic, VPos.CENTER);
+
+        table.add(birthdayLbl, 0, 3);
+        table.add(birthday, 1, 3);
+        GridPane.setHalignment(birthdayLbl, HPos.CENTER);
+        GridPane.setValignment(birthdayLbl, VPos.CENTER);
+        GridPane.setHalignment(birthday, HPos.CENTER);
+        GridPane.setValignment(birthday, VPos.CENTER);
+
+        table.add(phoneLbl, 0, 4);
+        table.add(phone, 1, 4);
+        GridPane.setHalignment(phoneLbl, HPos.CENTER);
+        GridPane.setValignment(phoneLbl, VPos.CENTER);
+        GridPane.setHalignment(phone, HPos.CENTER);
+        GridPane.setValignment(phone, VPos.CENTER);
+
+        table.add(emailLbl, 0, 5);
+        table.add(email, 1, 5);
+        GridPane.setHalignment(emailLbl, HPos.CENTER);
+        GridPane.setValignment(emailLbl, VPos.CENTER);
+        GridPane.setHalignment(email, HPos.CENTER);
+        GridPane.setValignment(email, VPos.CENTER);
+        
+        table.add(bioLbl, 0, 6);
+        table.add(bio, 1, 6);
+        GridPane.setHalignment(bioLbl, HPos.CENTER);
+        GridPane.setValignment(bioLbl, VPos.CENTER);
+        GridPane.setHalignment(bio, HPos.CENTER);
+        GridPane.setValignment(bio, VPos.CENTER);
+
+        table.add(roleLbl, 0, 7);
+        table.add(role, 1, 7);
+        GridPane.setHalignment(roleLbl, HPos.CENTER);
+        GridPane.setValignment(roleLbl, VPos.CENTER);
+        GridPane.setHalignment(role, HPos.CENTER);
+        GridPane.setValignment(role, VPos.CENTER);
+
+        table.setAlignment(Pos.CENTER);
+        table.setVgap(15);
+        table.setHgap(30);
+
+        changeAvatarBtn.setText("Сменить фото");
+        changePasswordBtn.setText("Сменить пароль");
+        changeInfoBtn.setText("Изменить данные");
         
         rightBox.setPrefWidth(MENU_WIDTH);
 
-        centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setMargin(title, new Insets(50, 10, 10, 10));
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
         centerBox.setSpacing(50);
+        avatarBox.setSpacing(30);
+        profileInfoBox.setSpacing(100);
+        changeInfoBtnsBox.setSpacing(50);
 
-        centerBox.getChildren().addAll(title);
+        avatarBox.setAlignment(Pos.CENTER);
+        centerBox.setAlignment(Pos.TOP_CENTER);
+        table.setAlignment(Pos.CENTER);
+        profileInfoBox.setAlignment(Pos.CENTER);
+        changeInfoBtnsBox.setAlignment(Pos.CENTER);
+
+
+        changeInfoBtn.setOnAction(event -> HelpFuncs.loadMasterChangeProfileInfoWindowFunc(changeInfoBtn, this));
+        changePasswordBtn.setOnAction(event -> HelpFuncs.loadMasterChangeProfilePasswordWindowFunc(changePasswordBtn, this));
+
+
+        Main main = this;
+        changeAvatarBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Выберите файл");
+                // Установите фильтры для выбора файлов (опционально)
+                FileChooser.ExtensionFilter extFilter1 = 
+                    new FileChooser.ExtensionFilter("Картинки (*.jpg)", "*.jpg");
+                FileChooser.ExtensionFilter extFilter2 = 
+                    new FileChooser.ExtensionFilter("Картинки (*.png)", "*.png");
+                fileChooser.getExtensionFilters().add(extFilter1);
+                fileChooser.getExtensionFilters().add(extFilter2);
+                
+                // Открыть диалог выбора файла
+                File file = fileChooser.showOpenDialog(changeAvatarBtn.getScene().getWindow());
+                if (file != null) {
+                    // Здесь вы можете выполнять действия с выбранным файлом
+                    System.out.println("Выбранный файл: " + file.getAbsolutePath());
+                    // Добавьте свои действия с файлом здесь
+                }
+                HelpFuncs.loadMasterProfileWindowFunc(changeAvatarBtn, main);
+            }
+        });
+
+        avatarBox.getChildren().addAll(avatarImageView, changeAvatarBtn);
+        changeInfoBtnsBox.getChildren().addAll(changePasswordBtn, changeInfoBtn);
+        profileInfoBox.getChildren().addAll(avatarBox, table);
+        centerBox.getChildren().addAll(title, profileInfoBox, changeInfoBtnsBox);
         root.setCenter(centerBox);
         root.setLeft(sideMenuStack);
         root.setRight(rightBox);
 
         return root;
     }
+
+
 
     public BorderPane loadMasterServicesWindow(){
         BorderPane root             = new BorderPane();
@@ -455,7 +855,7 @@ public class Main extends Application{
         rightBox.setPrefWidth(MENU_WIDTH);
 
         centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setMargin(title, new Insets(50, 10, 10, 10));
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
         centerBox.setSpacing(50);
 
         centerBox.getChildren().addAll(title);
@@ -480,7 +880,7 @@ public class Main extends Application{
         rightBox.setPrefWidth(MENU_WIDTH);
 
         centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setMargin(title, new Insets(50, 10, 10, 10));
+        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
         centerBox.setSpacing(50);
 
         centerBox.getChildren().addAll(title);
@@ -499,6 +899,7 @@ public class Main extends Application{
         VBox rightBox               = new VBox();
         
         VBox centerBox              = new VBox();
+        HBox calendarBox            = new HBox();
         
         HBox chooseMY               = new HBox();
         
@@ -508,6 +909,27 @@ public class Main extends Application{
         TextField yearField         = new TextField();
         
         Button confirmBtn           = new Button();
+        Button nextBtn              = new Button();
+        Button prevBtn              = new Button();
+
+
+        Image arrowRightIconImg   = null;
+        try{arrowRightIconImg     = new Image(new FileInputStream("photos/Arrow_right_ICON.png"));}
+        catch(Exception ex)         {System.out.println(ex);}
+        ImageView arrowRightIcon   = new ImageView(arrowRightIconImg);
+
+        Image arrowLeftIconImg    = null;
+        try{arrowLeftIconImg      = new Image(new FileInputStream("photos/Arrow_left_ICON.png"));}
+        catch(Exception ex)         {System.out.println(ex);}
+        ImageView arrowLeftIcon    = new ImageView(arrowLeftIconImg);
+
+        arrowLeftIcon.setFitWidth(50);
+        arrowLeftIcon.setFitHeight(100);
+        arrowRightIcon.setFitWidth(50);
+        arrowRightIcon.setFitHeight(100);
+
+        nextBtn.setGraphic(arrowRightIcon);
+        prevBtn.setGraphic(arrowLeftIcon);
         
 
         ObservableList<String> monthsList = FXCollections.observableArrayList("Январь", "Февраль", 
@@ -523,14 +945,18 @@ public class Main extends Application{
 
         chooseMY.setAlignment(Pos.CENTER);
         chooseMY.setSpacing(5);
+
+        calendarBox.setAlignment(Pos.CENTER);
+        calendarBox.setSpacing(5);
         
         
-        monthsComboBox.setValue(monthsList.get(LocalDate.now().getMonthValue()-1));
-        
-        yearField.setText(String.valueOf(LocalDate.now().getYear()));
+        monthsComboBox.setValue(monthsList.get(month));
+        yearField.setText(String.valueOf(year));
         
         calendar = buildCalendarByYM(Integer.parseInt(yearField.getText()), monthsList.indexOf(monthsComboBox.getValue())+1);
         
+
+
         centerBox.setAlignment(Pos.TOP_CENTER);
         centerBox.setMargin(title, new Insets(50, 10, 10, 10));
         centerBox.setSpacing(50);
@@ -538,13 +964,21 @@ public class Main extends Application{
         confirmBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                centerBox.getChildren().remove(calendar);
+                centerBox.getChildren().remove(calendarBox);
                 error.setText("");
                 try{
-                    int year = Integer.parseInt(yearField.getText());
-                    if(year <= 3000 && year >= 2000){
-                        calendar = buildCalendarByYM(Integer.parseInt(yearField.getText()), monthsList.indexOf(monthsComboBox.getValue())+1);
-                        centerBox.getChildren().add(calendar);        
+                    int newYear = Integer.parseInt(yearField.getText());
+                    int newMonth = monthsList.indexOf(monthsComboBox.getValue());
+                    if(newYear <= 3000 && newYear >= 2000){
+                        year = newYear;
+                        month = newMonth;
+                        
+                        monthsComboBox.setValue(monthsList.get(month));
+                        yearField.setText(String.valueOf(year));
+                        calendar = buildCalendarByYM(year, month+1);
+                        calendarBox.getChildren().clear();
+                        calendarBox.getChildren().addAll(prevBtn, calendar, nextBtn);
+                        centerBox.getChildren().add(calendarBox);        
                     }
                     else{
                         error.setText("Введите корректные месяц и год");
@@ -554,12 +988,87 @@ public class Main extends Application{
                     System.out.println(ex);
                     error.setText("Введите корректные месяц и год");
                 }
-                
+            }
+        });
+
+        nextBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(month == 11){
+                    month = 0;
+                    year++;
+                }
+                else{
+                    month++;
+                }
+
+                centerBox.getChildren().remove(calendarBox);
+                error.setText("");
+                try{
+                    if(year <= 3000 && year >= 2000){
+                        monthsComboBox.setValue(monthsList.get(month));
+                        yearField.setText(String.valueOf(year));
+
+                        calendar = buildCalendarByYM(year, month+1);
+                        calendarBox.getChildren().clear();
+                        calendarBox.getChildren().addAll(prevBtn, calendar, nextBtn);
+                        centerBox.getChildren().add(calendarBox);  
+                        monthsComboBox.setValue(monthsList.get(month));
+                        yearField.setText(String.valueOf(year));      
+                    }
+                    else{
+                        error.setText("Введите корректные месяц и год");
+                    }
+                }
+                catch(Exception ex){
+                    System.out.println(ex);
+                    error.setText("Введите корректные месяц и год");
+                }
+
+            }
+        });
+
+
+        prevBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if(month == 0){
+                    month = 11;
+                    year--;
+                }
+                else{
+                    month--;
+                }
+
+                centerBox.getChildren().remove(calendarBox);
+                error.setText("");
+                try{
+                    if(year <= 3000 && year >= 2000){
+                        monthsComboBox.setValue(monthsList.get(month));
+                        yearField.setText(String.valueOf(year));
+
+                        calendar = buildCalendarByYM(year, month+1);
+                        calendarBox.getChildren().clear();
+                        calendarBox.getChildren().addAll(prevBtn, calendar, nextBtn);
+                        centerBox.getChildren().add(calendarBox);  
+                        monthsComboBox.setValue(monthsList.get(month));
+                        yearField.setText(String.valueOf(year));      
+                    }
+                    else{
+                        error.setText("Введите корректные месяц и год");
+                    }
+                }
+                catch(Exception ex){
+                    System.out.println(ex);
+                    error.setText("Введите корректные месяц и год");
+                }
+
             }
         });
 
         chooseMY.getChildren().addAll(monthsComboBox, yearField, confirmBtn);
-        centerBox.getChildren().addAll(title, chooseMY, error, calendar);
+        calendarBox.getChildren().addAll(prevBtn, calendar, nextBtn);
+        centerBox.getChildren().addAll(title, chooseMY, error, calendarBox);
         root.setLeft(sideMenuStack);
         root.setCenter(centerBox);
         root.setRight(rightBox);
@@ -575,92 +1084,96 @@ public class Main extends Application{
         HBox buttons                    = new HBox();
         GridPane table                  = new GridPane();
         
-        Label head_lbl                  = new Label();
-        Label lbl_err                   = new Label();
-        Label login_lbl                 = new Label();
-        Label password_lbl              = new Label();
+        Label headLbl                  = new Label();
+        Label lblErr                   = new Label();
+        Label loginLbl                 = new Label();
+        Label passwordLbl              = new Label();
         
-        TextField login_field           = new TextField();
-        PasswordField password_field    = new PasswordField();
+        TextField loginField           = new TextField();
+        PasswordField passwordField    = new PasswordField();
         
-        Button authorization_btn        = new Button();
+        Button authorizationBtn        = new Button();
 
 
-        root.setSpacing(25);
-        buttons.setSpacing(50);
+        root.setSpacing(20);
+        buttons.setSpacing(30);
 
-        lbl_err.setText("");
-        head_lbl.setText("АВТОРИЗАЦИЯ");
-        login_lbl.setText("Логин");
-        password_lbl.setText("Пароль");
-        authorization_btn.setText("Авторизация");
+        lblErr.setText("");
+        headLbl.setText("АВТОРИЗАЦИЯ");
+        loginLbl.setText("Логин");
+        passwordLbl.setText("Пароль");
+        authorizationBtn.setText("Авторизация");
 
         root.setAlignment(Pos.CENTER);
         table.setAlignment(Pos.CENTER);
         buttons.setAlignment(Pos.CENTER);
         
         table.setVgap(15);
-        table.setHgap(50);
+        table.setHgap(30);
     
-        login_lbl.setTooltip(new Tooltip("Номер телефона"));
+        loginLbl.setTooltip(new Tooltip("Номер телефона"));
         
-        login_field.setPrefColumnCount(20);
-        password_field.setPrefColumnCount(20);
+        loginField.setPrefColumnCount(20);
+        passwordField.setPrefColumnCount(20);
 
-        
-        authorization_btn.setPrefWidth(170);
-        
-        
-        authorization_btn.setPrefHeight(25);
+        loginField.setPrefHeight(30);
+        passwordField.setPrefHeight(30);
+
+        authorizationBtn.setPrefWidth(170);
+        authorizationBtn.setPrefHeight(40);
 
         Main main = this;
-        authorization_btn.setOnAction(new EventHandler<ActionEvent>() {
+        authorizationBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String login    = login_field.getText();
-                String password = password_field.getText();
+                
+                // HelpFuncs.loadMasterCalendarWindowFunc(authorizationBtn, main);
+                
+                String login    = loginField.getText();
+                String password = passwordField.getText();
                 try{long k = Long.parseLong(login.substring(1));}
                 catch(Exception ex){
-                    lbl_err.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
+                    lblErr.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
                     return;
                 }
 
                 if(!login.startsWith("+7") || login.length() != 12){
-                    lbl_err.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
+                    lblErr.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
                     return;
                 }
 
                 String[] checkResponse = Connection.checkAuthAndGetToken(login, password);
                 if(checkResponse == null){
-                    lbl_err.setText("Ошибка подключения к серверу");
-                    // HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
+                    lblErr.setText("Ошибка подключения к серверу");
                     return;
                 }
                 if(checkResponse[0].equals("-1")){
-                    lbl_err.setText(checkResponse[1]);
+                    lblErr.setText(checkResponse[1]);
                     return;
                 }
 
                 token = checkResponse[0];
-                Properties props = new Properties();
-                props.setProperty("token", token);   
-                try{
-                    OutputStream out = Files.newOutputStream(Paths.get("sources/client_props.properties"));
-                    props.store(out, "add info");
-                }
-                catch(Exception ex){System.out.println(ex);}
-                HelpFuncs.loadMasterCalendarWindowFunc(authorization_btn, main);
+                role = checkResponse[1];
+                // Properties props = new Properties();
+                // props.setProperty("token", token);
+                // props.setProperty("role", role);   
+                // try{
+                //     OutputStream out = Files.newOutputStream(Paths.get("sources/client_props.properties"));
+                //     props.store(out, "add info");
+                // }
+                // catch(Exception ex){System.out.println(ex);}
+                HelpFuncs.loadMasterCalendarWindowFunc(authorizationBtn, main);
             }
         });
 
 
-        table.add(login_lbl, 0, 0);
-        table.add(password_lbl, 0, 1);
-        table.add(login_field, 1, 0);
-        table.add(password_field, 1, 1);
+        table.add(loginLbl, 0, 0);
+        table.add(passwordLbl, 0, 1);
+        table.add(loginField, 1, 0);
+        table.add(passwordField, 1, 1);
         
-        root.getChildren().addAll(head_lbl, table, lbl_err, buttons);
-        buttons.getChildren().addAll(authorization_btn);
+        root.getChildren().addAll(headLbl, table, lblErr, buttons);
+        buttons.getChildren().addAll(authorizationBtn);
         return root;
 
     }
@@ -699,6 +1212,8 @@ public class Main extends Application{
 
     @Override
     public void start(Stage stage) {
+        year = LocalDate.now().getYear();
+        month = LocalDate.now().getMonthValue()-1;
         Properties props = new Properties();
         try(InputStream in = Files.newInputStream(Paths.get("sources/client_props.properties"))){
                 props.load(in);

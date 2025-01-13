@@ -99,6 +99,14 @@ public class HelpFuncs extends Main{
 		node.getScene().setRoot(cur.loadMasterProfileWindow());	
 	}
 
+	public static void loadMasterChangeProfileInfoWindowFunc(Node node, Main cur){
+		node.getScene().setRoot(cur.loadChangeProfileWindow());	
+	}
+
+	public static void loadMasterChangeProfilePasswordWindowFunc(Node node, Main cur){
+		node.getScene().setRoot(cur.loadChangeProfilePasswordWindow());	
+	}
+
 	public static void loadMasterServicesWindowFunc(Node node, Main cur){
 		node.getScene().setRoot(cur.loadMasterServicesWindow());	
 	}
