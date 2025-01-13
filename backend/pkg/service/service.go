@@ -31,6 +31,13 @@ type Resource interface {
 type Schedule interface {
 }
 
+type Profile interface {
+	GetUserInfo(userId int) (models.Users, error)
+	//UpdateInfo(userId int, info models.Info) error
+	//UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
+	//UpdatePhoto(userId int, newPhoto []byte) error
+}
+
 type User interface {
 }
 
@@ -42,11 +49,13 @@ type Service struct {
 	Resource
 	Schedule
 	User
+	Profile
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Resource:      NewResourceService(repos),
 		Authorization: NewAuthService(repos),
+		Profile:       NewProfileService(repos),
 	}
 }

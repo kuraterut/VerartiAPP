@@ -27,9 +27,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			profile := master.Group("/profile")
 			{
-				profile.GET("/", h.getMaster)
+				profile.GET("/", h.getUserInfo)
 				profile.PUT("/photo", h.updatePhoto)
 				profile.PUT("/info", h.updateInfo)
+				profile.PUT("/password", h.updatePassword)
 			}
 
 			resource := master.Group("/resource")
@@ -58,6 +59,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			users := master.Group("/users")
 			{
+				// todo объединить запросы info и photo когда сделаем через url
 				users.GET("/master", h.getAllMasters)
 				users.GET("/master/:id", h.getMasterById)
 				users.GET("/admin", h.getAllAdmins)

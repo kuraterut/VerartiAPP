@@ -19,7 +19,7 @@ CREATE TABLE users
     email         varchar(255)             not null unique,
     phone         varchar(255)             not null unique,
     bio           varchar(511) default '',
-    pfp_url       varchar(255) default '',
+    photo         varchar(700000) default '',
     role_id       int references role (id) not null,
     salary        int          default 0
 );

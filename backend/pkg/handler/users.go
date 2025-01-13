@@ -11,3 +11,5 @@ func (h *Handler) getAllAdmins(c *gin.Context) {}
 func (h *Handler) getAdminById(c *gin.Context) {}
 
 func (h *Handler) getDirector(c *gin.Context) {}
+
+func (h *Handler) deleteUser(c *gin.Context) {}

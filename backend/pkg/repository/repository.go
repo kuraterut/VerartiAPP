@@ -33,6 +33,10 @@ type Schedule interface {
 type User interface {
 }
 
+type Profile interface {
+	GetUserInfo(userId int) (models.Users, error)
+}
+
 type Repository struct {
 	Appointment
 	Authorization
@@ -41,11 +45,13 @@ type Repository struct {
 	Resource
 	Schedule
 	User
+	Profile
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Resource:      NewResourcePostgres(db),
 		Authorization: NewAuthPostgres(db),
+		Profile:       NewProfilePostgres(db),
 	}
 }
