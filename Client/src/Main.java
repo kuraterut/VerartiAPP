@@ -91,8 +91,6 @@ public class Main extends Application{
     }
 
     private GridPane buildCalendarByYM(int year, int month){
-        // ArrayList<String[]>
-
         GridPane calendar           = new GridPane();
         
         int lastDayOfMonth          = YearMonth.of(year, month).lengthOfMonth();
@@ -124,7 +122,10 @@ public class Main extends Application{
 
         calendar.getRowConstraints().add(new RowConstraints(50));
         
-        
+        int numCell = 0;
+        ArrayList<String[]> timetableInfo = Connection.getTimetableByYM(year, month, token);
+
+
         int index = 1;
         boolean flag = true;
         for (int i = 1; i < 7; i++){
@@ -133,17 +134,26 @@ public class Main extends Application{
                     Rectangle rect = new Rectangle(150, 100, Color.TRANSPARENT); // Прозрачный
                     Label indexLbl = new Label(String.valueOf(index));
                     
-
                     Label cellMiniInfo = new Label();
-                    int guestCount = 1;
-                    String workTime = "9:00-21:00";
-                    cellMiniInfo.setText("Кол-во: "+ guestCount+"\nВремя работы:\n"+workTime);
+
+                    String[] infoYM = null;
+                    if(timetableInfo == null){
+                        infoYM = new String[2];
+                        infoYM[0] = "Ошибка";
+                        infoYM[1] = "Ошибка";
+                    }
+                    else{
+                        infoYM = timetableInfo.get(numCell);    
+                    }
+                    numCell++;
+                    cellMiniInfo.setText("Кол-во: " + infoYM[0] + "\nВремя работы:\n" + infoYM[1]);
 
                     
                     final int roww = i;
                     final int coll = j;
 
-                    rect.setOnMouseClicked(event -> showCellInfo(roww, coll));
+                    int numCellHelp = numCell;
+                    rect.setOnMouseClicked(event -> showCalendarCellInfoDialog(year, month, numCellHelp));
                     rect.setOnMouseEntered(event -> {
                         rect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
                     });
@@ -170,14 +180,24 @@ public class Main extends Application{
                     Label indexLbl = new Label(String.valueOf(index));
 
                     Label cellMiniInfo = new Label();
-                    int guestCount = 1;
-                    String workTime = "9:00-21:00";
-                    cellMiniInfo.setText("Кол-во: "+ guestCount+"\nВремя работы:\n"+workTime);
-                    
+
+                    String[] infoYM = null;
+                    if(timetableInfo == null){
+                        infoYM = new String[2];
+                        infoYM[0] = "Ошибка";
+                        infoYM[1] = "Ошибка";
+                    }
+                    else{
+                        infoYM = timetableInfo.get(numCell);    
+                    }
+                    numCell++;
+                    cellMiniInfo.setText("Кол-во: " + infoYM[0] + "\nВремя работы:\n" + infoYM[1]);
+
                     final int roww = i;
                     final int coll = j;
 
-                    rect.setOnMouseClicked(event -> showCellInfo(roww, coll));
+                    int numCellHelp = numCell;
+                    rect.setOnMouseClicked(event -> showCalendarCellInfoDialog(year, month, numCellHelp));
                     rect.setOnMouseEntered(event -> {
                         rect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
                     });
@@ -202,12 +222,81 @@ public class Main extends Application{
         return calendar;
     }
 
-    private void showCellInfo(int row, int col) {
-        Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle("Cell Information");
-        alert.setHeaderText(null);
-        alert.setContentText("You clicked on cell at Row: " + row + ", Column: " + col);
-        alert.showAndWait();
+    
+
+    private void showCalendarCellInfoDialog(int year, int month, int day) {
+        String monthStr = Month.of(month).getDisplayName(TextStyle.FULL_STANDALONE, Locale.forLanguageTag("ru")); // Вернёт Январь
+
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Информация о дне");
+        
+        Label infoLabel = new Label((day) + " " + monthStr + " " + year + " года");
+
+        ArrayList<String[]> arrGuestsInfo = Connection.getTimetableByDate(year, month, day, token);
+        javafx.scene.control.ScrollPane scrollTable = new javafx.scene.control.ScrollPane();
+        GridPane tableGuestsInfo = new GridPane();
+        
+        Label nameHead = new Label("Имя посетителя");
+        Label timeHead = new Label("Время");
+        Label serviceHead = new Label("Услуга");
+
+        tableGuestsInfo.addRow(0, nameHead, timeHead, serviceHead);
+        GridPane.setHalignment(nameHead, HPos.CENTER);
+        GridPane.setValignment(nameHead, VPos.CENTER);
+        GridPane.setHalignment(timeHead, HPos.CENTER);
+        GridPane.setValignment(timeHead, VPos.CENTER);
+        GridPane.setHalignment(serviceHead, HPos.CENTER);
+        GridPane.setValignment(serviceHead, VPos.CENTER);
+
+        if(arrGuestsInfo == null){
+            String[] errorStrArr = new String[]{"Ошибка", "Ошибка", "Ошибка"};
+            arrGuestsInfo = new ArrayList<>();
+            arrGuestsInfo.add(errorStrArr);
+        }
+
+        for (int i = 0; i < arrGuestsInfo.size(); i++){
+            Label name = new Label(arrGuestsInfo.get(i)[0]);
+            Label time = new Label(arrGuestsInfo.get(i)[1]);
+            Label service = new Label(arrGuestsInfo.get(i)[2]);
+            tableGuestsInfo.addRow(i+1, name, time, service);
+            GridPane.setHalignment(name, HPos.CENTER);
+            GridPane.setValignment(name, VPos.CENTER);
+            GridPane.setHalignment(time, HPos.CENTER);
+            GridPane.setValignment(time, VPos.CENTER);
+            GridPane.setHalignment(service, HPos.CENTER);
+            GridPane.setValignment(service, VPos.CENTER);
+        }
+
+        tableGuestsInfo.getColumnConstraints().add(new ColumnConstraints(150));
+        tableGuestsInfo.getColumnConstraints().add(new ColumnConstraints(150));
+
+        tableGuestsInfo.setAlignment(Pos.CENTER);
+        tableGuestsInfo.setGridLinesVisible(true);
+
+        scrollTable.setFitToWidth(true);
+        scrollTable.setFitToHeight(true);
+        scrollTable.setContent(tableGuestsInfo);
+        
+
+        
+        Button button1 = new Button("Назад");
+        button1.setOnAction(e -> {
+            dialog.close();
+        });
+
+
+        VBox dialogLayout = new VBox(100);
+        dialogLayout.setAlignment(Pos.CENTER);
+        HBox btns = new HBox();
+        btns.setAlignment(Pos.CENTER);
+        // btns.setSpacing(50);
+        btns.getChildren().addAll(button1);
+        dialogLayout.getChildren().addAll(infoLabel, scrollTable, btns);
+        Scene dialogScene = new Scene(dialogLayout, 500, 500);
+        
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
     }
 
     private void toggleMenu(VBox sideMenu) {
@@ -344,8 +433,8 @@ public class Main extends Application{
         javafx.scene.control.ScrollPane scrollTable = new javafx.scene.control.ScrollPane();
         GridPane tableResourceList = new GridPane();
         
-        Label nameHead = new Label("Название");
-        Label descriptionHead = new Label("Описание");
+        Label nameHead = new Label("Название ресурса");
+        Label descriptionHead = new Label("Описание ресурса");
 
         tableResourceList.addRow(0, nameHead, descriptionHead);
         GridPane.setHalignment(nameHead, HPos.CENTER);
@@ -363,16 +452,16 @@ public class Main extends Application{
             GridPane.setValignment(description, VPos.CENTER);
         }
 
-        tableResourceList.getColumnConstraints().add(new ColumnConstraints(150));
-        tableResourceList.getColumnConstraints().add(new ColumnConstraints(150));
+        tableResourceList.getColumnConstraints().add(new ColumnConstraints(500));
+        tableResourceList.getColumnConstraints().add(new ColumnConstraints(500));
 
         // tableResourceList.getRowConstraints().add(new RowConstraints(100));
         // tableResourceList.getRowConstraints().add(new RowConstraints(100));
         tableResourceList.setAlignment(Pos.CENTER);
         tableResourceList.setGridLinesVisible(true);
 
-        // scrollTable.setPrefViewportHeight(200);
-        // scrollTable.setPrefViewportWidth(100);
+        scrollTable.setPrefViewportHeight(200);
+        scrollTable.setPrefViewportWidth(100);
         scrollTable.setFitToWidth(true);
         scrollTable.setFitToHeight(true);
         scrollTable.setContent(tableResourceList);
@@ -808,21 +897,21 @@ public class Main extends Application{
             @Override
             public void handle(ActionEvent event) {
                 FileChooser fileChooser = new FileChooser();
+                
                 fileChooser.setTitle("Выберите файл");
-                // Установите фильтры для выбора файлов (опционально)
+                
                 FileChooser.ExtensionFilter extFilter1 = 
                     new FileChooser.ExtensionFilter("Картинки (*.jpg)", "*.jpg");
                 FileChooser.ExtensionFilter extFilter2 = 
                     new FileChooser.ExtensionFilter("Картинки (*.png)", "*.png");
+                
                 fileChooser.getExtensionFilters().add(extFilter1);
                 fileChooser.getExtensionFilters().add(extFilter2);
                 
-                // Открыть диалог выбора файла
                 File file = fileChooser.showOpenDialog(changeAvatarBtn.getScene().getWindow());
                 if (file != null) {
-                    // Здесь вы можете выполнять действия с выбранным файлом
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
-                    // Добавьте свои действия с файлом здесь
+                    int status = Connection.changeMasterPhoto(token, file);
                 }
                 HelpFuncs.loadMasterProfileWindowFunc(changeAvatarBtn, main);
             }
