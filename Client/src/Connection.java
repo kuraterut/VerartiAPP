@@ -127,9 +127,30 @@ public class Connection{
 	    }
 	}
 
-	// public static int changeMasterAvatar(String token, File file){
+	public static int changeMasterPhoto(String token, File file){
+		try{
+			getConnection("http://localhost:8000/api/master/profile/photo");
 
-	// }
+			connection.setRequestMethod("PUT");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			JSONObject outJson = new JSONObject();
+			byte[] byteArray = Files.readAllBytes(file.toPath());
+			String encodedPhoto = Base64.getEncoder().encodeToString(byteArray);
+			outJson.put("photo", encodedPhoto);
+			
+			sendJson(outJson);
+			
+			int status = connection.getResponseCode();
+
+			return status;
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return 1;
+	    }
+	}
 	
 	public static Image getMasterPhoto(String avatarBytesStr){
 		try{
@@ -205,7 +226,6 @@ public class Connection{
 	        		result[1] = text;
 	        		return result;
 	        }
-	   
 	    }
 	    catch(Exception ex){
 	    	System.out.println(ex);
@@ -219,7 +239,7 @@ public class Connection{
 
 			connection.setRequestMethod("GET");
 
-			connection.setRequestProperty("Authorization", token);
+			connection.setRequestProperty("Authorization", "Bearer " + token);
 			connection.setDoOutput(true);
 
 			JSONObject outJson = new JSONObject();
@@ -229,7 +249,6 @@ public class Connection{
 			sendJson(outJson);
 
 	        JSONObject data = getJson();
-
 
 	        ArrayList<String[]> result = new ArrayList<>();
 
@@ -251,12 +270,12 @@ public class Connection{
 	    }
 	}
 
-	public static JSONObject getTimetableByDate(int year, int month, int day, String token){
+	public static ArrayList<String[]> getTimetableByDate(int year, int month, int day, String token){
 		try{
 			getConnection("http://localhost:8000/api/master/shedule/day");
 
 			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", token);
+			connection.setRequestProperty("Authorization", "Bearer " + token);
 			connection.setDoOutput(true);
 
 			JSONObject outJson = new JSONObject();
@@ -266,7 +285,20 @@ public class Connection{
 
 			sendJson(outJson);
 
-			return getJson();
+			ArrayList<String[]> result = new ArrayList<>();
+			JSONObject data = getJson();
+			JSONArray jsonArr = (JSONArray) data.get("data");
+	        Iterator itr = jsonArr.iterator();
+	        while (itr.hasNext()) {
+	            JSONObject jsonObjArr = (JSONObject) itr.next();
+	            String[] strArr = new String[3];
+	            strArr[0] = (String)jsonObjArr.get("name");
+	            strArr[1] = (String)jsonObjArr.get("time");
+	            strArr[2] = (String)jsonObjArr.get("service");
+	            result.add(strArr);
+	        }
+
+			return result;
 	    }
 	    catch(Exception ex){
 	    	System.out.println(ex);
