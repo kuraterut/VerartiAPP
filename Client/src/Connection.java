@@ -18,7 +18,7 @@ public class Connection{
         connection = (HttpURLConnection) url.openConnection();
 	}
 
-	public static ArrayList<String[]> getMasterResourcesListJSON(String token) {
+	public static ArrayList<String[]> getMasterResourcesList(String token) {
 		try{
 			getConnection("http://localhost:8000/api/master/resource/all");
 
@@ -33,9 +33,58 @@ public class Connection{
 	        Iterator itr = jsonArr.iterator();
 	        while (itr.hasNext()) {
 	            JSONObject jsonObjArr = (JSONObject) itr.next();
-	            String[] strArr = new String[2];
-	            strArr[0] = (String)jsonObjArr.get("name");
-	            strArr[1] = (String)jsonObjArr.get("description");
+	            String[] strArr = new String[3];
+	            strArr[0] = String.valueOf((int)jsonObjArr.get("id"));
+	            strArr[1] = (String)jsonObjArr.get("name");
+	            strArr[2] = (String)jsonObjArr.get("description");
+	            result.add(strArr);
+	        }
+	        return result;
+
+	    }
+	    catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
+	public static ArrayList<String[]> getMasterResourcesRequestsList(String token) {
+		try{
+			getConnection("http://localhost:8000/api/master/resource/request");
+
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			
+	        JSONObject data = getJson();
+
+	        ArrayList<String[]> result = new ArrayList<>();
+
+			JSONArray jsonArr = (JSONArray) data.get("data");
+	        Iterator itr = jsonArr.iterator();
+	        while (itr.hasNext()) {
+	            JSONObject jsonObjArr = (JSONObject) itr.next();
+	            String[] strArr = new String[4];
+	            strArr[0] = String.valueOf((int)jsonObjArr.get("id"));
+	            strArr[1] = (String)jsonObjArr.get("name");
+	            strArr[2] = String.valueOf((int)jsonObjArr.get("count"));
+	            int status = (int)jsonObjArr.get("status");
+	            switch(status){
+	            	case 0:
+	            		strArr[3] = "Отказано";
+	            		break;
+            		case 1:
+            			strArr[3] = "Ожидает обработки администратором";
+	            		break;
+	            	case 2:
+            			strArr[3] = "В пути";
+	            		break;
+	            	case 3:
+            			strArr[3] = "Готово к получению";
+	            		break;
+	            	case 4:
+	            		continue;
+	            } 
+	            
 	            result.add(strArr);
 	        }
 	        return result;
@@ -49,7 +98,7 @@ public class Connection{
 
 	public static Map<String, String> getMasterProfileInfo(String token){
 		try{
-			getConnection("http://localhost:8000/api/master/profile");
+			getConnection("http://localhost:8000/api/master/profile/");
 
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -66,6 +115,7 @@ public class Connection{
 			masterInfoMap.put("bio", (String)data.get("bio"));
 			masterInfoMap.put("role", (String)data.get("role"));
 			masterInfoMap.put("photo", (String)data.get("photo"));
+			masterInfoMap.put("current_salary", (String)data.get("current_salary"));
 			
 			return masterInfoMap;
 		}
@@ -100,6 +150,53 @@ public class Connection{
 		catch(Exception ex){
 	    	System.out.println(ex);
 	    	return 1;
+	    }
+	}
+
+	public static int createResourceRequest(String token, int id, int count){
+		try{
+			getConnection("http://localhost:8000/api/master/resource/request");
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			JSONObject outJson = new JSONObject();
+			outJson.put("id", id);
+			outJson.put("count", count);
+			
+			sendJson(outJson);
+			
+			int status = connection.getResponseCode();
+
+			return status;
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return 1;
+	    }
+	}
+
+	public static String[] getResourceInfoByID(String token, int id){
+		try{
+			getConnection("http://localhost:8000/api/master/resource/"+id);
+
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			
+			JSONObject data = getJson();
+			String[] result = new String[2];
+			result[0] = (String)data.get("name");
+			result[1] = (String)data.get("description");
+			
+			// int status = connection.getResponseCode();
+
+			return result;
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
 	    }
 	}
 
