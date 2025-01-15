@@ -337,12 +337,12 @@ public class Main extends Application{
         ImageView menuIcon          = new ImageView(menuIconImg);
         LinkedList<ButtonBase>  sideMenuBtnsList = new LinkedList<>();
 
-        ButtonBase[] mainSideMenuBtn = new ButtonBase[5];
+        ButtonBase[] mainSideMenuBtn = new ButtonBase[4];
         mainSideMenuBtn[0] = new Button();
         mainSideMenuBtn[1] = new ToggleButton();
         mainSideMenuBtn[2] = new Button();
         mainSideMenuBtn[3] = new Button();
-        mainSideMenuBtn[4] = new Button();
+        // mainSideMenuBtn[4] = new Button();
 
         Button toggleButton = new Button();
         
@@ -354,8 +354,8 @@ public class Main extends Application{
         mainSideMenuBtn[0].setText("Календарь");
         mainSideMenuBtn[1].setText("Ресурсы");
         mainSideMenuBtn[2].setText("Профиль");
-        mainSideMenuBtn[3].setText("Услуги");
-        mainSideMenuBtn[4].setText("Помощь");
+        // mainSideMenuBtn[3].setText("Услуги");
+        mainSideMenuBtn[3].setText("Помощь");
         VBox.setMargin(mainSideMenuBtn[0], new Insets(100, 0, 0, 0));
 
         mainSideMenuBtn[state].setStyle("-fx-background-color: grey");
@@ -377,8 +377,8 @@ public class Main extends Application{
 
         mainSideMenuBtn[0].setOnAction(event -> HelpFuncs.loadMasterCalendarWindowFunc(mainSideMenuBtn[0], this));
         mainSideMenuBtn[2].setOnAction(event -> HelpFuncs.loadMasterProfileWindowFunc(mainSideMenuBtn[2], this));
-        mainSideMenuBtn[3].setOnAction(event -> HelpFuncs.loadMasterServicesWindowFunc(mainSideMenuBtn[3], this));
-        mainSideMenuBtn[4].setOnAction(event -> HelpFuncs.loadMasterHelpWindowFunc(mainSideMenuBtn[4], this));
+        // mainSideMenuBtn[3].setOnAction(event -> HelpFuncs.loadMasterServicesWindowFunc(mainSideMenuBtn[3], this));
+        mainSideMenuBtn[3].setOnAction(event -> HelpFuncs.loadMasterHelpWindowFunc(mainSideMenuBtn[3], this));
 
         Main main = this;
         ToggleButton resourcesBtn = (ToggleButton)mainSideMenuBtn[1];
@@ -1100,35 +1100,9 @@ public class Main extends Application{
     }
 
 
-
-    public BorderPane loadMasterServicesWindow(){
-        BorderPane root             = new BorderPane();
-        StackPane sideMenuStack     = buildMasterSideMenu(3);
-        
-        VBox rightBox               = new VBox();
-        VBox centerBox              = new VBox();
-
-        Label title = new Label();
-        
-        title.setText("Услуги");
-        
-        rightBox.setPrefWidth(MENU_WIDTH);
-
-        centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
-        centerBox.setSpacing(50);
-
-        centerBox.getChildren().addAll(title);
-        root.setCenter(centerBox);
-        root.setLeft(sideMenuStack);
-        root.setRight(rightBox);
-
-        return root;
-    }
-
     public BorderPane loadMasterHelpWindow(){
         BorderPane root             = new BorderPane();
-        StackPane sideMenuStack     = buildMasterSideMenu(4);
+        StackPane sideMenuStack     = buildMasterSideMenu(3);
         
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();

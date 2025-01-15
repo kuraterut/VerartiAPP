@@ -111,9 +111,9 @@ public class HelpFuncs extends Main{
 		node.getScene().setRoot(cur.loadChangeProfilePasswordWindow());	
 	}
 
-	public static void loadMasterServicesWindowFunc(Node node, Main cur){
-		node.getScene().setRoot(cur.loadMasterServicesWindow());	
-	}
+	// public static void loadMasterServicesWindowFunc(Node node, Main cur){
+	// 	node.getScene().setRoot(cur.loadMasterServicesWindow());	
+	// }
 
 	public static void loadMasterHelpWindowFunc(Node node, Main cur){
 		node.getScene().setRoot(cur.loadMasterHelpWindow());	
