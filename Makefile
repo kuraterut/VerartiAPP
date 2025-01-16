@@ -4,15 +4,16 @@ Runner = java
 
 Modules = javafx.controls
 Path_to_javaFX = /home/kuraterut/Desktop/HSE/my_projects/JavaProjects/javafx-sdk-22.0.2/lib
-JDBC_DRIVER = ./sources/mysql-connector-java-9.0.0.jar
-Main_class = Main
-Bin_dir = ./bin
-Files = src/Main.java src/HelpFuncs.java src/Connection.java 
-# CSS = /home/kuraterut/Desktop/HSE/my_projects/JavaProjects/VeronichkaNails_App/src
-CSS = style
-Mail_JAR = ./sources/javax.mail-1.6.2.jar
-Activation_JAR = ./sources/activation.jar
-Json_JAR = ./sources/json-simple-1.1.1.jar
+JDBC_DRIVER = ./client/sources/mysql-connector-java-9.0.0.jar
+Main_class = src.Main
+Bin_dir = ./client/bin
+
+Files := $(shell find client/src -name '*.java')
+
+CSS = client/style
+Mail_JAR = ./client/sources/javax.mail-1.6.2.jar
+Activation_JAR = ./client/sources/activation.jar
+Json_JAR = ./client/sources/json-simple-1.1.1.jar
 
 
 
@@ -36,18 +37,6 @@ $(Main_class): $(Files) Makefile
 
 run: $(Main_class) Makefile
 	$(Runner) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -classpath $(Bin_dir):$(CSS):$(Json_JAR) $(Main_class)
-
-
-
-
-Help: src/Help.java Makefile
-	@mkdir -p $(Bin_dir)
-	$(Compiler) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -d $(Bin_dir) -cp $(Json_JAR)  src/Help.java 
-
-help: Help Makefile
-	$(Runner) --module-path $(Path_to_javaFX) --add-modules=$(Modules) -classpath $(Bin_dir):$(Json_JAR) Help
-
-
 
 tutorial:
 	@sudo apt update
