@@ -1,13 +1,11 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+package src.master.connection;
+
 import org.json.simple.*;
 import org.json.simple.parser.*;
-import javafx.scene.image.Image;
+import javafx.scene.image.*;
 import java.util.*;
 import java.nio.file.*;
+import java.net.*;
 import java.io.*;
 
 public class Connection{
@@ -189,8 +187,6 @@ public class Connection{
 			String[] result = new String[2];
 			result[0] = (String)data.get("name");
 			result[1] = (String)data.get("description");
-			
-			// int status = connection.getResponseCode();
 
 			return result;
 		}
@@ -252,10 +248,10 @@ public class Connection{
 	public static Image getMasterPhoto(String avatarBytesStr){
 		try{
 			if(avatarBytesStr == null){
-				return new Image(new FileInputStream("photos/standard.jpg"));
+				return new Image(new FileInputStream("client/photos/standard.jpg"));
 			}
 			Image avatarImage = null;
-			FileOutputStream avatarFile = new FileOutputStream("photos/avatar.jpg");
+			FileOutputStream avatarFile = new FileOutputStream("client/photos/avatar.jpg");
 	        
 			byte[] avatarBytes = Base64.getDecoder().decode(avatarBytesStr);
 
@@ -264,7 +260,7 @@ public class Connection{
 			}
 	        
 	        avatarFile.close();
-	        avatarImage = new Image(new FileInputStream("photos/avatar.jpg"));
+	        avatarImage = new Image(new FileInputStream("client/photos/avatar.jpg"));
 	        return avatarImage;
 		}
 		catch(Exception ex){
@@ -310,8 +306,8 @@ public class Connection{
 	        		return result;
 
 	        	case 200:
-	        		text = (String)data.get("role");
 			        token = (String)data.get("token");
+	        		text = (String)data.get("role");
 			        result[0] = token;
 			        result[1] = text;				
 	        		return result;
@@ -330,7 +326,7 @@ public class Connection{
 	    }
 	}
 
-	public static ArrayList<String[]> getTimetableByYM(int year, int month, String token){
+	public static String[][] getTimetableByYM(int year, int month, String token){
 		try{
 			getConnection("http://localhost:8000/api/master/shedule/month");
 
@@ -347,16 +343,20 @@ public class Connection{
 
 	        JSONObject data = getJson();
 
-	        ArrayList<String[]> result = new ArrayList<>();
+	        String[][] result = new String[32][2];
 
 	        JSONArray jsonArr = (JSONArray) data.get("data");
 	        Iterator itr = jsonArr.iterator();
 	        while (itr.hasNext()) {
 	            JSONObject jsonObjArr = (JSONObject) itr.next();
 	            String[] strArr = new String[2];
+	            String dayNumStr = ((String)jsonObjArr.get("date")).substring(0, 2);
+	            int dayIndex = Integer.parseInt(dayNumStr)-1;
+
 	            strArr[0] = (String)jsonObjArr.get("count");
 	            strArr[1] = (String)jsonObjArr.get("time");
-	            result.add(strArr);
+	            result[dayIndex] = strArr;
+	            
 	        }
 	        return result;
 
@@ -442,5 +442,3 @@ public class Connection{
 	}
 
 }
-
-//INSERT INTO users (name, surname, patronymic, password_hash, email, phone, role_id) VALUES ('Ilia', 'Kurylin', 'Artemovich', '6e73766e6a6e75347538393438767568323968726866656276383339346876756233758758c5deb39e2e1c2077a3999e1cc77b2ed109ea', 'kuraterut@yandex.ru', '+79092762462', 3);
