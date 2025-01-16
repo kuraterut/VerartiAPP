@@ -1,4 +1,4 @@
-package src.master.connection;
+package src.admin.connection;
 
 import org.json.simple.*;
 import org.json.simple.parser.*;
@@ -269,6 +269,62 @@ public class Connection{
 		}
 	}
 
+
+	public static String[] checkAuthAndGetToken(String login, String password){
+		try{
+			getConnection("http://localhost:8000/auth/signin");
+
+			connection.setRequestMethod("POST");
+			connection.setDoOutput(true);
+
+			JSONObject outJson = new JSONObject();
+			outJson.put("phone", login);
+			outJson.put("password", password);
+
+			sendJson(outJson);
+
+			JSONObject data = getJson();  
+
+			
+			String text, token;
+			String[] result = new String[2];
+	        int status = connection.getResponseCode();
+
+	        switch(status){
+	        	case 401:
+	        		text = "Неверный логин или пароль";
+	        		token = "-1";
+	        		result[0] = token;
+	        		result[1] = text;
+	        		return result;
+	        		
+	        	case 500:
+	        		text = "Неверный формат ввода";
+	        		token = "-1";
+	        		result[0] = token;
+	        		result[1] = text;
+	        		return result;
+
+	        	case 200:
+			        token = (String)data.get("token");
+	        		text = (String)data.get("role");
+			        result[0] = token;
+			        result[1] = text;				
+	        		return result;
+	        	
+	        	default:
+	        		text = "Неизвестная ошибка";
+	        		token = "-1";
+	        		result[0] = token;
+	        		result[1] = text;
+	        		return result;
+	        }
+	    }
+	    catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
 
 	public static String[][] getTimetableByYM(int year, int month, String token){
 		try{

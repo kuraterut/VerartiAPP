@@ -1,9 +1,9 @@
-package src.master.calendarWindow;
+package src.admin.calendarWindow;
 
 import src.Main;
-import src.master.MasterInterface;
-import src.master.connection.Connection;
-import src.master.sideMenu.SideMenu;
+import src.admin.AdminInterface;
+import src.admin.connection.Connection;
+import src.admin.sideMenu.SideMenu;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -36,8 +36,8 @@ public class CalendarWindow extends Main{
         String yearStr              = String.valueOf(year);
         String monthStr             = String.valueOf(month);
         String lastDayOfMonthStr    = String.valueOf(lastDayOfMonth);
-        int firstDayInWeek          = MasterInterface.getDayOfWeekByStr(yearStr+"-"+monthStr+"-01");
-        int lastDayInWeek           = MasterInterface.getDayOfWeekByStr(yearStr+"-"+monthStr+"-"+lastDayOfMonthStr); 
+        int firstDayInWeek          = AdminInterface.getDayOfWeekByStr(yearStr+"-"+monthStr+"-01");
+        int lastDayInWeek           = AdminInterface.getDayOfWeekByStr(yearStr+"-"+monthStr+"-"+lastDayOfMonthStr); 
         
         Label[] daysOfWeekArr = {new Label("ПН"), new Label("ВТ"), new Label("СР"), new Label("ЧТ"), 
                                 new Label("ПТ"), new Label("СБ"), new Label("ВС")};
