@@ -1,8 +1,8 @@
-package src.master.sideMenu;
+package src.admin.sideMenu;
 
 import src.Main;
-import src.master.MasterInterface;
-import src.master.connection.Connection;
+import src.admin.AdminInterface;
+import src.admin.connection.Connection;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -53,7 +53,7 @@ public class SideMenu extends Main{
 
 
     public static StackPane buildSideMenu(int state){
-        Main.isMenuVisible               = true;
+        Main.isMenuVisible          = true;
         Image menuIconImg           = null;
         try{menuIconImg             = new Image(new FileInputStream("client/photos/Menu-ICON.png"));}
         catch(Exception ex)         {System.out.println(ex);}
@@ -99,9 +99,9 @@ public class SideMenu extends Main{
         menuIcon.setFitWidth(60);
         menuIcon.setFitHeight(60);
 
-        mainSideMenuBtn[0].setOnAction(event -> MasterInterface.loadCalendarWindow(mainSideMenuBtn[0]));
-        mainSideMenuBtn[2].setOnAction(event -> MasterInterface.loadProfileWindow(mainSideMenuBtn[2]));
-        mainSideMenuBtn[3].setOnAction(event -> MasterInterface.loadHelpWindow(mainSideMenuBtn[3]));
+        mainSideMenuBtn[0].setOnAction(event -> AdminInterface.loadCalendarWindow(mainSideMenuBtn[0]));
+        mainSideMenuBtn[2].setOnAction(event -> AdminInterface.loadProfileWindow(mainSideMenuBtn[2]));
+        mainSideMenuBtn[3].setOnAction(event -> AdminInterface.loadHelpWindow(mainSideMenuBtn[3]));
 
         ToggleButton resourcesBtn = (ToggleButton)mainSideMenuBtn[1];
         resourcesBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -111,8 +111,8 @@ public class SideMenu extends Main{
                     Button listBtn = new Button("Список");
                     Button requestsBtn = new Button("Запросы");
 
-                    listBtn.setOnAction(e -> MasterInterface.loadResourcesListWindow(listBtn));
-                    requestsBtn.setOnAction(e -> MasterInterface.loadResourcesRequestsWindow(requestsBtn));
+                    listBtn.setOnAction(e -> AdminInterface.loadResourcesListWindow(listBtn));
+                    requestsBtn.setOnAction(e -> AdminInterface.loadResourcesRequestsWindow(requestsBtn));
 
                     listBtn.setPrefWidth(MENU_WIDTH-30);
                     requestsBtn.setPrefWidth(MENU_WIDTH-30);

@@ -1,9 +1,9 @@
-package src.master.profileWindow;
+package src.admin.profileWindow;
 
 import src.Main;
-import src.master.MasterInterface;
-import src.master.connection.Connection;
-import src.master.sideMenu.SideMenu;
+import src.admin.AdminInterface;
+import src.admin.connection.Connection;
+import src.admin.sideMenu.SideMenu;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -133,7 +133,7 @@ public class ProfileWindow extends Main{
         btnsBox.setSpacing(100);
         centerBox.setSpacing(50);
 
-        cancel.setOnAction(event -> MasterInterface.loadProfileWindow(cancel));
+        cancel.setOnAction(event -> AdminInterface.loadProfileWindow(cancel));
         
         saveChanges.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -146,7 +146,7 @@ public class ProfileWindow extends Main{
                 String newBio           = bioField.getText();
 
                 int status = Connection.changeProfileInfo(token, newName, newSurname, newPatronymic, newEmail, newPhone, newBio);
-                if(status == 200){MasterInterface.loadProfileWindow(cancel);}
+                if(status == 200){AdminInterface.loadProfileWindow(cancel);}
                 else {errorMsg.setText("Ошибка отправки данных на сервер");}
             }
         });
@@ -218,7 +218,7 @@ public class ProfileWindow extends Main{
         btnsBox.setSpacing(100);
         centerBox.setSpacing(50);
 
-        cancel.setOnAction(event -> MasterInterface.loadProfileWindow(cancel));
+        cancel.setOnAction(event -> AdminInterface.loadProfileWindow(cancel));
         
         saveChanges.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -227,7 +227,7 @@ public class ProfileWindow extends Main{
                 String newPassword       = newPasswordField.getText();
                 
                 int status = Connection.changeProfilePassword(token, oldPassword, newPassword);
-                if(status == 200){MasterInterface.loadProfileWindow(cancel);}
+                if(status == 200){AdminInterface.loadProfileWindow(cancel);}
                 else {errorMsg.setText("Ошибка отправки данных на сервер");}
             }
         });
@@ -416,8 +416,8 @@ public class ProfileWindow extends Main{
         changeInfoBtnsBox.setAlignment(Pos.CENTER);
 
 
-        changeInfoBtn.setOnAction(event -> MasterInterface.loadChangeProfileInfoWindow(changeInfoBtn));
-        changePasswordBtn.setOnAction(event -> MasterInterface.loadChangeProfilePasswordWindow(changePasswordBtn));
+        changeInfoBtn.setOnAction(event -> AdminInterface.loadChangeProfileInfoWindow(changeInfoBtn));
+        changePasswordBtn.setOnAction(event -> AdminInterface.loadChangeProfilePasswordWindow(changePasswordBtn));
 
         changeAvatarBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -428,15 +428,18 @@ public class ProfileWindow extends Main{
                 
                 FileChooser.ExtensionFilter extFilter1 = 
                     new FileChooser.ExtensionFilter("Картинки (*.jpg)", "*.jpg");
+                // FileChooser.ExtensionFilter extFilter2 = 
+                //     new FileChooser.ExtensionFilter("Картинки (*.png)", "*.png");
                 
                 fileChooser.getExtensionFilters().add(extFilter1);
+                // fileChooser.getExtensionFilters().add(extFilter2);
                 fileChooser.setInitialDirectory(new File("/home/"));
                 File file = fileChooser.showOpenDialog(changeAvatarBtn.getScene().getWindow());
                 if (file != null) {
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
                     int status = Connection.changeProfilePhoto(token, file);
                 }
-                MasterInterface.loadProfileWindow(changeAvatarBtn);
+                AdminInterface.loadProfileWindow(changeAvatarBtn);
             }
         });
 

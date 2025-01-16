@@ -1,9 +1,8 @@
 package src;
 
-import src.LoadInterface;
+import src.master.MasterInterface;
 import src.Main;
-import src.master.connection.Connection;
-
+import src.Connection;
 import javafx.application.*;
 import javafx.stage.*;
 
@@ -98,7 +97,7 @@ public class AuthorizationWindow extends Main{
                 Main.role = checkResponse[1];
                 System.out.println(Main.role);
                 if(Main.role.equals("master")){
-                    LoadInterface.loadMasterCalendarWindowFunc(authorizationBtn);
+                    MasterInterface.loadCalendarWindow(authorizationBtn);
                 }
             }
         });

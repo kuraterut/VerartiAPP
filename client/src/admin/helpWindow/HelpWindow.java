@@ -1,9 +1,9 @@
-package src.master.helpWindow;
+package src.admin.helpWindow;
 
 import src.Main;
-import src.master.MasterInterface;
-import src.master.connection.Connection;
-import src.master.sideMenu.SideMenu;
+import src.admin.AdminInterface;
+import src.admin.connection.Connection;
+import src.admin.sideMenu.SideMenu;
 
 import javafx.application.*;
 import javafx.stage.*;

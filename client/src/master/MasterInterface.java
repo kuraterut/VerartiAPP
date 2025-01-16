@@ -1,4 +1,4 @@
-package src;
+package src.master;
 
 
 import src.master.calendarWindow.CalendarWindow;
@@ -28,7 +28,7 @@ import javafx.util.*;
 
 import java.time.*;
 
-public class LoadInterface{
+public class MasterInterface{
 	public static int getDayOfWeekByStr(String date){
 		int year = Integer.parseInt(date.split("-")[0]);
         int month = Integer.parseInt(date.split("-")[1]);
@@ -38,31 +38,31 @@ public class LoadInterface{
 		return dayOW.getValue();
 	} 
 
-	public static void loadMasterCalendarWindowFunc(Node node){
-		node.getScene().setRoot(CalendarWindow.loadMasterCalendarWindow());	
+	public static void loadCalendarWindow(Node node){
+		node.getScene().setRoot(CalendarWindow.loadCalendarWindow());	
 	}
 
-	public static void loadMasterResourcesListWindowFunc(Node node){
-		node.getScene().setRoot(ResourceWindow.loadMasterResourcesListWindow());	
+	public static void loadResourcesListWindow(Node node){
+		node.getScene().setRoot(ResourceWindow.loadResourcesListWindow());	
 	}
 
-	public static void loadMasterResourcesRequestsWindowFunc(Node node){
-		node.getScene().setRoot(ResourceWindow.loadMasterResourcesRequestsWindow());	
+	public static void loadResourcesRequestsWindow(Node node){
+		node.getScene().setRoot(ResourceWindow.loadResourcesRequestsWindow());	
 	}
 
-	public static void loadMasterProfileWindowFunc(Node node){
-		node.getScene().setRoot(ProfileWindow.loadMasterProfileWindow());	
+	public static void loadProfileWindow(Node node){
+		node.getScene().setRoot(ProfileWindow.loadProfileWindow());	
 	}
 
-	public static void loadMasterChangeProfileInfoWindowFunc(Node node){
+	public static void loadChangeProfileInfoWindow(Node node){
 		node.getScene().setRoot(ProfileWindow.loadChangeProfileWindow());	
 	}
 
-	public static void loadMasterChangeProfilePasswordWindowFunc(Node node){
+	public static void loadChangeProfilePasswordWindow(Node node){
 		node.getScene().setRoot(ProfileWindow.loadChangeProfilePasswordWindow());	
 	}
 
-	public static void loadMasterHelpWindowFunc(Node node){
-		node.getScene().setRoot(HelpWindow.loadMasterHelpWindow());	
+	public static void loadHelpWindow(Node node){
+		node.getScene().setRoot(HelpWindow.loadHelpWindow());	
 	}
 }
