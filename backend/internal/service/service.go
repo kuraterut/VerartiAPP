@@ -1,13 +1,14 @@
-package repository
+package service
 
 import (
-	"github.com/jmoiron/sqlx"
 	"verarti/models"
+	"verarti/pkg/repository"
 )
 
 type Authorization interface {
 	CreateUser(user models.Users, roleId int) (int, error)
-	GetUser(phone, password string) (models.Users, error)
+	GenerateToken(phone, password string) (string, string, error)
+	ParseToken(token string) (int, string, error)
 }
 
 type Appointment interface {
@@ -30,14 +31,17 @@ type Resource interface {
 type Schedule interface {
 }
 
+type Profile interface {
+	GetUserInfo(userId int) (models.Users, error)
+	//UpdateInfo(userId int, info models.Info) error
+	//UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
+	UpdatePhoto(userId int, newPhoto []byte) error
+}
+
 type User interface {
 }
 
-type Profile interface {
-	GetUserInfo(userId int) (models.Users, error)
-}
-
-type Repository struct {
+type Service struct {
 	Appointment
 	Authorization
 	Client
@@ -48,10 +52,10 @@ type Repository struct {
 	Profile
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{
-		Resource:      NewResourcePostgres(db),
-		Authorization: NewAuthPostgres(db),
-		Profile:       NewProfilePostgres(db),
+func NewService(repos *repository.Repository) *Service {
+	return &Service{
+		Resource:      NewResourceService(repos),
+		Authorization: NewAuthService(repos),
+		Profile:       NewProfileService(repos),
 	}
 }

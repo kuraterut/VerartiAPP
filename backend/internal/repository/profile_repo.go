@@ -29,3 +29,7 @@ func (r *ProfilePostgres) GetUserInfo(userId int) (models.Users, error) {
 
 	return user, err
 }
+
+func (r *ProfilePostgres) UpdatePhoto(userId int, newPhoto []byte) error {
+
+}
