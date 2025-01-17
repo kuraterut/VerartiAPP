@@ -30,8 +30,35 @@ services:
     build: ./backend
     depends_on:
       - migrate
+      - minio
     environment:
       - DB_PASSWORD=qwerty
     command: ./verarti-app
     ports:
       - 8000:8000
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_ENDPOINT_URL: http://localhost:9000
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+
+  minio-init:
+    image: minio/mc
+    depends_on:
+      - minio
+    volumes:
+      - ./backend/docs:/docs
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10 &&
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb local/photo &&
+      mc cp /docs/default_avatar.png local/photo/default/avatar.png
+      "

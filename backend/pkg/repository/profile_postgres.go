@@ -19,7 +19,9 @@ func NewProfilePostgres(db *sqlx.DB) *ProfilePostgres {
 
 func (r *ProfilePostgres) GetUserInfo(userId int) (models.Users, error) {
 	var user models.Users
-	query := fmt.Sprintf("Select * from %s WHERE id = $1", userTable)
+	query := fmt.Sprintf("SELECT us.id as id, rl.name as role"+
+		" FROM %s us INNER JOIN %s rl on us.role_id = rl.id"+
+		" WHERE us.id = $1", userTable, roleTable)
 	err := r.db.Get(&user, query, userId)
 	if errors.Is(err, sql.ErrNoRows) {
 		return models.Users{}, pkg.NewErrorResponse(404, "user not found")

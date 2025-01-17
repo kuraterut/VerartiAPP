@@ -10,8 +10,8 @@ type Users struct {
 	Phone      string `json:"phone" binding:"required" db:"phone"`
 	Photo      string `json:"photo" db:"photo"`
 	Bio        string `json:"bio" db:"bio"`
-	Role       string `json:"role" binding:"required" db:"role_id"`
-	Salary     string `json:"salary" db:"salary"`
+	Role       string `json:"role" binding:"required" db:"role"`
+	CurSalary  string `json:"current_salary" db:"current_salary"`
 }
 
 type Info struct {
