@@ -16,7 +16,7 @@ public class Connection{
         connection = (HttpURLConnection) url.openConnection();
 	}
 
-	public static String[] checkAuthAndGetToken(String login, String password){
+	public static String[] checkAuthAndGetToken(String login, String password, String role){
 		try{
 			getConnection("http://localhost:8000/auth/signin");
 
@@ -26,45 +26,42 @@ public class Connection{
 			JSONObject outJson = new JSONObject();
 			outJson.put("phone", login);
 			outJson.put("password", password);
+			// outJson.put("role", password);
 
 			sendJson(outJson);
 
 			JSONObject data = getJson();  
 
-			
-			String text, token;
+
+			String msgText = "";
+			String token = "";
 			String[] result = new String[2];
 	        int status = connection.getResponseCode();
 
 	        switch(status){
 	        	case 401:
-	        		text = "Неверный логин или пароль";
 	        		token = "-1";
-	        		result[0] = token;
-	        		result[1] = text;
-	        		return result;
+	        		msgText = "Неверный логин или пароль";
+	        		break;
 	        		
 	        	case 500:
-	        		text = "Неверный формат ввода";
 	        		token = "-1";
-	        		result[0] = token;
-	        		result[1] = text;
-	        		return result;
+	        		msgText = "Неверный формат ввода";
+	        		break;
 
 	        	case 200:
 			        token = (String)data.get("token");
-	        		text = (String)data.get("role");
-			        result[0] = token;
-			        result[1] = text;				
-	        		return result;
+			        break;
 	        	
 	        	default:
-	        		text = "Неизвестная ошибка";
 	        		token = "-1";
-	        		result[0] = token;
-	        		result[1] = text;
-	        		return result;
+	        		msgText = "Неизвестная ошибка";
+	        		break;
 	        }
+
+	        result[0] = token;				
+	        result[1] = msgText;
+	        return result;
 	    }
 	    catch(Exception ex){
 	    	System.out.println(ex);

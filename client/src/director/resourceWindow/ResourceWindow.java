@@ -1,9 +1,9 @@
-package src.admin.resourceWindow;
+package src.director.resourceWindow;
 
 import src.Main;
-import src.admin.AdminInterface;
-import src.admin.connection.Connection;
-import src.admin.sideMenu.SideMenu;
+import src.director.DirectorInterface;
+import src.director.connection.Connection;
+import src.director.sideMenu.SideMenu;
 
 import javafx.application.*;
 import javafx.stage.*;
