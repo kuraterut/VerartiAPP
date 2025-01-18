@@ -2,22 +2,29 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"verarti/internal"
 	"verarti/models"
 )
 
-func checkRole(role string) (int, error) {
-	if role == "master" {
-		return 1, nil
-	} else if role == "admin" {
-		return 2, nil
-	} else if role == "director" {
-		return 3, nil
+func checkRoles(roles []string) ([]int, error) {
+	roleIds := make([]int, len(roles))
+
+	for i, role := range roles {
+		if role == "master" {
+			roleIds[i] = 1
+		} else if role == "admin" {
+			roleIds[i] = 2
+		} else if role == "director" {
+			roleIds[i] = 3
+		} else {
+			return nil, errors.New(fmt.Sprintf("invalid role: %s", role))
+		}
 	}
 
-	return 0, errors.New("invalid input.Role")
+	return roleIds, nil
 }
 
 func (h *Handler) signUp(c *gin.Context) {
@@ -28,13 +35,13 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	roleId, err := checkRole(input.Role)
+	roleIds, err := checkRoles(input.Roles)
 	if err != nil {
 		newErrorResponse(c, http.StatusForbidden, err.Error())
 		return
 	}
 
-	id, err := h.services.Authorization.CreateUser(input, roleId)
+	id, err := h.services.Authorization.CreateUser(input, roleIds)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -48,11 +55,7 @@ func (h *Handler) signUp(c *gin.Context) {
 type signInInput struct {
 	Phone    string `json:"phone" binding:"required"`
 	Password string `json:"password" binding:"required"`
-}
-
-type getAuthorAndTokenResponse struct {
-	Role  string `json:"role"`
-	Token string `json:"token"`
+	Role     string `json:"role" binding:"required"`
 }
 
 func (h *Handler) signIn(c *gin.Context) {
@@ -63,7 +66,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, role, err := h.services.Authorization.GenerateToken(input.Phone, input.Password)
+	token, err := h.services.Authorization.GenerateToken(input.Phone, input.Password, input.Role)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -75,8 +78,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, getAuthorAndTokenResponse{
-		Role:  role,
-		Token: token,
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"token": token,
 	})
 }
