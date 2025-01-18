@@ -1,12 +1,11 @@
 package src.admin;
 
-
-
 import src.admin.calendarWindow.CalendarWindow;
 import src.admin.helpWindow.HelpWindow;
 import src.admin.profileWindow.ProfileWindow;
 import src.admin.resourceWindow.ResourceWindow;
 import src.admin.sideMenu.SideMenu;
+import src.admin.dayInfoWindow.DayInfoWindow;
 import src.AuthorizationWindow;
 
 import javafx.application.*;
@@ -65,5 +64,9 @@ public class AdminInterface{
 
 	public static void loadHelpWindow(Node node){
 		node.getScene().setRoot(HelpWindow.loadHelpWindow());	
+	}
+
+	public static void loadDayInfoWindow(Node node, LocalDate date){
+		node.getScene().setRoot(DayInfoWindow.loadWindow(date));	
 	}
 }

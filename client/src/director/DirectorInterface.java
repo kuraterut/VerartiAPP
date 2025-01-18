@@ -7,6 +7,7 @@ import src.director.helpWindow.HelpWindow;
 import src.director.profileWindow.ProfileWindow;
 import src.director.resourceWindow.ResourceWindow;
 import src.director.sideMenu.SideMenu;
+import src.director.mainInfoWindow.MainInfoWindow;
 import src.AuthorizationWindow;
 
 import javafx.application.*;

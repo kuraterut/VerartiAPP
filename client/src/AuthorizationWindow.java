@@ -23,6 +23,8 @@ import javafx.animation.*;
 import javafx.collections.*;
 import javafx.util.*;
 
+import java.time.*;
+
 
 public class AuthorizationWindow extends Main{
 	public static VBox loadAuthorizationWindow(){
@@ -111,7 +113,7 @@ public class AuthorizationWindow extends Main{
                     MasterInterface.loadCalendarWindow(authorizationBtn);
                 }
                 else if(Main.role.equals("Администратор")){
-                    AdminInterface.loadCalendarWindow(authorizationBtn);
+                    AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
                 }
                 else if(Main.role.equals("Директор")){
                     DirectorInterface.loadCalendarWindow(authorizationBtn);

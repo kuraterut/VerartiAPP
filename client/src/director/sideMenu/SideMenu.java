@@ -63,11 +63,12 @@ public class SideMenu extends Main{
         ImageView menuIcon          = new ImageView(menuIconImg);
         LinkedList<ButtonBase>  sideMenuBtnsList = new LinkedList<>();
 
-        ButtonBase[] mainSideMenuBtn = new ButtonBase[4];
+        ButtonBase[] mainSideMenuBtn = new ButtonBase[5];
         mainSideMenuBtn[0] = new Button();
         mainSideMenuBtn[1] = new ToggleButton();
         mainSideMenuBtn[2] = new Button();
         mainSideMenuBtn[3] = new Button();
+        mainSideMenuBtn[4] = new Button();
 
         Button toggleButton = new Button();
         
@@ -76,10 +77,11 @@ public class SideMenu extends Main{
             mainSideMenuBtn[i].setPrefWidth(Double.MAX_VALUE);
             mainSideMenuBtn[i].setPrefHeight(SIDEMENU_BTN_HEIGHT);
         }
-        mainSideMenuBtn[0].setText("Календарь");
+        mainSideMenuBtn[0].setText("Главная");
         mainSideMenuBtn[1].setText("Ресурсы");
         mainSideMenuBtn[2].setText("Профиль");
         mainSideMenuBtn[3].setText("Помощь");
+        mainSideMenuBtn[4].setText("Календарь");
         VBox.setMargin(mainSideMenuBtn[0], new Insets(100, 0, 0, 0));
 
         mainSideMenuBtn[state].setStyle("-fx-background-color: grey");
@@ -102,6 +104,7 @@ public class SideMenu extends Main{
         mainSideMenuBtn[0].setOnAction(event -> DirectorInterface.loadCalendarWindow(mainSideMenuBtn[0]));
         mainSideMenuBtn[2].setOnAction(event -> DirectorInterface.loadProfileWindow(mainSideMenuBtn[2]));
         mainSideMenuBtn[3].setOnAction(event -> DirectorInterface.loadHelpWindow(mainSideMenuBtn[3]));
+        mainSideMenuBtn[4].setOnAction(event -> DirectorInterface.loadCalendarWindow(mainSideMenuBtn[4]));
 
         ToggleButton resourcesBtn = (ToggleButton)mainSideMenuBtn[1];
         resourcesBtn.setOnAction(new EventHandler<ActionEvent>() {

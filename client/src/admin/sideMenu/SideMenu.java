@@ -24,6 +24,7 @@ import javafx.util.*;
 
 import java.io.*;
 import java.util.*;
+import java.time.LocalDate;
 
 
 public class SideMenu extends Main{
@@ -76,7 +77,7 @@ public class SideMenu extends Main{
             mainSideMenuBtn[i].setPrefWidth(Double.MAX_VALUE);
             mainSideMenuBtn[i].setPrefHeight(SIDEMENU_BTN_HEIGHT);
         }
-        mainSideMenuBtn[0].setText("Календарь");
+        mainSideMenuBtn[0].setText("Главная");
         mainSideMenuBtn[1].setText("Ресурсы");
         mainSideMenuBtn[2].setText("Профиль");
         mainSideMenuBtn[3].setText("Помощь");
@@ -99,7 +100,7 @@ public class SideMenu extends Main{
         menuIcon.setFitWidth(60);
         menuIcon.setFitHeight(60);
 
-        mainSideMenuBtn[0].setOnAction(event -> AdminInterface.loadCalendarWindow(mainSideMenuBtn[0]));
+        mainSideMenuBtn[0].setOnAction(event -> AdminInterface.loadDayInfoWindow(mainSideMenuBtn[0], LocalDate.now()));
         mainSideMenuBtn[2].setOnAction(event -> AdminInterface.loadProfileWindow(mainSideMenuBtn[2]));
         mainSideMenuBtn[3].setOnAction(event -> AdminInterface.loadHelpWindow(mainSideMenuBtn[3]));
 
