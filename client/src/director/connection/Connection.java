@@ -1,4 +1,4 @@
-package src.admin.connection;
+package src.director.connection;
 
 import org.json.simple.*;
 import org.json.simple.parser.*;

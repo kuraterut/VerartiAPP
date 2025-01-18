@@ -1,9 +1,9 @@
-package src.admin.profileWindow;
+package src.director.profileWindow;
 
 import src.Main;
-import src.admin.AdminInterface;
-import src.admin.connection.Connection;
-import src.admin.sideMenu.SideMenu;
+import src.director.DirectorInterface;
+import src.director.connection.Connection;
+import src.director.sideMenu.SideMenu;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -133,7 +133,7 @@ public class ProfileWindow extends Main{
         btnsBox.setSpacing(100);
         centerBox.setSpacing(50);
 
-        cancel.setOnAction(event -> AdminInterface.loadProfileWindow(cancel));
+        cancel.setOnAction(event -> DirectorInterface.loadProfileWindow(cancel));
         
         saveChanges.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -146,7 +146,7 @@ public class ProfileWindow extends Main{
                 String newBio           = bioField.getText();
 
                 int status = Connection.changeProfileInfo(token, newName, newSurname, newPatronymic, newEmail, newPhone, newBio);
-                if(status == 200){AdminInterface.loadProfileWindow(cancel);}
+                if(status == 200){DirectorInterface.loadProfileWindow(cancel);}
                 else {errorMsg.setText("Ошибка отправки данных на сервер");}
             }
         });
@@ -218,7 +218,7 @@ public class ProfileWindow extends Main{
         btnsBox.setSpacing(100);
         centerBox.setSpacing(50);
 
-        cancel.setOnAction(event -> AdminInterface.loadProfileWindow(cancel));
+        cancel.setOnAction(event -> DirectorInterface.loadProfileWindow(cancel));
         
         saveChanges.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -227,7 +227,7 @@ public class ProfileWindow extends Main{
                 String newPassword       = newPasswordField.getText();
                 
                 int status = Connection.changeProfilePassword(token, oldPassword, newPassword);
-                if(status == 200){AdminInterface.loadProfileWindow(cancel);}
+                if(status == 200){DirectorInterface.loadProfileWindow(cancel);}
                 else {errorMsg.setText("Ошибка отправки данных на сервер");}
             }
         });
@@ -406,8 +406,8 @@ public class ProfileWindow extends Main{
         changeInfoBtnsBox.setAlignment(Pos.CENTER);
 
 
-        changeInfoBtn.setOnAction(event -> AdminInterface.loadChangeProfileInfoWindow(changeInfoBtn));
-        changePasswordBtn.setOnAction(event -> AdminInterface.loadChangeProfilePasswordWindow(changePasswordBtn));
+        changeInfoBtn.setOnAction(event -> DirectorInterface.loadChangeProfileInfoWindow(changeInfoBtn));
+        changePasswordBtn.setOnAction(event -> DirectorInterface.loadChangeProfilePasswordWindow(changePasswordBtn));
 
         changeAvatarBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -426,7 +426,7 @@ public class ProfileWindow extends Main{
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
                     int status = Connection.changeProfilePhoto(token, file);
                 }
-                AdminInterface.loadProfileWindow(changeAvatarBtn);
+                DirectorInterface.loadProfileWindow(changeAvatarBtn);
             }
         });
 

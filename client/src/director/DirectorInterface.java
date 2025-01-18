@@ -1,11 +1,13 @@
-package src.admin;
+package src.director;
 
-import src.admin.calendarWindow.CalendarWindow;
-import src.admin.helpWindow.HelpWindow;
-import src.admin.profileWindow.ProfileWindow;
-import src.admin.resourceWindow.ResourceWindow;
-import src.admin.sideMenu.SideMenu;
-import src.admin.dayInfoWindow.DayInfoWindow;
+
+
+import src.director.calendarWindow.CalendarWindow;
+import src.director.helpWindow.HelpWindow;
+import src.director.profileWindow.ProfileWindow;
+import src.director.resourceWindow.ResourceWindow;
+import src.director.sideMenu.SideMenu;
+import src.director.mainInfoWindow.MainInfoWindow;
 import src.AuthorizationWindow;
 
 import javafx.application.*;
@@ -28,7 +30,7 @@ import javafx.util.*;
 
 import java.time.*;
 
-public class AdminInterface{
+public class DirectorInterface{
 	public static int getDayOfWeekByStr(String date){
 		int year = Integer.parseInt(date.split("-")[0]);
         int month = Integer.parseInt(date.split("-")[1]);
@@ -64,9 +66,5 @@ public class AdminInterface{
 
 	public static void loadHelpWindow(Node node){
 		node.getScene().setRoot(HelpWindow.loadHelpWindow());	
-	}
-
-	public static void loadDayInfoWindow(Node node, LocalDate date){
-		node.getScene().setRoot(DayInfoWindow.loadWindow(date));	
 	}
 }

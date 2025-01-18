@@ -1,6 +1,8 @@
 package src;
 
 import src.master.MasterInterface;
+import src.admin.AdminInterface;
+import src.director.DirectorInterface;
 import src.Main;
 import src.Connection;
 import javafx.application.*;
@@ -21,6 +23,8 @@ import javafx.animation.*;
 import javafx.collections.*;
 import javafx.util.*;
 
+import java.time.*;
+
 
 public class AuthorizationWindow extends Main{
 	public static VBox loadAuthorizationWindow(){
@@ -32,6 +36,7 @@ public class AuthorizationWindow extends Main{
         Label lblErr                   = new Label();
         Label loginLbl                 = new Label();
         Label passwordLbl              = new Label();
+        Label roleLbl                  = new Label();
         
         TextField loginField           = new TextField();
         PasswordField passwordField    = new PasswordField();
@@ -39,14 +44,21 @@ public class AuthorizationWindow extends Main{
         Button authorizationBtn        = new Button();
 
 
+        ObservableList<String> rolesList = FXCollections.observableArrayList("Мастер", "Администратор", "Директор");
+        ComboBox<String> rolesComboBox = new ComboBox<String>(rolesList);
+        rolesComboBox.setValue("Мастер"); // устанавливаем выбранный элемент по умолчанию
+         
+        
         root.setSpacing(20);
         buttons.setSpacing(30);
 
         lblErr.setText("");
         headLbl.setText("АВТОРИЗАЦИЯ");
-        loginLbl.setText("Логин");
+        loginLbl.setText("Телефон");
         passwordLbl.setText("Пароль");
+        roleLbl.setText("Роль");
         authorizationBtn.setText("Авторизация");
+
 
         root.setAlignment(Pos.CENTER);
         table.setAlignment(Pos.CENTER);
@@ -72,6 +84,7 @@ public class AuthorizationWindow extends Main{
             public void handle(ActionEvent event) {
                 String login    = loginField.getText();
                 String password = passwordField.getText();
+                String chosenRole = rolesComboBox.getValue();
                 try{long k = Long.parseLong(login.substring(1));}
                 catch(Exception ex){
                     lblErr.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
@@ -83,7 +96,7 @@ public class AuthorizationWindow extends Main{
                     return;
                 }
 
-                String[] checkResponse = Connection.checkAuthAndGetToken(login, password);
+                String[] checkResponse = Connection.checkAuthAndGetToken(login, password, chosenRole);
                 if(checkResponse == null){
                     lblErr.setText("Ошибка подключения к серверу");
                     return;
@@ -94,10 +107,16 @@ public class AuthorizationWindow extends Main{
                 }
 
                 Main.token = checkResponse[0];
-                Main.role = checkResponse[1];
-                System.out.println(Main.role);
-                if(Main.role.equals("master")){
+                Main.role = chosenRole;
+
+                if(Main.role.equals("Мастер")){
                     MasterInterface.loadCalendarWindow(authorizationBtn);
+                }
+                else if(Main.role.equals("Администратор")){
+                    AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
+                }
+                else if(Main.role.equals("Директор")){
+                    DirectorInterface.loadCalendarWindow(authorizationBtn);
                 }
             }
         });
@@ -105,8 +124,11 @@ public class AuthorizationWindow extends Main{
 
         table.add(loginLbl, 0, 0);
         table.add(passwordLbl, 0, 1);
+        table.add(roleLbl, 0, 2);
         table.add(loginField, 1, 0);
         table.add(passwordField, 1, 1);
+        table.add(rolesComboBox, 1, 2);
+
         
         root.getChildren().addAll(headLbl, table, lblErr, buttons);
         buttons.getChildren().addAll(authorizationBtn);
