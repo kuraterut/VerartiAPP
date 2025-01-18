@@ -32,5 +32,5 @@ func (r *ProfilePostgres) GetUserInfo(userId int) (models.Users, error) {
 }
 
 func (r *ProfilePostgres) UpdatePhoto(userId int, newPhoto []byte) error {
-
+	return nil
 }
