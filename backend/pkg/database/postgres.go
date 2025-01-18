@@ -1,4 +1,4 @@
-package repository
+package database
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	resourceTable     = "resource"
-	userTable         = "users"
-	userResourceTable = "users_resource"
-	roleTable         = "role"
+	ResourceTable     = "resource"
+	UserTable         = "users"
+	UserResourceTable = "users_resource"
+	RoleTable         = "role"
 )
 
 type Config struct {

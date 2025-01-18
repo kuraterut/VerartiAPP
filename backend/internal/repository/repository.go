@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/minio/minio-go/v6"
 	"verarti/models"
 )
 
@@ -35,6 +36,7 @@ type User interface {
 
 type Profile interface {
 	GetUserInfo(userId int) (models.Users, error)
+	UpdatePhoto(userId int, newPhoto []byte) error
 }
 
 type Repository struct {
@@ -48,7 +50,7 @@ type Repository struct {
 	Profile
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
+func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 	return &Repository{
 		Resource:      NewResourcePostgres(db),
 		Authorization: NewAuthPostgres(db),
