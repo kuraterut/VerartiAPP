@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 )
 
@@ -26,13 +27,32 @@ func (h *Handler) updatePhoto(c *gin.Context) {
 		return
 	}
 
-	file, err := c.FormFile("photo")
+	fileHeader, err := c.FormFile("photo")
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err := h.services.Profile.
+	file, err := fileHeader.Open()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	defer file.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.services.Profile.UpdatePhoto(userId, fileBytes)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "ok")
 }
 
 func (h *Handler) updateInfo(c *gin.Context) {}
