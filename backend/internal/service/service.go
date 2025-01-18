@@ -6,9 +6,9 @@ import (
 )
 
 type Authorization interface {
-	CreateUser(user models.Users, roleId int) (int, error)
-	GenerateToken(phone, password string) (string, string, error)
-	ParseToken(token string) (int, string, error)
+	CreateUser(user models.Users, roleIds []int) (int, error)
+	GenerateToken(phone, password, role string) (string, error)
+	ParseToken(token string) (int, []string, error)
 }
 
 type Appointment interface {

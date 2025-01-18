@@ -1,3 +1,5 @@
+DROP TABLE users_role;
+
 DROP TABLE users_resource;
 
 DROP TABLE resource;

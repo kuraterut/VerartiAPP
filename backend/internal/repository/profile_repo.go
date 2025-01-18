@@ -20,12 +20,17 @@ func NewProfilePostgres(db *sqlx.DB) *ProfilePostgres {
 
 func (r *ProfilePostgres) GetUserInfo(userId int) (models.Users, error) {
 	var user models.Users
-	query := fmt.Sprintf("SELECT us.id as id, rl.name as role"+
-		" FROM %s us INNER JOIN %s rl on us.role_id = rl.id"+
-		" WHERE us.id = $1", database.UserTable, database.RoleTable)
-	err := r.db.Get(&user, query, userId)
+	queryGetUser := fmt.Sprintf("SELECT id, name, surname, patronymic, email, phone, bio, photo, salary FROM %s WHERE id = $1", database.UserTable)
+	err := r.db.Get(&user, queryGetUser, userId)
 	if errors.Is(err, sql.ErrNoRows) {
 		return models.Users{}, internal.NewErrorResponse(404, "user not found")
+	}
+
+	queryGetRoles := fmt.Sprintf("SELECT rl.name as roles FROM %s us_rl INNER JOIN %s rl on rl.id = us_rl.role_id "+
+		" WHERE us_rl.users_id = $1", database.UsersRoleTable, database.RoleTable)
+	err = r.db.Select(&user.Roles, queryGetRoles, user.Id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
 	}
 
 	return user, err
