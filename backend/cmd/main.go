@@ -8,9 +8,10 @@ import (
 	"log"
 	"os"
 	"verarti"
-	"verarti/pkg/handler"
-	"verarti/pkg/repository"
-	"verarti/pkg/service"
+	"verarti/internal/handler"
+	"verarti/internal/repository"
+	"verarti/internal/service"
+	"verarti/pkg/database"
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 		log.Fatalf("error loading env variables: %s", err.Error())
 	}
 
-	db, err := repository.NewPostgresDB(repository.Config{
+	db, err := database.NewPostgresDB(database.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -35,7 +36,12 @@ func main() {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	repos := repository.NewRepository(db)
+	minio, err := database.InitializeMinioClient()
+	if err != nil {
+		logrus.Fatalf("failed to initialize minio client: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db, minio)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 

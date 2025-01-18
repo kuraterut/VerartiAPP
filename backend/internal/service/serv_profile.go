@@ -1,8 +1,8 @@
 package service
 
 import (
+	"verarti/internal/repository"
 	"verarti/models"
-	"verarti/pkg/repository"
 )
 
 type ProfileService struct {

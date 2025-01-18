@@ -1,4 +1,4 @@
-package pkg
+package internal
 
 type ErrorResponse struct {
 	Code int    `json:"code"`

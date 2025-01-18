@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"verarti/pkg/service"
+	"verarti/internal/service"
 )
 
 type Handler struct {
