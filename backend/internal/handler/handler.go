@@ -95,8 +95,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			clients := admin.Group("/clients")
 			{
-				clients.GET("/")
-				clients.GET("/:id")
+				clients.POST("/", h.createClient)
+				clients.GET("/", h.getAllClients)
+				clients.GET("/:id", h.getClientById)
+				clients.PUT("/", h.updateClient)
 			}
 
 			feedback := admin.Group("/feedback")

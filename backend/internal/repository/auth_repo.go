@@ -29,26 +29,26 @@ func (r *AuthPostgres) CreateUser(user models.Users, roleIds []int) (int, error)
 	}
 	defer tx.Rollback()
 
-	var id int
+	var userId, id int
 
 	queryCreateUser := fmt.Sprintf("INSERT INTO %s (name, surname, patronymic, password_hash, email, phone)"+
 		" VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", database.UserTable)
 	row := tx.QueryRow(queryCreateUser, user.Name, user.Surname, user.Patronymic,
 		user.Password, user.Email, user.Phone)
-	if err := row.Scan(&id); err != nil {
+	if err := row.Scan(&userId); err != nil {
 		return 0, err
 	}
 
 	for _, roleId := range roleIds {
 		queryCreateUserRole := fmt.Sprintf("INSERT INTO %s (users_id, role_id)"+
 			" VALUES ($1, $2) RETURNING id", database.UsersRoleTable)
-		row = tx.QueryRow(queryCreateUserRole, id, roleId)
+		row = tx.QueryRow(queryCreateUserRole, userId, roleId)
 		if err := row.Scan(&id); err != nil {
 			return 0, err
 		}
 	}
 
-	return id, tx.Commit()
+	return userId, tx.Commit()
 }
 
 func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {
