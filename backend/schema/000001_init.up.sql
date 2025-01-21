@@ -25,9 +25,9 @@ CREATE TABLE users
 
 CREATE TABLE users_role
 (
-    id      serial                                      not null unique,
+    id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
-    role_id int references role (id) on delete cascade  not null
+    role_id  int references role (id) on delete cascade  not null
 );
 
 CREATE TABLE client
@@ -36,9 +36,9 @@ CREATE TABLE client
     name       varchar(255) not null,
     surname    varchar(255) not null,
     patronymic varchar(255),
-    email      varchar(255) not null unique,
+    email      varchar(255) unique,
     phone      varchar(255) not null unique,
-    bio        varchar(255),
+    comment    varchar(511),
     birthday   date
 );
 

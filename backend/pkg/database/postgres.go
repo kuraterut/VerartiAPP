@@ -11,6 +11,7 @@ const (
 	UserResourceTable = "users_resource"
 	RoleTable         = "role"
 	UsersRoleTable    = "users_role"
+	ClientTable       = "client"
 )
 
 type Config struct {

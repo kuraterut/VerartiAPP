@@ -15,6 +15,7 @@ type Appointment interface {
 }
 
 type Client interface {
+	CreateClient(client models.Client) (int, error)
 }
 
 type Feedback interface {
@@ -57,5 +58,6 @@ func NewService(repos *repository.Repository) *Service {
 		Resource:      NewResourceService(repos),
 		Authorization: NewAuthService(repos),
 		Profile:       NewProfileService(repos),
+		Client:        NewClientService(repos),
 	}
 }
