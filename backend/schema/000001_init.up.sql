@@ -11,17 +11,23 @@ VALUES ('master'),
 
 CREATE TABLE users
 (
-    id            serial                   not null unique,
-    name          varchar(255)             not null,
-    surname       varchar(255)             not null,
+    id            serial       not null unique,
+    name          varchar(255) not null,
+    surname       varchar(255) not null,
     patronymic    varchar(255) default '',
-    password_hash varchar(255)             not null,
-    email         varchar(255)             not null unique,
-    phone         varchar(255)             not null unique,
+    password_hash varchar(255) not null,
+    email         varchar(255) not null unique,
+    phone         varchar(255) not null unique,
     bio           varchar(511) default '',
     photo         varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
-    role_id       int references role (id) not null,
     salary        int          default 0
+);
+
+CREATE TABLE users_role
+(
+    id      serial                                      not null unique,
+    users_id int references users (id) on delete cascade not null,
+    role_id int references role (id) on delete cascade  not null
 );
 
 CREATE TABLE client
