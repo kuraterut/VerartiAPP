@@ -1,5 +1,7 @@
 package src.admin.connection;
 
+import stc.admin.utils.*;
+
 import org.json.simple.*;
 import org.json.simple.parser.*;
 import javafx.scene.image.*;
@@ -96,7 +98,7 @@ public class Connection{
 
 	public static Map<String, String> getProfileInfo(String token){
 		try{
-			getConnection("http://localhost:8000/api/master/profile/");
+			getConnection("http://localhost:8000/api/admin/profile/");
 
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -113,7 +115,6 @@ public class Connection{
 			masterInfoMap.put("bio", (String)data.get("bio"));
 			masterInfoMap.put("role", (String)data.get("role"));
 			masterInfoMap.put("photo", (String)data.get("photo"));
-			masterInfoMap.put("current_salary", (String)data.get("current_salary"));
 			
 			return masterInfoMap;
 		}
@@ -245,22 +246,23 @@ public class Connection{
 	    }
 	}
 	
-	public static Image getProfilePhoto(String avatarBytesStr){
+	public static Image getProfilePhoto(String avatarURL){
 		try{
-			if(avatarBytesStr == null){
-				return new Image(new FileInputStream("client/photos/standard.jpg"));
-			}
-			Image avatarImage = null;
-			FileOutputStream avatarFile = new FileOutputStream("client/photos/avatar.jpg");
-	        
-			byte[] avatarBytes = Base64.getDecoder().decode(avatarBytesStr);
+			getConnection(avatarURL);
+				
+			String avatarFileName = "client/photos/"+"avatar.png";
+			//TODO получить filename из URL
 
-			for(int i = 0; i < avatarBytes.length; i++){
-				avatarFile.write((int)avatarBytes[i]);
-			}
-	        
-	        avatarFile.close();
-	        avatarImage = new Image(new FileInputStream("client/photos/avatar.jpg"));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			BufferedWriter writter = new BufferedWriter(new FileWriter(avatarFileName));
+
+			String line;
+
+	        while (!(line = reader.readLine()).equals("exit")) {
+	            writter.write(line);
+	        }
+
+	        Image avatarImage = new Image(new FileInputStream("client/photos/avatar.png"));
 	        return avatarImage;
 		}
 		catch(Exception ex){
@@ -312,6 +314,43 @@ public class Connection{
 	    }
 	}
 
+
+	public static ArrayList<String>[] getAllClientsInfo(String token){
+		try{
+			getConnection("http://localhost:8000/api/admin/clients/");
+
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			// connection.setDoOutput(true);
+
+			
+
+			
+
+			ArrayList[] result = new ArrayList[2];
+			result[0] = new ArrayList<String>(); //for name
+			result[1] = new ArrayList<String>(); //for number phone
+
+			JSONObject data = getJson();
+			JSONArray jsonArr = (JSONArray) data.get("data");
+	        
+	        for(int i = 0; i < jsonArr.size(); i++) {
+	            String name = (String)((JSONObject)jsonArr.get(i)).get("name");
+	            String phone = (String)((JSONObject)jsonArr.get(i)).get("phone");
+	            
+	            result[0].add(name);
+	            result[1].add(phone);
+	        }
+
+			return result;
+	    }
+	    catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	} 
+
+	
 	public static ArrayList<String[]> getTimetableByDate(int year, int month, int day, String token){
 		try{
 			getConnection("http://localhost:8000/api/master/shedule/day");
@@ -333,6 +372,42 @@ public class Connection{
 	        Iterator itr = jsonArr.iterator();
 	        while (itr.hasNext()) {
 	            JSONObject jsonObjArr = (JSONObject) itr.next();
+	            String[] strArr = new String[3];
+	            strArr[0] = (String)jsonObjArr.get("name");
+	            strArr[1] = (String)jsonObjArr.get("time");
+	            strArr[2] = (String)jsonObjArr.get("service");
+	            result.add(strArr);
+	        }
+
+			return result;
+	    }
+	    catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
+
+	public static MasterInfo[] getDayInfo(String token, LocalDate date){
+		try{
+			getConnection("http://localhost:8000/api/admin/shedule/day");
+
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			String dateStr = date.getDayOfMonth() + "." + date.getMonthValue() + "." + date.getYear();
+			JSONObject outJson = new JSONObject();
+			outJson.put("date", dateStr);
+
+			sendJson(outJson);
+
+			ArrayList<String[]> result = new ArrayList<>();
+			JSONObject data = getJson();
+			JSONArray jsonArr = (JSONArray) data.get("data");
+	        
+	        for (JSONObject elem: jsonArr){
+	            
 	            String[] strArr = new String[3];
 	            strArr[0] = (String)jsonObjArr.get("name");
 	            strArr[1] = (String)jsonObjArr.get("time");
@@ -385,5 +460,6 @@ public class Connection{
 	    	return null;
 	    }
 	}
+
 
 }
