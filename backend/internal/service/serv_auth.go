@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
+	"verarti/internal/repository"
 	"verarti/models"
-	"verarti/pkg/repository"
 )
 
 const (

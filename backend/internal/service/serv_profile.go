@@ -1,8 +1,8 @@
 package service
 
 import (
+	"verarti/internal/repository"
 	"verarti/models"
-	"verarti/pkg/repository"
 )
 
 type ProfileService struct {
@@ -15,4 +15,8 @@ func NewProfileService(repo repository.Profile) *ProfileService {
 
 func (s *ProfileService) GetUserInfo(userId int) (models.Users, error) {
 	return s.repo.GetUserInfo(userId)
+}
+
+func (s *ProfileService) UpdatePhoto(userId int, newPhoto []byte) error {
+	return s.repo.UpdatePhoto(userId, newPhoto)
 }

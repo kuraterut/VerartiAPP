@@ -4,8 +4,8 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"verarti/internal"
 	"verarti/models"
-	"verarti/pkg"
 )
 
 func checkRole(role string) (int, error) {
@@ -65,7 +65,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	token, role, err := h.services.Authorization.GenerateToken(input.Phone, input.Password)
 	if err != nil {
-		var errResp *pkg.ErrorResponse
+		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

@@ -1,8 +1,8 @@
 package service
 
 import (
+	"verarti/internal/repository"
 	"verarti/models"
-	"verarti/pkg/repository"
 )
 
 type Authorization interface {
@@ -35,7 +35,7 @@ type Profile interface {
 	GetUserInfo(userId int) (models.Users, error)
 	//UpdateInfo(userId int, info models.Info) error
 	//UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
-	//UpdatePhoto(userId int, newPhoto []byte) error
+	UpdatePhoto(userId int, newPhoto []byte) error
 }
 
 type User interface {

@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"verarti/internal"
 	"verarti/models"
-	"verarti/pkg"
 )
 
 func (h *Handler) createResource(c *gin.Context) {
@@ -52,7 +52,7 @@ func (h *Handler) getResourceById(c *gin.Context) {
 
 	resource, err := h.services.GetById(resourceId)
 	if err != nil {
-		var errResp *pkg.ErrorResponse
+		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -96,7 +96,7 @@ func (h *Handler) addResource(c *gin.Context) {
 
 	_, err = h.services.Resource.Add(masterId, resourceId)
 	if err != nil {
-		var errResp *pkg.ErrorResponse
+		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
