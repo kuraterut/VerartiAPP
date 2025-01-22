@@ -71,6 +71,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				clients.GET("/", h.getAllClients)
 				clients.GET("/:id", h.getClientById)
+				clients.GET("/phone", h.getClientByPhone)
 			}
 
 			feedback := master.Group("/feedback")

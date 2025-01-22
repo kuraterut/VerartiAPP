@@ -10,7 +10,7 @@ import (
 const (
 	authorizationHeader = "Authorization"
 	userCtx             = "userId"
-	rolesCtx            = "roles"
+	roleCtx             = "role"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
@@ -36,92 +36,68 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		return
 	}
 
-	userId, roles, err := h.services.Authorization.ParseToken(headerParts[1])
+	userId, role, err := h.services.Authorization.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	c.Set(rolesCtx, roles)
+	c.Set(roleCtx, role)
 	c.Set(userCtx, userId)
 }
 
 func (h *Handler) masterIdentity(c *gin.Context) {
-	roles, ok := c.Get(rolesCtx)
+	role, ok := c.Get(roleCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "roles not found")
+		newErrorResponse(c, http.StatusInternalServerError, "role not found")
 		return
 	}
 
-	rolesStr, ok := roles.([]string)
+	roleStr, ok := role.(string)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "roles is of invalid type")
+		newErrorResponse(c, http.StatusInternalServerError, "role is of invalid type")
 		return
 	}
 
-	var exist bool
-	for _, role := range rolesStr {
-		if role == "master" {
-			exist = true
-			break
-		}
-	}
-
-	if !exist {
+	if roleStr != "master" {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
 		return
 	}
 }
 
 func (h *Handler) adminIdentity(c *gin.Context) {
-	roles, ok := c.Get(rolesCtx)
+	role, ok := c.Get(roleCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "roles not found")
+		newErrorResponse(c, http.StatusInternalServerError, "role not found")
 		return
 	}
 
-	rolesStr, ok := roles.([]string)
+	roleStr, ok := role.(string)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "roles is of invalid type")
+		newErrorResponse(c, http.StatusInternalServerError, "role is of invalid type")
 		return
 	}
 
-	var exist bool
-	for _, role := range rolesStr {
-		if role == "admin" {
-			exist = true
-			break
-		}
-	}
-
-	if !exist {
+	if roleStr != "admin" {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
 		return
 	}
 }
 
 func (h *Handler) directorIdentity(c *gin.Context) {
-	roles, ok := c.Get(rolesCtx)
+	role, ok := c.Get(roleCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "roles not found")
+		newErrorResponse(c, http.StatusInternalServerError, "role not found")
 		return
 	}
 
-	rolesStr, ok := roles.([]string)
+	roleStr, ok := role.(string)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "roles is of invalid type")
+		newErrorResponse(c, http.StatusInternalServerError, "role is of invalid type")
 		return
 	}
 
-	var exist bool
-	for _, role := range rolesStr {
-		if role == "director" {
-			exist = true
-			break
-		}
-	}
-
-	if !exist {
+	if roleStr != "director" {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
 		return
 	}
