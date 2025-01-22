@@ -18,6 +18,7 @@ type Client interface {
 	CreateClient(client models.Client) (int, error)
 	GetClientByPhone(phone string) (models.Client, error)
 	GetClientById(clientId int) (models.Client, error)
+	GetAllClients() ([]models.Client, error)
 }
 
 type Feedback interface {

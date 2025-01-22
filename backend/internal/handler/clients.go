@@ -35,7 +35,21 @@ func (h *Handler) createClient(c *gin.Context) {
 }
 
 func (h *Handler) getAllClients(c *gin.Context) {
+	clients, err := h.services.Client.GetAllClients()
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
 
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"clients": clients,
+	})
 }
 
 func (h *Handler) getClientById(c *gin.Context) {

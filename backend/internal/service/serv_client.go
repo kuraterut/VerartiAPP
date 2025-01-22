@@ -24,3 +24,7 @@ func (s *ClientService) GetClientByPhone(phone string) (models.Client, error) {
 func (s *ClientService) GetClientById(clientId int) (models.Client, error) {
 	return s.repo.GetClientById(clientId)
 }
+
+func (s *ClientService) GetAllClients() ([]models.Client, error) {
+	return s.repo.GetAllClients()
+}
