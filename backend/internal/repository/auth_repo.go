@@ -55,6 +55,10 @@ func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {
 	var user models.Users
 	queryGetUser := fmt.Sprintf("SELECT id FROM %s WHERE phone = $1 AND password_hash = $2", database.UserTable)
 	err := r.db.Get(&user, queryGetUser, phone, password)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return models.Users{}, err
+	}
+
 	if errors.Is(err, sql.ErrNoRows) {
 		return models.Users{}, internal.NewErrorResponse(401, "incorrect login or password")
 	}
@@ -62,11 +66,15 @@ func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {
 	queryGetRoles := fmt.Sprintf("SELECT rl.name as roles FROM %s us_rl INNER JOIN %s rl on rl.id = us_rl.role_id "+
 		" WHERE us_rl.users_id = $1", database.UsersRoleTable, database.RoleTable)
 	err = r.db.Select(&user.Roles, queryGetRoles, user.Id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return models.Users{}, err
+	}
+
 	if errors.Is(err, sql.ErrNoRows) {
 		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
 	}
 
-	return user, err
+	return user, nil
 }
 
 //func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {

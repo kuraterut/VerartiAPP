@@ -16,6 +16,7 @@ type Appointment interface {
 
 type Client interface {
 	CreateClient(client models.Client) (int, error)
+	GetClientByPhone(phone string) (models.Client, error)
 }
 
 type Feedback interface {
