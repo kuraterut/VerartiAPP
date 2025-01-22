@@ -2,9 +2,9 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"verarti/internal"
 	"verarti/models"
 )
@@ -38,7 +38,27 @@ func (h *Handler) getAllClients(c *gin.Context) {
 
 }
 
-func (h *Handler) getClientById(c *gin.Context) {}
+func (h *Handler) getClientById(c *gin.Context) {
+	clientId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	client, err := h.services.Client.GetClientById(clientId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, client)
+}
 
 func (h *Handler) getClientByPhone(c *gin.Context) {
 	phone := c.Query("phone")
@@ -46,8 +66,6 @@ func (h *Handler) getClientByPhone(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "phone number is required")
 		return
 	}
-
-	fmt.Println("phone", phone)
 
 	client, err := h.services.Client.GetClientByPhone(phone)
 	if err != nil {

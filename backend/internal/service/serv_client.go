@@ -20,3 +20,7 @@ func (s *ClientService) CreateClient(client models.Client) (int, error) {
 func (s *ClientService) GetClientByPhone(phone string) (models.Client, error) {
 	return s.repo.GetClientByPhone(phone)
 }
+
+func (s *ClientService) GetClientById(clientId int) (models.Client, error) {
+	return s.repo.GetClientById(clientId)
+}
