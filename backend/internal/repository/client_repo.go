@@ -51,3 +51,35 @@ func (r *ClientPostgres) GetClientByPhone(phone string) (models.Client, error) {
 
 	return client, err
 }
+
+func (r *ClientPostgres) GetClientById(clientId int) (models.Client, error) {
+	var client models.Client
+
+	query := fmt.Sprintf("SELECT id, name, surname, patronymic, email, phone, comment, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday FROM %s WHERE id=$1", database.ClientTable)
+	err := r.db.Get(&client, query, clientId)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return models.Client{}, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return models.Client{}, internal.NewErrorResponse(404, "client with this id not found")
+	}
+
+	return client, err
+}
+
+func (r *ClientPostgres) GetAllClients() ([]models.Client, error) {
+	var clients []models.Client
+
+	query := fmt.Sprintf("SELECT id, name, surname, patronymic, email, phone, comment, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday FROM %s", database.ClientTable)
+	err := r.db.Select(&clients, query)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, internal.NewErrorResponse(404, "no clients found")
+	}
+
+	return clients, err
+}
