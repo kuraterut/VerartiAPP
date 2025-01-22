@@ -1,8 +1,11 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"verarti/internal"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -31,4 +34,20 @@ func (r *ClientPostgres) CreateClient(client models.Client) (int, error) {
 	}
 
 	return id, nil
+}
+
+func (r *ClientPostgres) GetClientByPhone(phone string) (models.Client, error) {
+	var client models.Client
+
+	query := fmt.Sprintf("SELECT id, name, surname, patronymic, email, phone, comment, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday FROM %s WHERE phone=$1", database.ClientTable)
+	err := r.db.Get(&client, query, phone)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return models.Client{}, err
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return models.Client{}, internal.NewErrorResponse(404, "client with this phone number not found")
+	}
+
+	return client, err
 }

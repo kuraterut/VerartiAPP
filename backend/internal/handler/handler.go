@@ -98,6 +98,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				clients.POST("/", h.createClient)
 				clients.GET("/", h.getAllClients)
 				clients.GET("/:id", h.getClientById)
+				clients.GET("/phone", h.getClientByPhone)
 				clients.PUT("/", h.updateClient)
 			}
 
