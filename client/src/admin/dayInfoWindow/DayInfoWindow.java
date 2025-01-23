@@ -126,7 +126,8 @@ public class DayInfoWindow extends Main{
                 for(int i = 1; i <= CELLS_IN_COLUMN_COUNT; i++){
                     if(!usedCells.contains(i)){
                         Rectangle unusedRect = new Rectangle(150, 100, Color.TRANSPARENT);
-                        // unusedRect.setOnMouseClicked(event -> showAppointmentInfoDialog(id));
+                        Integer startCellToCreate = i;
+                        unusedRect.setOnMouseClicked(event -> showCreateAppointmentDialog(master, date, startCellToCreate, appointments));
                         table.add(unusedRect, countColumn, i);
                         unusedRect.setOnMouseEntered(event -> {
                             unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
@@ -143,6 +144,21 @@ public class DayInfoWindow extends Main{
 
 		return scrollPane;
 	}
+
+    private static LocalTime startCellToStartTime(Integer startCell){
+        Integer hour = (startCell-1)/2 + 8;
+        Integer minute = 30*((startCell+1)%2);
+        return LocalTime.of(hour, minute);
+    }
+
+    public static void showCreateAppointmentDialog(MasterInfo master, LocalDate date, Integer startCell, List<Appointment> appointments){
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Создать запись");
+
+        LocalTime startTime = startCellToStartTime(startCell);
+        
+    }
 
 
     public static void showAppointmentInfoDialog(Long appointmentId) {

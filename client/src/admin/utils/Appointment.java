@@ -4,7 +4,7 @@ package src.admin.utils;
 import java.util.*;
 import java.time.*;
 
-public class Appointment{
+public class Appointment extends Response{
 	private Long id;
 	private LocalDate date;
 	private LocalTime startTime;

@@ -1,6 +1,6 @@
 package src.admin.utils;
 
-public class MasterInfo{
+public class MasterInfo extends Response{
 	private Long id;
 	private String name;
 	private String surname;
