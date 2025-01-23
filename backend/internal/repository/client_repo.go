@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"strings"
 	"verarti/internal"
 	"verarti/models"
 	"verarti/pkg/database"
@@ -82,4 +83,65 @@ func (r *ClientPostgres) GetAllClients() ([]models.Client, error) {
 	}
 
 	return clients, err
+}
+
+func (r *ClientPostgres) UpdateClient(clientId int, input models.Client) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	if input.Name != "" {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, input.Name)
+		argId++
+	}
+
+	if input.Surname != "" {
+		setValues = append(setValues, fmt.Sprintf("surname=$%d", argId))
+		args = append(args, input.Surname)
+		argId++
+	}
+
+	if input.Patronymic != "" {
+		setValues = append(setValues, fmt.Sprintf("patronymic=$%d", argId))
+		args = append(args, input.Patronymic)
+		argId++
+	}
+
+	if input.Email != "" {
+		setValues = append(setValues, fmt.Sprintf("email=$%d", argId))
+		args = append(args, input.Email)
+		argId++
+	}
+
+	if input.Phone != "" {
+		setValues = append(setValues, fmt.Sprintf("phone=$%d", argId))
+		args = append(args, input.Phone)
+		argId++
+	}
+
+	if input.Comment != "" {
+		setValues = append(setValues, fmt.Sprintf("comment=$%d", argId))
+		args = append(args, input.Comment)
+		argId++
+	}
+
+	if input.Birthday != "" {
+		setValues = append(setValues, fmt.Sprintf("birthday=$%d", argId))
+		args = append(args, input.Birthday)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	if setQuery == "" {
+		return internal.NewErrorResponse(400, "invalid input body: it is empty")
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d",
+		database.ClientTable, setQuery, argId)
+	args = append(args, clientId)
+
+	_, err := r.db.Exec(query, args...)
+	return err
 }
