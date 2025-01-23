@@ -4,7 +4,7 @@ import java.util.*;
 import java.time.*;
 import java.time.format.*;
 
-public class ServiceInfo{
+public class ServiceInfo extends Response{
 	private Long id;
 	private String name;
 	private String description;

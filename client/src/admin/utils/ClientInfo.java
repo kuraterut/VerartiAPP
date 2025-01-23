@@ -3,7 +3,7 @@ package src.admin.utils;
 import java.util.*;
 import java.time.*;
 
-public class ClientInfo{
+public class ClientInfo extends Response{
 	private Long id;
 	private String name;
 	private String surname;

@@ -462,6 +462,102 @@ public class Connection{
 	    }
 	}
 
+
+	public static ClientInfo getClientByPhone(String token, String phone){
+		try{
+			getConnection("http://localhost:8000/api/admin/clients/phone");
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			JSONObject outJson = new JSONObject();
+			outJson.put("phone", phone);
+			sendJson(outJson);
+
+			JSONObject data = getJson();
+
+			ClientInfo client = new ClientInfo();
+			
+			Long id = (Long)data.get("id");
+			String name = (String)data.get("name");
+			String surname = (String)data.get("surname");
+			String patronymic = (String)data.get("patronymic");
+			// String phone = (String)data.get("phone");
+			String comment = (String)data.get("comment");
+			String[] birthdayStr = ((String)data.get("birthday")).split("-");
+			LocalDate birthday = LocalDate.of(Integer.valueOf(birthdayStr[0]), Integer.valueOf(birthdayStr[1]), Integer.valueOf(birthdayStr[2]));
+
+
+			client.setId(id);
+			client.setName(name);
+			client.setSurname(surname);
+			client.setPatronymic(patronymic);
+			client.setPhone(phone);
+			client.setComment(comment);
+			client.setBirthday(birthday);
+
+			return client;
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
+
+	public static Response createAppointment(String token, Appointment appointment){
+		try{
+			getConnection("http://localhost:8000/api/admin/appointment");
+			connection.setRequestMethod("PUT");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			JSONObject outJson = new JSONObject();
+			
+
+			LocalDate date = appointment.getDate();
+			String dateStr = date.getYear()+"-";
+			dateStr += date.getMonthValue()+"-";
+			dateStr += date.getDayOfMonth();
+
+			LocalTime startTime = appointment.getStartTime();
+			String startTimeStr = startTime.getHour()+":"+startTime.getMinute();
+
+			JSONArray servicesJSON = new JSONArray();
+			for(ServiceInfo service : appointment.getServices()){
+				servicesJSON.add(service.getId());
+			}
+
+			Long clientId = appointment.getClient().getId();
+			Long masterId = appointment.getMaster().getId();
+			String comment = appointment.getComment();
+			
+			outJson.put("date", dateStr);
+			outJson.put("start_time", startTimeStr);
+			outJson.put("services", servicesJSON);
+			outJson.put("client_id", clientId);
+			outJson.put("master_id", masterId);
+			outJson.put("comment", comment);
+
+			sendJson(outJson);
+
+			Response response = new Response();
+			response.setCode((long)connection.getResponseCode());
+
+			return response;
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	
+	    	Response response = new Response();
+			response.setCode(Long.valueOf(-1));
+			response.setMsg("Нет подключения");
+
+	    	return response;
+	    }
+	}
+
+
 	public static Appointment getAppointmentById(String token, Long id){
 		try{
 			getConnection("http://localhost:8000/api/admin/appointment/" + id);
@@ -581,9 +677,6 @@ public class Connection{
 	    }
 	}
 
-
-
-
 	private static void sendJson(JSONObject outJson){
 		try{
 			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
@@ -620,6 +713,4 @@ public class Connection{
 	    	return null;
 	    }
 	}
-
-
 }
