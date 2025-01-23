@@ -84,7 +84,11 @@ public class AuthorizationWindow extends Main{
             public void handle(ActionEvent event) {
                 String login    = loginField.getText();
                 String password = passwordField.getText();
-                String chosenRole = rolesComboBox.getValue();
+                String chosenRole = null;
+                if(rolesComboBox.getValue().equals("Мастер")){chosenRole = "master";}
+                if(rolesComboBox.getValue().equals("Администратор")){chosenRole = "admin";}
+                if(rolesComboBox.getValue().equals("Директор")){chosenRole = "director";}
+
                 try{long k = Long.parseLong(login.substring(1));}
                 catch(Exception ex){
                     lblErr.setText("Некорректный номер телефона. Пожалуйста проверьте правильность, он должен начинаться с +7");
@@ -109,13 +113,13 @@ public class AuthorizationWindow extends Main{
                 Main.token = checkResponse[0];
                 Main.role = chosenRole;
 
-                if(Main.role.equals("Мастер")){
+                if(Main.role.equals("master")){
                     MasterInterface.loadCalendarWindow(authorizationBtn);
                 }
-                else if(Main.role.equals("Администратор")){
+                else if(Main.role.equals("admin")){
                     AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
                 }
-                else if(Main.role.equals("Директор")){
+                else if(Main.role.equals("director")){
                     DirectorInterface.loadCalendarWindow(authorizationBtn);
                 }
             }

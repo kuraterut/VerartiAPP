@@ -27,8 +27,11 @@ import javafx.util.*;
 import java.io.*;
 import java.util.*;
 import java.time.*;
+import java.time.format.*;
 
 public class DayInfoWindow extends Main{
+    private static Integer CELLS_IN_COLUMN_COUNT = 28;
+
 	public static ScrollPane createDayInfoTable(LocalDate date){
 		int day = date.getDayOfMonth();
 		int year = date.getYear();
@@ -58,7 +61,81 @@ public class DayInfoWindow extends Main{
 		scrollPane.setContent(table);
 
 		table.getColumnConstraints().add(new ColumnConstraints(100));
-		table.getColumnConstraints().add(new ColumnConstraints(150));
+
+        Map<Long, List<Appointment>> dayInfo = Connection.getDayInfoMapMaster(token, date);
+        if(dayInfo == null){dayInfo = new HashMap<>();}
+
+        int countColumn = 0;
+        for(Long masterId : dayInfo.keySet()){
+            Set<Integer> usedCells = new HashSet<>();
+            countColumn++;
+            table.getColumnConstraints().add(new ColumnConstraints(200));
+            MasterInfo master = Connection.getMasterById(token, masterId);
+
+            Label masterIdLbl = new Label(Long.toString(masterId));
+            Label masterFioLbl = new Label(master.getFio());
+
+            table.add(masterIdLbl, countColumn, 0);
+            table.add(masterFioLbl, countColumn, 0);
+            GridPane.setHalignment(masterIdLbl, HPos.CENTER);
+            GridPane.setValignment(masterIdLbl, VPos.CENTER);
+            GridPane.setHalignment(masterFioLbl, HPos.CENTER);
+            GridPane.setValignment(masterFioLbl, VPos.CENTER);
+
+            List<Appointment> appointments = dayInfo.get(masterId);
+
+            for(Appointment appointment: appointments){
+                Long id = appointment.getId();
+                ClientInfo client = appointment.getClient();
+                List<ServiceInfo> services = appointment.getServices();
+                ServiceInfo firstService = services.get(0);
+                Integer cellStart = calculateCellStart(appointment.getStartTime());
+                Integer cellNumber = calculateCellNumber(services);
+
+                Rectangle rectStart = new Rectangle(150, 100, Color.AQUAMARINE);
+                rectStart.setOnMouseClicked(event -> showAppointmentInfoDialog(id));
+                rectStart.setOnMouseEntered(event -> {
+                    rectStart.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
+                });
+                rectStart.setOnMouseExited(event -> rectStart.setStyle("-fx-fill: aquamarine"));
+
+                Label appointmentHeadLbl = new Label("Запись №"+id);
+                Label clientLbl = new Label(client.getFio());
+                Label serviceLbl = new Label();
+                
+                if(services.size() == 1){
+                    serviceLbl.setText(firstService.getName());
+                }
+                else{
+                    serviceLbl.setText(firstService.getName()+"...");
+                }
+
+                table.add(appointmentHeadLbl, countColumn, cellStart);
+                table.add(clientLbl, countColumn, cellStart);
+                table.add(serviceLbl, countColumn, cellStart);
+                table.add(rectStart, countColumn, cellStart);
+                
+                usedCells.add(cellStart);
+
+                for(int i = 1; i < cellNumber; i++){
+                    Rectangle rectFill = new Rectangle(150, 100, Color.AQUA);
+                    table.add(rectFill, countColumn, cellStart+i);
+                    usedCells.add(cellStart+i);
+                }
+
+                for(int i = 1; i <= CELLS_IN_COLUMN_COUNT; i++){
+                    if(!usedCells.contains(i)){
+                        Rectangle unusedRect = new Rectangle(150, 100, Color.TRANSPARENT);
+                        // unusedRect.setOnMouseClicked(event -> showAppointmentInfoDialog(id));
+                        table.add(unusedRect, countColumn, i);
+                        unusedRect.setOnMouseEntered(event -> {
+                            unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
+                        });
+                        unusedRect.setOnMouseExited(event -> unusedRect.setStyle("")); 
+                    }   
+                }
+            }
+        }
 
 		table.setGridLinesVisible(true);
 		scrollPane.setPrefViewportHeight(800);
@@ -66,6 +143,116 @@ public class DayInfoWindow extends Main{
 
 		return scrollPane;
 	}
+
+
+    public static void showAppointmentInfoDialog(Long appointmentId) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Информация о записи");
+
+        Appointment appointment = Connection.getAppointmentById(token, appointmentId);
+        MasterInfo master = appointment.getMaster();
+        ClientInfo client = appointment.getClient();
+        List<ServiceInfo> services = appointment.getServices();
+        LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String dateTimeStr = dateTime.format(formatter); // "1986-04-08 12:30"
+
+        Label dateTimeLbl = new Label(dateTimeStr);
+        Label appointmentHeadLbl = new Label("Запись №"+appointmentId);
+        Label masterLbl = new Label("Мастер: " + master.getFio());
+        Label clientLbl = new Label("Клиент: " + client.toString());
+        Label servicesLbl = new Label("Услуги:");
+
+        ScrollPane servicesScrollPane = new ScrollPane();
+        servicesScrollPane.setPrefViewportHeight(300);
+        servicesScrollPane.setPrefViewportWidth(400);
+        
+        GridPane servicesTable = new GridPane();
+        servicesTable.setGridLinesVisible(true);
+
+        servicesScrollPane.setContent(servicesTable);
+
+        Label serviceHeadTable = new Label("Услуга");
+        Label timeHeadTable = new Label("Рассчетное время");
+        Label priceHeadTable = new Label("Прайс");
+        
+        servicesTable.add(serviceHeadTable, 0, 0);
+        servicesTable.add(timeHeadTable, 1, 0);
+        servicesTable.add(priceHeadTable, 2, 0);
+
+        int numServiceRow = 0;
+        for(ServiceInfo service: services){
+            numServiceRow++;
+            Label serviceLbl = new Label(service.getName());
+            Label timeLbl = new Label(service.getTimeString());
+            Label priceLbl = new Label(Double.toString(service.getPrice()));
+            servicesTable.add(serviceLbl, 0, numServiceRow);
+            servicesTable.add(timeLbl, 1, numServiceRow);
+            servicesTable.add(priceLbl, 2, numServiceRow);
+            GridPane.setHalignment(serviceLbl, HPos.CENTER);
+            GridPane.setValignment(serviceLbl, VPos.CENTER);
+            GridPane.setHalignment(timeLbl, HPos.CENTER);
+            GridPane.setValignment(timeLbl, VPos.CENTER);
+            GridPane.setHalignment(priceLbl, HPos.CENTER);
+            GridPane.setValignment(priceLbl, VPos.CENTER);
+        }
+        Button addServiceBtn = new Button("Добавить услугу");
+
+        TextArea commentsArea = new TextArea();
+        commentsArea.setWrapText(true);
+        commentsArea.setScrollLeft(Double.MAX_VALUE);
+        commentsArea.setText(appointment.getComment());
+        commentsArea.setMinWidth(400);
+        commentsArea.setMinHeight(200);
+
+
+        HBox bottomBtnsBox = new HBox();
+        Button closeBtn = new Button("Закрыть");
+        Button cancelServiceBtn = new Button("Отмена услуги");
+        Button paymentBtn = new Button("Оплата");
+
+        bottomBtnsBox.getChildren().addAll(closeBtn, cancelServiceBtn, paymentBtn);
+        bottomBtnsBox.setSpacing(100);
+        bottomBtnsBox.setAlignment(Pos.CENTER);
+
+        VBox root = new VBox();
+
+        dateTimeLbl.setAlignment(Pos.TOP_RIGHT);
+        appointmentHeadLbl.setAlignment(Pos.TOP_CENTER);
+        root.setAlignment(Pos.CENTER);
+
+        root.getChildren().addAll(dateTimeLbl, appointmentHeadLbl);
+        root.getChildren().addAll(masterLbl, clientLbl);
+        root.getChildren().addAll(servicesLbl, servicesScrollPane);
+        root.getChildren().addAll(addServiceBtn, commentsArea);
+        root.getChildren().addAll(bottomBtnsBox);
+        
+        Scene dialogScene = new Scene(root, 500, 500);
+        
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+    }
+
+
+    private static Integer calculateCellStart(LocalTime startTime){
+        int hour = startTime.getHour();
+        int minute = startTime.getMinute();
+
+        int ans = (hour-8)*2 + 1 + ((minute == 30)?1:0);
+        return ans;
+    }
+    private static Integer calculateCellNumber(List<ServiceInfo> services){
+        int totalCount = 0;
+        for(ServiceInfo service : services){
+            totalCount += service.getTime().getHour()*2;
+            totalCount += service.getTime().getMinute()==30?1:0;
+        }
+        
+        return totalCount;
+    }
+
 
 	public static BorderPane loadWindow(LocalDate date){
         BorderPane root             = new BorderPane();
@@ -76,6 +263,7 @@ public class DayInfoWindow extends Main{
 
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();
+        
         HBox sheduleHeaders			= new HBox();
         HBox rightSheduleHeaders	= new HBox();
         HBox leftSheduleHeaders		= new HBox();
@@ -84,19 +272,15 @@ public class DayInfoWindow extends Main{
         Button totalSumBtn			= new Button();
         Button cashBtn 				= new Button();
 
-        ComboBox<String> comboBox = new ComboBox<>();
+        ComboBox<String> comboBox   = new ComboBox<>();
 
-        ArrayList<String>[] clientsInfo = Connection.getAllClientsInfo(token);
-        if(clientsInfo == null){
-            clientsInfo = new ArrayList[2];
-            clientsInfo[0] = new ArrayList<String>();
-            clientsInfo[1] = new ArrayList<String>();
-        }
+        ArrayList<ClientInfo> clientsInfo = Connection.getAllClientsInfo(token);
+        if(clientsInfo == null){clientsInfo = new ArrayList<>();}
 
-        comboBox.getEditor().setOnKeyReleased(new AutoCompleteComboBoxListener(comboBox, clientsInfo[0], clientsInfo[1]));
+        comboBox.getEditor().setOnKeyReleased(new AutoCompleteComboBoxListener(comboBox, clientsInfo));
 
         comboBox.setEditable(true);
-        comboBox.getItems().addAll(numbers);
+        // comboBox.getItems().addAll(numbers);
         comboBox.setPrefWidth(500);
         
 
@@ -135,9 +319,6 @@ public class DayInfoWindow extends Main{
             AdminInterface.loadDayInfoWindow(miniCalendar, newValue);
 	    });
 
-
-
-
         rightSheduleHeaders.getChildren().addAll(cashBtn, totalSumBtn);
         leftSheduleHeaders.getChildren().addAll(miniCalendar);
         sheduleHeaders.getChildren().addAll(leftSheduleHeaders, rightSheduleHeaders);
@@ -154,15 +335,25 @@ public class DayInfoWindow extends Main{
 
 class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
     private ComboBox comboBox;
-    private ObservableList names;
+    private ObservableList fios;
     private ObservableList numbers;
     private boolean moveCaretToPos = false;
     private int caretPos;
 
-    public AutoCompleteComboBoxListener(final ComboBox comboBox, List<String> listNames, List<String> listNumbers) {
+    public AutoCompleteComboBoxListener(final ComboBox comboBox, List<ClientInfo> clientsInfo) {
         this.comboBox = comboBox;
-        this.names = FXCollections.observableList(listNames);
-        this.numbers = FXCollections.observableList(listNumbers);
+        List<String> fiosList = new ArrayList<>();
+        List<String> numbersList = new ArrayList<>();
+        
+
+
+        for(int i = 0; i < clientsInfo.size(); i++){
+            fiosList.add(clientsInfo.get(i).getFio());
+            numbersList.add(clientsInfo.get(i).getPhone());
+        }
+
+        this.fios = FXCollections.observableArrayList(fiosList);
+        this.numbers = FXCollections.observableArrayList(numbersList);
 
         this.comboBox.setEditable(true);
         this.comboBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -207,17 +398,17 @@ class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
 
 
         ObservableList list = FXCollections.observableArrayList();
-        for (int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < fios.size(); i++) {
             String input = comboBox.getEditor().getText().toLowerCase().trim();
             
             if(input.length() > 0 && Character.isDigit(input.charAt(0))){
                 if(numbers.get(i).toString().toLowerCase().endsWith(input)){
-                    list.add(names.get(i) + " (" + numbers.get(i) + ")"); 
+                    list.add(fios.get(i) + " (" + numbers.get(i) + ")"); 
                 } 
             }
             else{
-                if(names.get(i).toString().toLowerCase().startsWith(input)) {
-                    list.add(names.get(i) + " (" + numbers.get(i) + ")");
+                if(fios.get(i).toString().toLowerCase().startsWith(input)) {
+                    list.add(fios.get(i) + " (" + numbers.get(i) + ")");
                 }    
             }
             

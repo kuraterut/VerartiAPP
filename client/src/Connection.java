@@ -26,7 +26,7 @@ public class Connection{
 			JSONObject outJson = new JSONObject();
 			outJson.put("phone", login);
 			outJson.put("password", password);
-			// outJson.put("role", password);
+			outJson.put("role", role);
 
 			sendJson(outJson);
 
