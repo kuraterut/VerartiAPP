@@ -16,6 +16,7 @@ import javafx.scene.input.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.*;
+import javafx.scene.text.*;
 import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 import javafx.geometry.*;
@@ -83,6 +84,11 @@ public class DayInfoWindow extends Main{
             GridPane.setValignment(masterFioLbl, VPos.CENTER);
 
             List<Appointment> appointments = dayInfo.get(masterId);
+            Set<Integer> startCellsSet = new HashSet<>();
+            for(Appointment appointment: appointments){
+                Integer startCellForSet = calculateCellStart(appointment.getStartTime());
+                startCellsSet.add(startCellForSet);
+            }
 
             for(Appointment appointment: appointments){
                 Long id = appointment.getId();
@@ -118,6 +124,7 @@ public class DayInfoWindow extends Main{
                 usedCells.add(cellStart);
 
                 for(int i = 1; i < cellNumber; i++){
+                    if(startCellsSet.contains(cellStart+i)) break;
                     Rectangle rectFill = new Rectangle(150, 100, Color.AQUA);
                     table.add(rectFill, countColumn, cellStart+i);
                     usedCells.add(cellStart+i);
@@ -157,6 +164,8 @@ public class DayInfoWindow extends Main{
         dialog.setTitle("Создать запись");
 
         LocalTime startTime = startCellToStartTime(startCell);
+        List<ServiceInfo> services = master.getServices();
+    
         
     }
 
@@ -284,9 +293,13 @@ public class DayInfoWindow extends Main{
         HBox rightSheduleHeaders	= new HBox();
         HBox leftSheduleHeaders		= new HBox();
         HBox centerInfo				= new HBox();
+        HBox searchStringBox        = new HBox();
 
         Button totalSumBtn			= new Button();
         Button cashBtn 				= new Button();
+        Button putMasterOnDayBtn    = new Button();
+        Button putAdminOnDayBtn     = new Button();
+        Button addNewClientBtn      = new Button();
 
         ComboBox<String> comboBox   = new ComboBox<>();
 
@@ -298,17 +311,24 @@ public class DayInfoWindow extends Main{
         comboBox.setEditable(true);
         // comboBox.getItems().addAll(numbers);
         comboBox.setPrefWidth(500);
+        comboBox.setPrefHeight(30);
+        addNewClientBtn.setMinHeight(30);
+        addNewClientBtn.setMinWidth(100);        
         
 
         centerBox.setAlignment(Pos.CENTER);
+        searchStringBox.setAlignment(Pos.CENTER);
         rightBox.setMinWidth(MENU_WIDTH);
-        totalSumBtn.setMinHeight(25);
+        totalSumBtn.setMinHeight(40);
         totalSumBtn.setMinWidth(150);
-        cashBtn.setMinHeight(25);
+        cashBtn.setMinHeight(40);
         cashBtn.setMinWidth(150);
-        miniCalendar.setMinHeight(25);
+        putAdminOnDayBtn.setMinHeight(40);
+        putAdminOnDayBtn.setMinWidth(150);
+        putMasterOnDayBtn.setMinHeight(40);
+        putMasterOnDayBtn.setMinWidth(150);
+        miniCalendar.setMinHeight(40);
         miniCalendar.setMinWidth(200);
-        
 
         // int totalSum = Connection.getTotalSum(token, date);
         // int cash = Connection.getCash(token, date);
@@ -316,13 +336,28 @@ public class DayInfoWindow extends Main{
         int cash = 1000;
 
 
-        totalSumBtn.setText(Integer.toString(totalSum));
-        cashBtn.setText(Integer.toString(cash));
+        totalSumBtn.setText("Общее: " + totalSum);
+        cashBtn.setText("Касса: " + cash);
+        putMasterOnDayBtn.setText("Назначить мастера");
+        putAdminOnDayBtn.setText("Назначить администратора");
+        addNewClientBtn.setText("Добавить клиента");
+
+        cashBtn.setWrapText(true);
+        totalSumBtn.setWrapText(true);
+        putAdminOnDayBtn.setWrapText(true);
+        putMasterOnDayBtn.setWrapText(true);
+        addNewClientBtn.setWrapText(true);
+
+        cashBtn.setTextAlignment(TextAlignment.CENTER);
+        totalSumBtn.setTextAlignment(TextAlignment.CENTER);
+        putAdminOnDayBtn.setTextAlignment(TextAlignment.CENTER);
+        putMasterOnDayBtn.setTextAlignment(TextAlignment.CENTER);
+        addNewClientBtn.setTextAlignment(TextAlignment.CENTER);
 
         VBox.setMargin(sheduleHeaders, new Insets(100, 0, 0, 0));
 
         sheduleHeaders.setAlignment(Pos.CENTER);
-        sheduleHeaders.setSpacing(850);
+        sheduleHeaders.setSpacing(550);
         miniCalendar.setValue(date);
 
         ScrollPane scrollTable = createDayInfoTable(date);
@@ -331,15 +366,25 @@ public class DayInfoWindow extends Main{
         textArea.setWrapText(true);
         textArea.setScrollLeft(Double.MAX_VALUE);
 
+        searchStringBox.setSpacing(25);
+
         miniCalendar.valueProperty().addListener((observable, oldValue, newValue) -> {
             AdminInterface.loadDayInfoWindow(miniCalendar, newValue);
 	    });
 
-        rightSheduleHeaders.getChildren().addAll(cashBtn, totalSumBtn);
+
+        // putMasterOnDayBtn.setOnAction(event -> showPutMasterOnDayDialog());
+        // putAdminOnDayBtn.setOnAction(event -> showPutAdminOnDayDialog());
+        // сash.setOnAction(event -> showCashDialog());
+        // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
+
+
+        searchStringBox.getChildren().addAll(comboBox, addNewClientBtn);
+        rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, cashBtn, totalSumBtn);
         leftSheduleHeaders.getChildren().addAll(miniCalendar);
         sheduleHeaders.getChildren().addAll(leftSheduleHeaders, rightSheduleHeaders);
         centerInfo.getChildren().addAll(scrollTable, textArea);
-        centerBox.getChildren().addAll(comboBox, sheduleHeaders, centerInfo);
+        centerBox.getChildren().addAll(searchStringBox, sheduleHeaders, centerInfo);
         root.setLeft(sideMenuStack);
         root.setCenter(centerBox);
         root.setRight(rightBox);

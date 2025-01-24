@@ -1,6 +1,6 @@
 package src.admin;
 
-// import src.admin.calendarWindow.CalendarWindow;
+import src.admin.calendarOfEmployeesWindow.CalendarOfEmployeesWindow;
 import src.admin.helpWindow.HelpWindow;
 import src.admin.profileWindow.ProfileWindow;
 import src.admin.resourceWindow.ResourceWindow;
@@ -64,5 +64,9 @@ public class AdminInterface{
 
 	public static void loadDayInfoWindow(Node node, LocalDate date){
 		node.getScene().setRoot(DayInfoWindow.loadWindow(date));	
+	}
+
+	public static void loadCalendarOfEmployeesWindow(Node node){
+		node.getScene().setRoot(CalendarOfEmployeesWindow.loadCalendarWindow());	
 	}
 }

@@ -273,10 +273,9 @@ public class Connection{
 	}
 
 
-
-	public static String[][] getTimetableByYM(int year, int month, String token){
+	public static AdminInfo getAdminByDate(String token, LocalDate date){
 		try{
-			getConnection("http://localhost:8000/api/master/shedule/month");
+			getConnection("http://localhost:8000/api/admin/shedule/admin/month");
 
 			connection.setRequestMethod("GET");
 
@@ -284,29 +283,91 @@ public class Connection{
 			connection.setDoOutput(true);
 
 			JSONObject outJson = new JSONObject();
-			outJson.put("year", year);
-			outJson.put("month", month);
+			String dateStr = date.getYear()+"-"+date.getMonthValue()+"-"+date.getDayOfMonth();
+			outJson.put("date", dateStr);
 
 			sendJson(outJson);
 
 	        JSONObject data = getJson();
 
-	        String[][] result = new String[32][2];
+	        AdminInfo admin = null; 
+
+	        Long adminId = (Long) data.get("admin_id");
+	        if(adminId != -1){
+	        	admin = getAdminById(token, adminId);
+	        }
+	        else{
+	        	admin = new AdminInfo();
+	        	admin.setName("");
+	        	admin.setSurname("Не назначен");
+	        }
+	        
+	        return admin;
+
+	    }
+	    catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
+	public static AdminInfo getAdminById(String token, Long id){
+		try{
+			getConnection("http://localhost:8000/api/admin/users/" + id);
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			JSONObject data = getJson();
+
+			AdminInfo admin = new AdminInfo();
+			
+			String name = (String)data.get("name");
+			String surname = (String)data.get("surname");
+			String patronymic = (String)data.get("patronymic");
+			String bio = (String)data.get("bio");
+
+			admin.setId(id);
+			admin.setName(name);
+			admin.setSurname(surname);
+			admin.setPatronymic(patronymic);
+			admin.setBio(bio);
+
+			return admin;
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
+
+	public static List<MasterInfo> getMastersListByDate(String token, LocalDate date){
+		try{
+			getConnection("http://localhost:8000/api/admin/shedule/masters/month");
+
+			connection.setRequestMethod("GET");
+
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			JSONObject outJson = new JSONObject();
+			String dateStr = date.getYear()+"-"+date.getMonthValue()+"-"+date.getDayOfMonth();
+			outJson.put("date", dateStr);
+
+			sendJson(outJson);
+
+	        JSONObject data = getJson();
+
+	        List<MasterInfo> masters = new ArrayList<>(); 
 
 	        JSONArray jsonArr = (JSONArray) data.get("data");
-	        Iterator itr = jsonArr.iterator();
-	        while (itr.hasNext()) {
-	            JSONObject jsonObjArr = (JSONObject) itr.next();
-	            String[] strArr = new String[2];
-	            String dayNumStr = ((String)jsonObjArr.get("date")).substring(0, 2);
-	            int dayIndex = Integer.parseInt(dayNumStr)-1;
-
-	            strArr[0] = (String)jsonObjArr.get("count");
-	            strArr[1] = (String)jsonObjArr.get("time");
-	            result[dayIndex] = strArr;
-	            
+	        for (Object elem: jsonArr) {
+	           	Long masterId = (Long)elem;
+	           	MasterInfo master = getMasterById(token, masterId);
+	           	masters.add(master);
 	        }
-	        return result;
+	        return masters;
 
 	    }
 	    catch(Exception ex){
@@ -409,12 +470,21 @@ public class Connection{
 			String patronymic = (String)data.get("patronymic");
 			String bio = (String)data.get("bio");
 
+			List<ServiceInfo> services = new ArrayList<>();
+			JSONArray servicesArr = (JSONArray)data.get("services_id");
+			for(Object elem: servicesArr){
+				Long serviceId = (Long)elem;
+				ServiceInfo service = getServiceById(token, serviceId);
+				services.add(service);
+			}
+
 
 			master.setId(id);
 			master.setName(name);
 			master.setSurname(surname);
 			master.setPatronymic(patronymic);
 			master.setBio(bio);
+			master.setServices(services);
 
 			return master;
 
@@ -541,7 +611,7 @@ public class Connection{
 			sendJson(outJson);
 
 			Response response = new Response();
-			response.setCode((long)connection.getResponseCode());
+			response.setCode(connection.getResponseCode());
 
 			return response;
 
@@ -550,9 +620,6 @@ public class Connection{
 	    	System.out.println(ex);
 	    	
 	    	Response response = new Response();
-			response.setCode(Long.valueOf(-1));
-			response.setMsg("Нет подключения");
-
 	    	return response;
 	    }
 	}
@@ -605,6 +672,105 @@ public class Connection{
 	    }
 	}
 
+
+	public static Map<Long, List<Appointment>> getMastersByDate(String token, LocalDate date){
+		try{
+			getConnection("http://localhost:8000/api/admin/appointment/masters");
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			Map<Long, List<Appointment>> mastersMap = new HashMap<>();
+
+			JSONObject data = getJson();
+			JSONArray mastersArr = (JSONArray)data.get("master_ids");
+			for(Object elem: mastersArr){
+				Long id = (Long)elem;
+				mastersMap.put(id, new ArrayList<>());
+			}
+
+			return mastersMap;
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return new HashMap<>();
+	    }
+	}
+
+	public static Response getDayTransactions(String token, LocalDate date){
+		try{
+			getConnection("http://localhost:8000/api/admin/transactions");
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			String dateStr = date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
+			
+			JSONObject outJson = new JSONObject();
+			outJson.put("date", dateStr);
+
+			sendJson(outJson);
+
+			JSONObject data = getJson();
+
+			Double cash = (Double)data.get("cash");
+			Double card = (Double)data.get("card");
+			Double goods = (Double)data.get("goods");
+
+
+			DayTransactions dayTransactions = new DayTransactions();
+			
+			dayTransactions.setDate(date);
+			dayTransactions.setCash(cash);
+			dayTransactions.setCard(card);
+			dayTransactions.setGoods(goods);
+
+			return dayTransactions;
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return new Response(404, "Ошибка подключения к серверу");
+	    }
+	}
+
+	public static Response setDayTransactions(String token, DayTransactions dayTransactions){
+		try{
+			getConnection("http://localhost:8000/api/admin/transactions");
+			connection.setRequestMethod("PUT");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			LocalDate date = dayTransactions.getDate();
+			Double cash = dayTransactions.getCash();
+			Double card = dayTransactions.getCard();
+			Double goods = dayTransactions.getGoods();
+
+			String dateStr = date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
+			
+			JSONObject outJson = new JSONObject();
+			outJson.put("date", dateStr);
+			outJson.put("cash", cash);
+			outJson.put("card", card);
+			outJson.put("goods", goods);
+
+			sendJson(outJson);
+
+			int status = connection.getResponseCode();
+			if(status == 200){
+				return new Response(200, "");
+			}
+			String msg = (String)getJson().get("msg");
+			return new Response(status, msg); 
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return new Response(404, "Ошибка подключения к серверу");
+	    }
+	}
+
+
+
 	public static Map<Long, List<Appointment>> getDayInfoMapMaster(String token, LocalDate date){
 		try{
 			getConnection("http://localhost:8000/api/admin/shedule/day");
@@ -620,7 +786,7 @@ public class Connection{
 
 			sendJson(outJson);
 
-			Map<Long, List<Appointment>> appointments = new HashMap<>();
+			Map<Long, List<Appointment>> appointments = getMastersByDate(token, date);
 			
 			JSONObject data = getJson();
 			JSONArray jsonArr = (JSONArray) data.get("data");
