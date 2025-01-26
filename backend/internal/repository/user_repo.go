@@ -147,3 +147,40 @@ func (r *UserPostgres) GetAllAdmins() ([]models.Users, error) {
 
 	return admins, nil
 }
+
+func (r *UserPostgres) GetAdminById(masterId int) (models.Users, error) {
+	var admin models.Users
+
+	query := fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary, 
+	   	(
+			SELECT array_remove(array_agg(rl.name), NULL)
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id
+		) AS roles
+		FROM %s us
+		WHERE us.id = $1`, database.UsersRoleTable, database.RoleTable, database.UserTable)
+
+	row := r.db.QueryRow(query, masterId)
+	err := row.Scan(&admin.Id, &admin.Name, &admin.Surname, &admin.Patronymic, &admin.Email, &admin.Phone, &admin.Bio, &admin.Photo, &admin.CurSalary, pq.Array(&admin.Roles))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Users{}, internal.NewErrorResponse(404, "user not found")
+		}
+
+		return models.Users{}, err
+	}
+
+	if admin.Roles == nil {
+		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+	} else {
+		for _, role := range admin.Roles {
+			if role == "admin" {
+				return admin, nil
+			}
+		}
+	}
+
+	return models.Users{}, internal.NewErrorResponse(400, "this user does not have the admin role")
+}

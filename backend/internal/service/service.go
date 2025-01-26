@@ -47,6 +47,7 @@ type User interface {
 	GetAllMasters() ([]models.Users, error)
 	GetMasterById(masterId int) (models.Users, error)
 	GetAllAdmins() ([]models.Users, error)
+	GetAdminById(masterId int) (models.Users, error)
 }
 
 type Service struct {

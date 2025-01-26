@@ -66,7 +66,27 @@ func (h *Handler) getAllAdmins(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getAdminById(c *gin.Context) {}
+func (h *Handler) getAdminById(c *gin.Context) {
+	adminId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	admin, err := h.services.User.GetAdminById(adminId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, admin)
+}
 
 func (h *Handler) getDirector(c *gin.Context) {}
 
