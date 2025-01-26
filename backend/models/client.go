@@ -10,3 +10,13 @@ type Client struct {
 	Comment    string `json:"comment,omitempty" db:"comment"`
 	Birthday   string `json:"birthday,omitempty" db:"birthday"`
 }
+
+type ClientUpdate struct {
+	Name       string `json:"name"`
+	Surname    string `json:"surname"`
+	Patronymic string `json:"patronymic"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Comment    string `json:"comment"`
+	Birthday   string `json:"birthday"`
+}

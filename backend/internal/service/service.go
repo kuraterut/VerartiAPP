@@ -19,6 +19,7 @@ type Client interface {
 	GetClientByPhone(phone string) (models.Client, error)
 	GetClientById(clientId int) (models.Client, error)
 	GetAllClients() ([]models.Client, error)
+	UpdateClient(clientId int, input models.Client) error
 }
 
 type Feedback interface {
@@ -43,6 +44,7 @@ type Profile interface {
 }
 
 type User interface {
+	GetAllMasters() ([]models.Users, error)
 }
 
 type Service struct {
@@ -62,5 +64,6 @@ func NewService(repos *repository.Repository) *Service {
 		Authorization: NewAuthService(repos),
 		Profile:       NewProfileService(repos),
 		Client:        NewClientService(repos),
+		User:          NewUserService(repos),
 	}
 }

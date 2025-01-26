@@ -28,3 +28,7 @@ func (s *ClientService) GetClientById(clientId int) (models.Client, error) {
 func (s *ClientService) GetAllClients() ([]models.Client, error) {
 	return s.repo.GetAllClients()
 }
+
+func (s *ClientService) UpdateClient(clientId int, input models.Client) error {
+	return s.repo.UpdateClient(clientId, input)
+}

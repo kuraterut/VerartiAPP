@@ -19,6 +19,7 @@ type Client interface {
 	GetClientByPhone(phone string) (models.Client, error)
 	GetClientById(clientId int) (models.Client, error)
 	GetAllClients() ([]models.Client, error)
+	UpdateClient(clientId int, input models.Client) error
 }
 
 type Feedback interface {
@@ -36,6 +37,7 @@ type Schedule interface {
 }
 
 type User interface {
+	GetAllMasters() ([]models.Users, error)
 }
 
 type Profile interface {
@@ -60,5 +62,6 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Authorization: NewAuthPostgres(db),
 		Profile:       NewProfilePostgres(db),
 		Client:        NewClientPostgres(db),
+		User:          NewUserPostgres(db),
 	}
 }

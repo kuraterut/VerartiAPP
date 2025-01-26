@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"verarti/internal"
 	"verarti/models"
 	"verarti/pkg/database"
@@ -53,47 +54,27 @@ func (r *AuthPostgres) CreateUser(user models.Users, roleIds []int) (int, error)
 
 func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {
 	var user models.Users
-	queryGetUser := fmt.Sprintf("SELECT id FROM %s WHERE phone = $1 AND password_hash = $2", database.UserTable)
-	err := r.db.Get(&user, queryGetUser, phone, password)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	query := fmt.Sprintf(`
+		SELECT us.id, array_remove(array_agg(rl.name), NULL) as roles
+		FROM %s us
+		LEFT JOIN %s us_rl ON us.id = us_rl.users_id
+		LEFT JOIN %s rl ON rl.id = us_rl.role_id
+		WHERE us.phone = $1 AND us.password_hash = $2
+		GROUP BY us.id`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+
+	row := r.db.QueryRow(query, phone, password)
+	err := row.Scan(&user.Id, pq.Array(&user.Roles))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Users{}, internal.NewErrorResponse(401, "incorrect login or password")
+		}
+
 		return models.Users{}, err
 	}
 
-	if errors.Is(err, sql.ErrNoRows) {
-		return models.Users{}, internal.NewErrorResponse(401, "incorrect login or password")
-	}
-
-	queryGetRoles := fmt.Sprintf("SELECT rl.name as roles FROM %s us_rl INNER JOIN %s rl on rl.id = us_rl.role_id "+
-		" WHERE us_rl.users_id = $1", database.UsersRoleTable, database.RoleTable)
-	err = r.db.Select(&user.Roles, queryGetRoles, user.Id)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return models.Users{}, err
-	}
-
-	if errors.Is(err, sql.ErrNoRows) {
+	if user.Roles == nil {
 		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
 	}
 
 	return user, nil
 }
-
-//func (r *AuthPostgres) GetUser(phone, password string) (models.Users, error) {
-//	var user models.Users
-//	query := fmt.Sprintf(`
-//		SELECT us.id, array_agg(rl.name) as roles
-//		FROM %s us
-//		LEFT JOIN %s us_rl ON us.id = us_rl.user_id
-//		LEFT JOIN %s rl ON rl.id = us_rl.role_id
-//		WHERE us.phone = $1 AND us.password_hash = $2
-//		GROUP BY us.id`, database.UserTable, database.UsersRoleTable, database.RoleTable)
-//
-//	err := r.db.Get(&user, query, phone, password)
-//	if errors.Is(err, sql.ErrNoRows) {
-//		return models.Users{}, internal.NewErrorResponse(401, "incorrect login or password")
-//	}
-//	if user.Roles == nil {
-//		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
-//	}
-//
-//	return user, nil
-//}

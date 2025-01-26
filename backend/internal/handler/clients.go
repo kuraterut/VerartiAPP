@@ -96,4 +96,40 @@ func (h *Handler) getClientByPhone(c *gin.Context) {
 	c.JSON(http.StatusOK, client)
 }
 
-func (h *Handler) updateClient(c *gin.Context) {}
+func (h *Handler) updateClient(c *gin.Context) {
+	clientId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	var input models.ClientUpdate
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	client := models.Client{
+		Name:       input.Name,
+		Surname:    input.Surname,
+		Patronymic: input.Patronymic,
+		Phone:      input.Phone,
+		Email:      input.Email,
+		Comment:    input.Comment,
+		Birthday:   input.Birthday,
+	}
+
+	err = h.services.Client.UpdateClient(clientId, client)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}

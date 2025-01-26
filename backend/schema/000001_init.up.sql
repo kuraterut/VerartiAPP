@@ -20,7 +20,7 @@ CREATE TABLE users
     phone         varchar(255) not null unique,
     bio           varchar(511) default '',
     photo         varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
-    salary        int          default 0
+    current_salary        int          default 0
 );
 
 CREATE TABLE users_role
