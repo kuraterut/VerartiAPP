@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -61,4 +63,41 @@ func (r *UserPostgres) GetAllMasters() ([]models.Users, error) {
 	}
 
 	return masters, nil
+}
+
+func (r *UserPostgres) GetMasterById(masterId int) (models.Users, error) {
+	var master models.Users
+
+	query := fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary, 
+	   	(
+			SELECT array_remove(array_agg(rl.name), NULL)
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id
+		) AS roles
+		FROM %s us
+		WHERE us.id = $1`, database.UsersRoleTable, database.RoleTable, database.UserTable)
+
+	row := r.db.QueryRow(query, masterId)
+	err := row.Scan(&master.Id, &master.Name, &master.Surname, &master.Patronymic, &master.Email, &master.Phone, &master.Bio, &master.Photo, &master.CurSalary, pq.Array(&master.Roles))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Users{}, internal.NewErrorResponse(404, "user not found")
+		}
+
+		return models.Users{}, err
+	}
+
+	if master.Roles == nil {
+		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+	} else {
+		for _, role := range master.Roles {
+			if role == "master" {
+				return master, nil
+			}
+		}
+	}
+
+	return models.Users{}, internal.NewErrorResponse(400, "this user does not have the master role")
 }

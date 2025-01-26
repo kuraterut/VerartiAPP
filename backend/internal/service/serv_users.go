@@ -16,3 +16,7 @@ func NewUserService(repo repository.User) *UserService {
 func (s *UserService) GetAllMasters() ([]models.Users, error) {
 	return s.repo.GetAllMasters()
 }
+
+func (s *UserService) GetMasterById(masterId int) (models.Users, error) {
+	return s.repo.GetMasterById(masterId)
+}
