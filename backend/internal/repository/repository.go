@@ -41,6 +41,7 @@ type User interface {
 	GetMasterById(masterId int) (models.Users, error)
 	GetAllAdmins() ([]models.Users, error)
 	GetAdminById(masterId int) (models.Users, error)
+	GetDirector() (models.Users, error)
 }
 
 type Profile interface {
