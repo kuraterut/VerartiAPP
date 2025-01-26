@@ -48,7 +48,23 @@ func (h *Handler) getMasterById(c *gin.Context) {
 	c.JSON(http.StatusOK, master)
 }
 
-func (h *Handler) getAllAdmins(c *gin.Context) {}
+func (h *Handler) getAllAdmins(c *gin.Context) {
+	admins, err := h.services.User.GetAllAdmins()
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"admins": admins,
+	})
+}
 
 func (h *Handler) getAdminById(c *gin.Context) {}
 

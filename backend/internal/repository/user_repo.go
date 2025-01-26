@@ -101,3 +101,49 @@ func (r *UserPostgres) GetMasterById(masterId int) (models.Users, error) {
 
 	return models.Users{}, internal.NewErrorResponse(400, "this user does not have the master role")
 }
+
+func (r *UserPostgres) GetAllAdmins() ([]models.Users, error) {
+	var admins []models.Users
+
+	query := fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary, 
+	   	(
+			SELECT array_remove(array_agg(rl.name), NULL)
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id
+		) AS roles
+		FROM %s us
+		WHERE EXISTS (
+			SELECT 1
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id AND rl.name = 'admin'
+		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable)
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.Users
+		err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
+		if err != nil {
+			return nil, err
+		}
+
+		if user.Roles == nil {
+			continue
+		}
+
+		admins = append(admins, user)
+	}
+
+	if len(admins) == 0 {
+		return nil, internal.NewErrorResponse(404, "admins not found")
+	}
+
+	return admins, nil
+}

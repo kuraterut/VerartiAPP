@@ -20,3 +20,7 @@ func (s *UserService) GetAllMasters() ([]models.Users, error) {
 func (s *UserService) GetMasterById(masterId int) (models.Users, error) {
 	return s.repo.GetMasterById(masterId)
 }
+
+func (s *UserService) GetAllAdmins() ([]models.Users, error) {
+	return s.repo.GetAllAdmins()
+}
