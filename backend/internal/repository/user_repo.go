@@ -234,3 +234,17 @@ func (r *UserPostgres) GetDirector() (models.Users, error) {
 
 	return directors[0], nil
 }
+
+func (r *UserPostgres) DeleteUser(userId int) error {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id = $1`, database.UserTable)
+	_, err := r.db.Exec(query, userId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return internal.NewErrorResponse(404, "user not found")
+		}
+
+		return err
+	}
+
+	return nil
+}

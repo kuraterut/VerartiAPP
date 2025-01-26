@@ -104,4 +104,24 @@ func (h *Handler) getDirector(c *gin.Context) {
 	c.JSON(http.StatusOK, director)
 }
 
-func (h *Handler) deleteUser(c *gin.Context) {}
+func (h *Handler) deleteUser(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	err = h.services.User.DeleteUser(userId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}

@@ -124,12 +124,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			users := director.Group("/users")
 			{
-				users.POST("/signup", h.signUp)
-				users.GET("/master")
-				users.GET("/master/:id")
-				users.GET("/admin")
-				users.GET("/admin/:id")
-				users.GET("/director")
+				users.GET("/master", h.getAllMasters)
+				users.GET("/master/:id", h.getMasterById)
+				users.GET("/admin", h.getAllAdmins)
+				users.GET("/admin/:id", h.getAdminById)
+				users.GET("/director", h.getDirector)
+				users.DELETE("/:id", h.deleteUser)
 			}
 
 			clients := director.Group("/clients")
