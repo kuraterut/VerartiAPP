@@ -44,6 +44,7 @@ type Profile interface {
 }
 
 type User interface {
+	GetAllMasters() ([]models.Users, error)
 }
 
 type Service struct {
@@ -63,5 +64,6 @@ func NewService(repos *repository.Repository) *Service {
 		Authorization: NewAuthService(repos),
 		Profile:       NewProfileService(repos),
 		Client:        NewClientService(repos),
+		User:          NewUserService(repos),
 	}
 }
