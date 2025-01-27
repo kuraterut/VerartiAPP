@@ -12,6 +12,7 @@ type Authorization interface {
 }
 
 type Appointment interface {
+	CreateAppointment(appointment models.Appointment) (int, error)
 }
 
 type Client interface {
@@ -68,5 +69,6 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Profile:       NewProfilePostgres(db),
 		Client:        NewClientPostgres(db),
 		User:          NewUserPostgres(db),
+		Appointment:   NewAppointmentPostgres(db),
 	}
 }

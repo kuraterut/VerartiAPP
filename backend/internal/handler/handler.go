@@ -118,12 +118,23 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				//resource.GET("/request", h.getRequests)
 				//resource.GET("/response", h.getResponseByRequestId)
 			}
+
+			appointment := admin.Group("/appointment")
+			{
+				appointment.POST("/", h.createAppointment)
+				appointment.POST("/:id", h.addAppointmentForMaster)
+				appointment.GET("/", h.getAllAppointments)
+				appointment.GET("/:id", h.getAppointmentById)
+				appointment.PUT("/:id", h.updateAppointment)
+				appointment.DELETE("/:id", h.deleteAppointment)
+			}
 		}
 
 		director := api.Group("/director", h.directorIdentity)
 		{
 			users := director.Group("/users")
 			{
+				users.POST("/signup", h.signUp)
 				users.GET("/master", h.getAllMasters)
 				users.GET("/master/:id", h.getMasterById)
 				users.GET("/admin", h.getAllAdmins)

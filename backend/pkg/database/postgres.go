@@ -12,6 +12,7 @@ const (
 	RoleTable         = "role"
 	UsersRoleTable    = "users_role"
 	ClientTable       = "client"
+	AppointmentTable  = "appointment"
 )
 
 type Config struct {
