@@ -26,3 +26,11 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.Appointment) 
 
 	return id, nil
 }
+
+func (r *AppointmentPostgres) GetAllAppointments() ([]models.Appointment, error) {
+	var appointments []models.Appointment
+	query := fmt.Sprintf("SELECT * FROM %s", database.AppointmentTable)
+	err := r.db.Select(&appointments, query)
+
+	return appointments, err
+}

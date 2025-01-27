@@ -16,3 +16,7 @@ func NewAppointmentService(repo repository.Appointment) *AppointmentService {
 func (s *AppointmentService) CreateAppointment(appointment models.Appointment) (int, error) {
 	return s.repo.CreateAppointment(appointment)
 }
+
+func (s *AppointmentService) GetAllAppointments() ([]models.Appointment, error) {
+	return s.repo.GetAllAppointments()
+}

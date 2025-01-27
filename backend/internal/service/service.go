@@ -13,6 +13,7 @@ type Authorization interface {
 
 type Appointment interface {
 	CreateAppointment(appointment models.Appointment) (int, error)
+	GetAllAppointments() ([]models.Appointment, error)
 }
 
 type Client interface {

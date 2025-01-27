@@ -31,7 +31,17 @@ func (h *Handler) createAppointment(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getAllAppointments(c *gin.Context) {}
+func (h *Handler) getAllAppointments(c *gin.Context) {
+	appointments, err := h.services.Appointment.GetAllAppointments()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"appointments": appointments,
+	})
+}
 
 func (h *Handler) getAppointmentById(c *gin.Context) {}
 
