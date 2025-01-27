@@ -20,3 +20,7 @@ func (s *AppointmentService) CreateAppointment(appointment models.Appointment) (
 func (s *AppointmentService) GetAllAppointments() ([]models.Appointment, error) {
 	return s.repo.GetAllAppointments()
 }
+
+func (s *AppointmentService) GetAppointmentById(appointmentId int) (models.Appointment, error) {
+	return s.repo.GetAppointmentById(appointmentId)
+}

@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
+	"verarti/internal"
 	"verarti/internal/domain"
 	"verarti/models"
 )
@@ -43,7 +46,27 @@ func (h *Handler) getAllAppointments(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getAppointmentById(c *gin.Context) {}
+func (h *Handler) getAppointmentById(c *gin.Context) {
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	appointment, err := h.services.Appointment.GetAppointmentById(appointmentId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, appointment)
+}
 
 func (h *Handler) addAppointmentForMaster(c *gin.Context) {}
 
