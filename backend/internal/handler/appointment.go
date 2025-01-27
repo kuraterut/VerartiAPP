@@ -70,6 +70,32 @@ func (h *Handler) getAppointmentById(c *gin.Context) {
 
 func (h *Handler) addAppointmentForMaster(c *gin.Context) {}
 
-func (h *Handler) updateAppointment(c *gin.Context) {}
+func (h *Handler) updateAppointment(c *gin.Context) {
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	var input models.AppointmentUpdate
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	err = h.services.Appointment.UpdateAppointment(input, appointmentId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}
 
 func (h *Handler) deleteAppointment(c *gin.Context) {}

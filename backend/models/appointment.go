@@ -7,3 +7,10 @@ type Appointment struct {
 	Description string `json:"description" db:"description" binding:"required"`
 	Duration    string `json:"duration" db:"duration" binding:"required"`
 }
+
+type AppointmentUpdate struct {
+	Price       int    `json:"price,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Duration    string `json:"duration,omitempty"`
+}

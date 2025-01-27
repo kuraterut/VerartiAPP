@@ -24,3 +24,7 @@ func (s *AppointmentService) GetAllAppointments() ([]models.Appointment, error) 
 func (s *AppointmentService) GetAppointmentById(appointmentId int) (models.Appointment, error) {
 	return s.repo.GetAppointmentById(appointmentId)
 }
+
+func (s *AppointmentService) UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error {
+	return s.repo.UpdateAppointment(appointment, appointmentId)
+}
