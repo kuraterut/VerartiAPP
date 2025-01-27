@@ -28,3 +28,7 @@ func (s *AppointmentService) GetAppointmentById(appointmentId int) (models.Appoi
 func (s *AppointmentService) UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error {
 	return s.repo.UpdateAppointment(appointment, appointmentId)
 }
+
+func (s *AppointmentService) DeleteAppointment(appointmentId int) error {
+	return s.repo.DeleteAppointment(appointmentId)
+}

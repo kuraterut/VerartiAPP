@@ -92,3 +92,17 @@ func (r *AppointmentPostgres) UpdateAppointment(appointment models.AppointmentUp
 	_, err := r.db.Exec(query, args...)
 	return err
 }
+
+func (r *AppointmentPostgres) DeleteAppointment(appointmentId int) error {
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id = $1`, database.AppointmentTable)
+	_, err := r.db.Exec(query, appointmentId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return internal.NewErrorResponse(404, "appointment not found")
+		}
+
+		return err
+	}
+
+	return nil
+}

@@ -98,4 +98,24 @@ func (h *Handler) updateAppointment(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func (h *Handler) deleteAppointment(c *gin.Context) {}
+func (h *Handler) deleteAppointment(c *gin.Context) {
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	err = h.services.Appointment.DeleteAppointment(appointmentId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}
