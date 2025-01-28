@@ -25,6 +25,26 @@ public class ClientInfo extends Response{
         return view;
     }
 
+    public Response checkInfo(){
+    	if (this.name.equals("")){
+    		return new Response(-1, "Введите имя");
+    	}
+    	if (this.surname.equals("")){
+    		return new Response(-1, "Введите фамилию");
+    	}
+    	//+79092762462
+    	if (this.phone.length() != 12 || !this.phone.startsWith("+7")){
+    		for(int i = 1; i < 12; i++){
+    			if(!Character.isDigit(this.phone.charAt(i))){
+    				return new Response(-1, "Неверный формат номера телефона(+7...)");		
+    			}
+    		}
+    		
+    	}
+
+    	return new Response(200, "");
+    }
+
 	public Long getId()				{return this.id;}
 	public String getName()			{return this.name;}
 	public String getSurname()		{return this.surname;}

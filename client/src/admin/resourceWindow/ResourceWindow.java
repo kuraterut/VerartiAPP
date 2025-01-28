@@ -1,9 +1,12 @@
 package src.admin.resourceWindow;
 
 import src.Main;
+
 import src.admin.AdminInterface;
-import src.admin.connection.Connection;
+import src.admin.connection.*;
+import src.admin.connection.resources.ConnectionResources;
 import src.admin.sideMenu.SideMenu;
+import src.admin.utils.*;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -28,7 +31,7 @@ import java.util.*;
 
 public class ResourceWindow extends Main{
     public static BorderPane loadResourcesListWindow(){
-        ArrayList<String[]> resourceList = Connection.getResourcesList(token);
+        ArrayList<ResourceInfo> resourceList = ConnectionResources.getResourcesList(token);
         
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = SideMenu.buildSideMenu(1);
@@ -54,21 +57,25 @@ public class ResourceWindow extends Main{
         GridPane.setValignment(descriptionHead, VPos.CENTER);
 
         if(resourceList == null){
-            String[] errorStrArr = new String[]{"Ошибка", "Ошибка", "Ошибка"};
-            resourceList = new ArrayList<>();
-            resourceList.add(errorStrArr);
+            ResourceInfo resource = new ResourceInfo();
+            resource.setId(Long.valueOf(-1));
+            resource.setName("Ошибка");
+            resource.setDescription("Ошибка");
+            resourceList.add(resource);
         }
 
         for (int i = 0; i < resourceList.size(); i++){
-            Label id = new Label(resourceList.get(i)[0]);
-            Label name = new Label(resourceList.get(i)[1]);
-            Label description = new Label(resourceList.get(i)[2]);
-            Button order = new Button("Заказать");
-            String idStr = resourceList.get(i)[0];
-            order.setOnAction(event -> loadResourceOrderDialog(idStr));
+            ResourceInfo resource = resourceList.get(i);
 
-            if(resourceList.get(i)[0].equals("Ошибка")){
-                tableResourceList.addRow(i+1, id, name, description);    
+            Label id = new Label(resource.getId()+"");
+            Label name = new Label(resource.getName());
+            Label description = new Label(resource.getDescription());
+            Button order = new Button("Заказать");
+            
+            order.setOnAction(event -> loadResourceOrderDialog(resource.getId()));
+
+            if(resource.getId() == -1){
+                tableResourceList.addRow(i+1, name, description);    
             }
             else{
                 tableResourceList.addRow(i+1, id, name, description, order);
@@ -113,23 +120,21 @@ public class ResourceWindow extends Main{
     }
 
 
-    public static void loadResourceOrderDialog(String idStr) {
-        int id = Integer.parseInt(idStr);
-        
-        String[] resourceInfo = Connection.getResourceInfoByID(token, id);
-        if(resourceInfo == null){
-            resourceInfo = new String[2];
-            resourceInfo[0] = "Ошибка";
-            resourceInfo[1] = "Ошибка";
+    public static void loadResourceOrderDialog(Long id) {    
+        ResourceInfo resource = (ResourceInfo)ConnectionResources.getResourceById(token, id);
+        if(resource.getCode() != 200){
+            resource.setName(resource.getMsg());
+            resource.setDescription(resource.getMsg());
         }
-        String resourceName = resourceInfo[0];
-        String resourceDescription = resourceInfo[1];
+
+        String resourceName = resource.getName();
+        String resourceDescription = resource.getDescription();
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Заказать ресурс");
         
-        Label idLbl = new Label(idStr);
+        Label idLbl = new Label(id+"");
         Label nameLbl = new Label(resourceName);
         Label descriptionLbl = new Label(resourceDescription);
         Label countLbl = new Label("Укажите количество:");
@@ -146,9 +151,9 @@ public class ResourceWindow extends Main{
             String countStr = countField.getText();
             try{
                 int count = Integer.parseInt(countStr);
-                int status = Connection.createResourceRequest(token, id, count);
-                if(status == 200){dialog.close();}
-                else{error.setText("Ошибка отправки запроса");}
+                Response response = ConnectionResources.createResourceRequest(token, id, count);
+                if(response.getCode() == 200){dialog.close();}
+                else{error.setText(response.getMsg());}
             }
             catch(Exception ex){
                 error.setText("Введите число");
@@ -169,7 +174,7 @@ public class ResourceWindow extends Main{
     }
 
     public static BorderPane loadResourcesRequestsWindow(){
-        ArrayList<String[]> resourceRequestsList = Connection.getResourcesRequestsList(token);
+        ArrayList<ResourceRequestInfo> resourceRequestsList = ConnectionResources.getResourcesRequestsList(token);
         
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = SideMenu.buildSideMenu(1);
@@ -198,23 +203,21 @@ public class ResourceWindow extends Main{
         GridPane.setValignment(statusHead, VPos.CENTER);
 
         if(resourceRequestsList == null){
-            String[] errorStrArr = new String[]{"Ошибка", "Ошибка", "Ошибка", "Ошибка"};
             resourceRequestsList = new ArrayList<>();
-            resourceRequestsList.add(errorStrArr);
         }
 
         for (int i = 0; i < resourceRequestsList.size(); i++){
             HBox statusBox = new HBox();
             statusBox.setSpacing(20);
-            String statusStr = resourceRequestsList.get(i)[3];
 
-            Label id = new Label(resourceRequestsList.get(i)[0]);
-            Label name = new Label(resourceRequestsList.get(i)[1]);
-            Label count = new Label(resourceRequestsList.get(i)[2]);
-            Label status = new Label(resourceRequestsList.get(i)[3]);
+            ResourceRequestInfo request = resourceRequestsList.get(i);
+            Label id = new Label(request.getId()+"");
+            Label name = new Label(request.getResource().getName());
+            Label count = new Label(request.getCount()+"");
+            Label status = new Label(request.getStatusDescription());
 
             statusBox.getChildren().add(status);
-            if(statusStr.equals("Готово к получению")){
+            if(request.getStatus() == 3){
                 Button statusBtn = new Button("Получено");
                 statusBox.getChildren().add(statusBtn);
             }

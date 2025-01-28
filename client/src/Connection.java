@@ -49,7 +49,7 @@ public class Connection{
 	        		msgText = "Неверный формат ввода";
 	        		break;
 
-	        	case 200:
+	        	case HttpURLConnection.HTTP_OK:
 			        token = (String)data.get("token");
 			        break;
 	        	
