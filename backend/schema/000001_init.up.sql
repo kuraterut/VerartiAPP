@@ -36,7 +36,7 @@ CREATE TABLE client
     name       varchar(255) not null,
     surname    varchar(255) not null,
     patronymic varchar(255),
-    email      varchar(255) unique,
+    email      varchar(255),
     phone      varchar(255) not null unique,
     comment    varchar(511),
     birthday   date
