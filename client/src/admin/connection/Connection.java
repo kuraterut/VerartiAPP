@@ -12,264 +12,50 @@ import java.io.*;
 import java.time.*;
 
 public class Connection{
-	private static HttpURLConnection connection;
+	public static HttpURLConnection connection;
 
 	public static void getConnection(String urlAddr) throws Exception{
 		URL url = new URL(urlAddr);
         connection = (HttpURLConnection) url.openConnection();
 	}
 
-	public static ArrayList<String[]> getResourcesList(String token) {
+
+	public static Response addNewClient(String token, ClientInfo client){
 		try{
-			getConnection("http://localhost:8000/api/master/resource/all");
-
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-			
-	        JSONObject data = getJson();
-
-	        ArrayList<String[]> result = new ArrayList<>();
-
-			JSONArray jsonArr = (JSONArray) data.get("data");
-	        Iterator itr = jsonArr.iterator();
-	        while (itr.hasNext()) {
-	            JSONObject jsonObjArr = (JSONObject) itr.next();
-	            String[] strArr = new String[3];
-	            strArr[0] = String.valueOf((int)jsonObjArr.get("id"));
-	            strArr[1] = (String)jsonObjArr.get("name");
-	            strArr[2] = (String)jsonObjArr.get("description");
-	            result.add(strArr);
-	        }
-	        return result;
-
-	    }
-	    catch(Exception ex){
-	    	System.out.println(ex);
-	    	return null;
-	    }
-	}
-
-	public static ArrayList<String[]> getResourcesRequestsList(String token) {
-		try{
-			getConnection("http://localhost:8000/api/master/resource/request");
-
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-			
-	        JSONObject data = getJson();
-
-	        ArrayList<String[]> result = new ArrayList<>();
-
-			JSONArray jsonArr = (JSONArray) data.get("data");
-	        Iterator itr = jsonArr.iterator();
-	        while (itr.hasNext()) {
-	            JSONObject jsonObjArr = (JSONObject) itr.next();
-	            String[] strArr = new String[4];
-	            strArr[0] = String.valueOf((int)jsonObjArr.get("id"));
-	            strArr[1] = (String)jsonObjArr.get("name");
-	            strArr[2] = String.valueOf((int)jsonObjArr.get("count"));
-	            int status = (int)jsonObjArr.get("status");
-	            switch(status){
-	            	case 0:
-	            		strArr[3] = "Отказано";
-	            		break;
-            		case 1:
-            			strArr[3] = "Ожидает обработки администратором";
-	            		break;
-	            	case 2:
-            			strArr[3] = "В пути";
-	            		break;
-	            	case 3:
-            			strArr[3] = "Готово к получению";
-	            		break;
-	            	case 4:
-	            		continue;
-	            } 
-	            
-	            result.add(strArr);
-	        }
-	        return result;
-
-	    }
-	    catch(Exception ex){
-	    	System.out.println(ex);
-	    	return null;
-	    }
-	}
-
-	public static Map<String, String> getProfileInfo(String token){
-		try{
-			getConnection("http://localhost:8000/api/admin/profile/");
-
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-
-			Map<String, String> masterInfoMap = new HashMap<>();
-			JSONObject data = getJson();
-
-			masterInfoMap.put("name", (String)data.get("name"));
-			masterInfoMap.put("surname", (String)data.get("surname"));
-			masterInfoMap.put("patronymic", (String)data.get("patronymic"));
-			masterInfoMap.put("phone", (String)data.get("phone"));
-			masterInfoMap.put("email", (String)data.get("email"));
-			masterInfoMap.put("birhday", (String)data.get("birthday"));
-			masterInfoMap.put("bio", (String)data.get("bio"));
-			masterInfoMap.put("role", (String)data.get("role"));
-			masterInfoMap.put("photo", (String)data.get("photo"));
-			
-			return masterInfoMap;
-		}
-		catch(Exception ex){
-	    	System.out.println(ex);
-	    	return null;
-	    }
-	}
-
-	public static int changeProfileInfo(String token, String name, String surname, String patronymic, String email, String phone, String bio){
-		try{
-			getConnection("http://localhost:8000/api/master/profile/info");
-
+			getConnection("http://localhost:8000/api/admin/clients");
 			connection.setRequestMethod("PUT");
 			connection.setRequestProperty("Authorization", "Bearer " + token);
 			connection.setDoOutput(true);
 
+
+			String name = client.getName();
+			String surname = client.getSurname();
+			String patronymic = client.getPatronymic();
+			String phone = client.getPhone();
+			LocalDate birthday = client.getBirthday();
+			
+			String birthdayStr = birthday.getYear() + "-" + birthday.getMonthValue() + "-" + birthday.getDayOfMonth();
+			
 			JSONObject outJson = new JSONObject();
+			outJson.put("birthday", birthdayStr);
 			outJson.put("name", name);
 			outJson.put("surname", surname);
 			outJson.put("patronymic", patronymic);
-			outJson.put("email", email);
 			outJson.put("phone", phone);
-			outJson.put("bio", bio);
 
 			sendJson(outJson);
-			
+
 			int status = connection.getResponseCode();
+			if(status == 200){
+				return new Response(200, "");
+			}
+			return new Response(status, "Ошибка");
 
-			return status;
 		}
 		catch(Exception ex){
 	    	System.out.println(ex);
-	    	return 1;
+	    	return new Response(404, "Ошибка подключения к серверу");
 	    }
-	}
-
-	public static int createResourceRequest(String token, int id, int count){
-		try{
-			getConnection("http://localhost:8000/api/master/resource/request");
-
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-			connection.setDoOutput(true);
-
-			JSONObject outJson = new JSONObject();
-			outJson.put("id", id);
-			outJson.put("count", count);
-			
-			sendJson(outJson);
-			
-			int status = connection.getResponseCode();
-
-			return status;
-		}
-		catch(Exception ex){
-	    	System.out.println(ex);
-	    	return 1;
-	    }
-	}
-
-	public static String[] getResourceInfoByID(String token, int id){
-		try{
-			getConnection("http://localhost:8000/api/master/resource/"+id);
-
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-
-			
-			JSONObject data = getJson();
-			String[] result = new String[2];
-			result[0] = (String)data.get("name");
-			result[1] = (String)data.get("description");
-
-			return result;
-		}
-		catch(Exception ex){
-	    	System.out.println(ex);
-	    	return null;
-	    }
-	}
-
-	public static int changeProfilePassword(String token, String oldPassword, String newPassword){
-		try{
-			getConnection("http://localhost:8000/api/master/profile/password");
-
-			connection.setRequestMethod("PUT");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-			connection.setDoOutput(true);
-
-			JSONObject outJson = new JSONObject();
-			outJson.put("oldPassword", oldPassword);
-			outJson.put("newPassword", newPassword);
-			
-			sendJson(outJson);
-			
-			int status = connection.getResponseCode();
-
-			return status;
-		}
-		catch(Exception ex){
-	    	System.out.println(ex);
-	    	return 1;
-	    }
-	}
-
-	public static int changeProfilePhoto(String token, File file){
-		try{
-			getConnection("http://localhost:8000/api/master/profile/photo");
-
-			connection.setRequestMethod("PUT");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-			connection.setDoOutput(true);
-
-			JSONObject outJson = new JSONObject();
-			byte[] byteArray = Files.readAllBytes(file.toPath());
-			String encodedPhoto = Base64.getEncoder().encodeToString(byteArray);
-			outJson.put("photo", encodedPhoto);
-			
-			sendJson(outJson);
-			
-			int status = connection.getResponseCode();
-
-			return status;
-		}
-		catch(Exception ex){
-	    	System.out.println(ex);
-	    	return 1;
-	    }
-	}
-	
-	public static Image getProfilePhoto(String avatarURL){
-		try{
-			getConnection(avatarURL);
-				
-			String avatarFileName = "client/photos/"+"avatar.png";
-			//TODO получить filename из URL
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			BufferedWriter writter = new BufferedWriter(new FileWriter(avatarFileName));
-
-			String line;
-
-	        while (!(line = reader.readLine()).equals("exit")) {
-	            writter.write(line);
-	        }
-
-	        Image avatarImage = new Image(new FileInputStream("client/photos/avatar.png"));
-	        return avatarImage;
-		}
-		catch(Exception ex){
-			System.out.println(ex);
-			return null;
-		}
 	}
 
 
@@ -311,36 +97,41 @@ public class Connection{
 	    }
 	}
 
-	public static AdminInfo getAdminById(String token, Long id){
+	
+
+
+	public static Set<Long> getMastersIdsSetByDate(String token, LocalDate date){
 		try{
-			getConnection("http://localhost:8000/api/admin/users/" + id);
+			getConnection("http://localhost:8000/api/admin/shedule/masters/month");
+
 			connection.setRequestMethod("GET");
+
 			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
 
-			JSONObject data = getJson();
+			JSONObject outJson = new JSONObject();
+			String dateStr = date.getYear()+"-"+date.getMonthValue()+"-"+date.getDayOfMonth();
+			outJson.put("date", dateStr);
 
-			AdminInfo admin = new AdminInfo();
-			
-			String name = (String)data.get("name");
-			String surname = (String)data.get("surname");
-			String patronymic = (String)data.get("patronymic");
-			String bio = (String)data.get("bio");
+			sendJson(outJson);
 
-			admin.setId(id);
-			admin.setName(name);
-			admin.setSurname(surname);
-			admin.setPatronymic(patronymic);
-			admin.setBio(bio);
+	        JSONObject data = getJson();
 
-			return admin;
+	        Set<Long> masters = new HashSet<>(); 
 
-		}
-		catch(Exception ex){
+	        JSONArray jsonArr = (JSONArray) data.get("data");
+	        for (Object elem: jsonArr) {
+	           	Long masterId = (Long)elem;
+	           	masters.add(masterId);
+	        }
+	        return masters;
+
+	    }
+	    catch(Exception ex){
 	    	System.out.println(ex);
 	    	return null;
 	    }
 	}
-
 
 	public static List<MasterInfo> getMastersListByDate(String token, LocalDate date){
 		try{
@@ -364,8 +155,7 @@ public class Connection{
 	        JSONArray jsonArr = (JSONArray) data.get("data");
 	        for (Object elem: jsonArr) {
 	           	Long masterId = (Long)elem;
-	           	MasterInfo master = getMasterById(token, masterId);
-	           	masters.add(master);
+	           	masters.add(getMasterById(token, masterId));
 	        }
 	        return masters;
 
@@ -376,8 +166,36 @@ public class Connection{
 	    }
 	}
 
+	public static List<MasterInfo> getAllMasters(String token){
+		try{
+			getConnection("http://localhost:8000/api/admin/users/masters");
 
-	public static ArrayList<ClientInfo> getAllClientsInfo(String token){
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+
+			List<MasterInfo> masters = new ArrayList<>();
+			
+			JSONObject data = getJson();
+			JSONArray jsonArr = (JSONArray) data.get("masters");
+
+			for(Object elem: jsonArr){
+				Long masterId = (Long) elem;
+
+				masters.add(getMasterById(token, masterId));
+			}
+			return masters;
+
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
+
+	public static List<ClientInfo> getAllClients(String token){
 		try{
 			getConnection("http://localhost:8000/api/admin/clients/");
 
@@ -385,7 +203,7 @@ public class Connection{
 			connection.setRequestProperty("Authorization", "Bearer " + token);
 
 
-			ArrayList<ClientInfo> clients = new ArrayList<>();
+			List<ClientInfo> clients = new ArrayList<>();
 			
 			JSONObject data = getJson();
 			JSONArray jsonArr = (JSONArray) data.get("users");
@@ -421,6 +239,37 @@ public class Connection{
 	    	return null;
 	    }
 	} 
+
+
+	public static AdminInfo getAdminById(String token, Long id){
+		try{
+			getConnection("http://localhost:8000/api/admin/users/" + id);
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			JSONObject data = getJson();
+
+			AdminInfo admin = new AdminInfo();
+			
+			String name = (String)data.get("name");
+			String surname = (String)data.get("surname");
+			String patronymic = (String)data.get("patronymic");
+			String bio = (String)data.get("bio");
+
+			admin.setId(id);
+			admin.setName(name);
+			admin.setSurname(surname);
+			admin.setPatronymic(patronymic);
+			admin.setBio(bio);
+
+			return admin;
+
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
 
 	
 
@@ -469,6 +318,7 @@ public class Connection{
 			String surname = (String)data.get("surname");
 			String patronymic = (String)data.get("patronymic");
 			String bio = (String)data.get("bio");
+			String phone = (String)data.get("phone");
 
 			List<ServiceInfo> services = new ArrayList<>();
 			JSONArray servicesArr = (JSONArray)data.get("services_id");
@@ -484,6 +334,7 @@ public class Connection{
 			master.setSurname(surname);
 			master.setPatronymic(patronymic);
 			master.setBio(bio);
+			master.setPhone(phone);
 			master.setServices(services);
 
 			return master;
@@ -697,6 +548,82 @@ public class Connection{
 	    }
 	}
 
+	public static Map<Long, List<Appointment>> getMastersAppointmentsByDate(String token, LocalDate date){
+		try{
+			getConnection("http://localhost:8000/api/admin/shedule/day");
+
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			String dateStr = date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
+			
+			JSONObject outJson = new JSONObject();
+			outJson.put("date", dateStr);
+
+			sendJson(outJson);
+
+			Map<Long, List<Appointment>> appointments = getMastersByDate(token, date);
+			
+			JSONObject data = getJson();
+			JSONArray jsonArr = (JSONArray) data.get("data");
+	        
+	        for (Object elemObj: jsonArr){
+	            Appointment appointment = new Appointment();
+				List<ServiceInfo> services = new ArrayList<>();
+	            
+	            JSONObject elem = (JSONObject)elemObj;
+
+	            Long id 				= (Long)elem.get("id");
+	            Long masterId 			= (Long)elem.get("master_id");
+	            Long clientId 			= (Long)elem.get("client_id");
+				String comment 			= (String)elem.get("comment");
+	            String[] startTimeStr 	= ((String)elem.get("start_time")).split(":");
+	            LocalTime startTime 	= LocalTime.of(Integer.valueOf(startTimeStr[0]), Integer.valueOf(startTimeStr[1]));
+				
+				
+				JSONArray servicesArr = (JSONArray)elem.get("services");
+				for(Object serviceObj: servicesArr){
+					Long serviceId = (Long)serviceObj;
+					ServiceInfo service = getServiceById(token, serviceId);
+					services.add(service);
+				}
+
+				MasterInfo master = getMasterById(token, masterId);
+				ClientInfo client = getClientById(token, clientId);
+				
+				appointment.setId(id);
+				appointment.setStartTime(startTime);
+				appointment.setClient(client);
+				appointment.setMaster(master);
+				appointment.setDate(date);
+				appointment.setServices(services);
+				appointment.setComment(comment);
+
+				List<Appointment> appointmentsList = null;
+	            if(appointments.containsKey(masterId)){
+	            	appointmentsList = appointments.get(masterId);
+	            }
+	            else{
+	            	appointmentsList = new ArrayList<>();
+	            }
+
+	            appointmentsList.add(appointment);
+	            appointments.put(masterId, appointmentsList);
+	        }
+
+			return appointments;
+	    }
+	    catch(Exception ex){
+	    	System.out.println(ex);
+	    	return new HashMap<>();
+	    }
+	}
+
+
+	
+
+
 	public static Response getDayTransactions(String token, LocalDate date){
 		try{
 			getConnection("http://localhost:8000/api/admin/transactions");
@@ -771,79 +698,9 @@ public class Connection{
 
 
 
-	public static Map<Long, List<Appointment>> getDayInfoMapMaster(String token, LocalDate date){
-		try{
-			getConnection("http://localhost:8000/api/admin/shedule/day");
+	
 
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Authorization", "Bearer " + token);
-			connection.setDoOutput(true);
-
-			String dateStr = date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
-			
-			JSONObject outJson = new JSONObject();
-			outJson.put("date", dateStr);
-
-			sendJson(outJson);
-
-			Map<Long, List<Appointment>> appointments = getMastersByDate(token, date);
-			
-			JSONObject data = getJson();
-			JSONArray jsonArr = (JSONArray) data.get("data");
-	        
-	        for (Object elemObj: jsonArr){
-	            Appointment appointment = new Appointment();
-				List<ServiceInfo> services = new ArrayList<>();
-	            
-	            JSONObject elem = (JSONObject)elemObj;
-
-	            Long id 				= (Long)elem.get("id");
-	            Long masterId 			= (Long)elem.get("master_id");
-	            Long clientId 			= (Long)elem.get("client_id");
-				String comment 			= (String)elem.get("comment");
-	            String[] startTimeStr 	= ((String)elem.get("start_time")).split(":");
-	            LocalTime startTime 	= LocalTime.of(Integer.valueOf(startTimeStr[0]), Integer.valueOf(startTimeStr[1]));
-				
-				
-				JSONArray servicesArr = (JSONArray)elem.get("services");
-				for(Object serviceObj: servicesArr){
-					Long serviceId = (Long)serviceObj;
-					ServiceInfo service = getServiceById(token, serviceId);
-					services.add(service);
-				}
-
-				MasterInfo master = getMasterById(token, masterId);
-				ClientInfo client = getClientById(token, clientId);
-				
-				appointment.setId(id);
-				appointment.setStartTime(startTime);
-				appointment.setClient(client);
-				appointment.setMaster(master);
-				appointment.setDate(date);
-				appointment.setServices(services);
-				appointment.setComment(comment);
-
-				List<Appointment> appointmentsList = null;
-	            if(appointments.containsKey(masterId)){
-	            	appointmentsList = appointments.get(masterId);
-	            }
-	            else{
-	            	appointmentsList = new ArrayList<>();
-	            }
-
-	            appointmentsList.add(appointment);
-	            appointments.put(masterId, appointmentsList);
-	        }
-
-			return appointments;
-	    }
-	    catch(Exception ex){
-	    	System.out.println(ex);
-	    	return new HashMap<>();
-	    }
-	}
-
-	private static void sendJson(JSONObject outJson){
+	public static void sendJson(JSONObject outJson){
 		try{
 			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
 	        writer.write(outJson.toString());
@@ -856,7 +713,7 @@ public class Connection{
 	}
 
 
-	private static JSONObject getJson(){
+	public static JSONObject getJson(){
 		try{
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 

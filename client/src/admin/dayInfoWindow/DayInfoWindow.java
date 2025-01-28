@@ -63,7 +63,7 @@ public class DayInfoWindow extends Main{
 
 		table.getColumnConstraints().add(new ColumnConstraints(100));
 
-        Map<Long, List<Appointment>> dayInfo = Connection.getDayInfoMapMaster(token, date);
+        Map<Long, List<Appointment>> dayInfo = Connection.getMastersAppointmentsByDate(token, date);
         if(dayInfo == null){dayInfo = new HashMap<>();}
 
         int countColumn = 0;
@@ -303,13 +303,16 @@ public class DayInfoWindow extends Main{
 
         ComboBox<String> comboBox   = new ComboBox<>();
 
-        ArrayList<ClientInfo> clientsInfo = Connection.getAllClientsInfo(token);
+        List<ClientInfo> clientsInfo = Connection.getAllClients(token);
         if(clientsInfo == null){clientsInfo = new ArrayList<>();}
 
-        comboBox.getEditor().setOnKeyReleased(new AutoCompleteComboBoxListener(comboBox, clientsInfo));
+        comboBox.getEditor().setOnKeyReleased(new SearchingStringListenerClients(comboBox, clientsInfo));
 
         comboBox.setEditable(true);
-        // comboBox.getItems().addAll(numbers);
+
+        ObservableList comboBoxList = FXCollections.observableArrayList(clientsInfo); 
+        comboBox.setItems(comboBoxList);
+
         comboBox.setPrefWidth(500);
         comboBox.setPrefHeight(30);
         addNewClientBtn.setMinHeight(30);
@@ -373,11 +376,11 @@ public class DayInfoWindow extends Main{
 	    });
 
 
-        // putMasterOnDayBtn.setOnAction(event -> showPutMasterOnDayDialog());
+        putMasterOnDayBtn.setOnAction(event -> showPutMasterOnDayDialog(date));
         // putAdminOnDayBtn.setOnAction(event -> showPutAdminOnDayDialog());
         // сash.setOnAction(event -> showCashDialog());
         // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
-
+        addNewClientBtn.setOnAction(event -> showAddNewClientDialog());
 
         searchStringBox.getChildren().addAll(comboBox, addNewClientBtn);
         rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, cashBtn, totalSumBtn);
@@ -390,115 +393,214 @@ public class DayInfoWindow extends Main{
         root.setRight(rightBox);
         return root;
 	}
-}
 
 
-
-class AutoCompleteComboBoxListener implements EventHandler<KeyEvent> {
-    private ComboBox comboBox;
-    private ObservableList fios;
-    private ObservableList numbers;
-    private boolean moveCaretToPos = false;
-    private int caretPos;
-
-    public AutoCompleteComboBoxListener(final ComboBox comboBox, List<ClientInfo> clientsInfo) {
-        this.comboBox = comboBox;
-        List<String> fiosList = new ArrayList<>();
-        List<String> numbersList = new ArrayList<>();
+    public static void showPutMasterOnDayDialog(LocalDate date) {
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM yyyy", Locale.ENGLISH);
+        String dateStr = dtf.format(date);
         
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Назначить мастера");
 
+        Label errorMsg = new Label("");
+        Label dateLbl = new Label(dateStr);
 
-        for(int i = 0; i < clientsInfo.size(); i++){
-            fiosList.add(clientsInfo.get(i).getFio());
-            numbersList.add(clientsInfo.get(i).getPhone());
+        // Set<Long> mastersOnDate = Connection.getMastersIdsSetByDate(token, date);
+        // List<MasterInfo> mastersNotOnDate = new ArrayList<>();
+        // List<MasterInfo> allMasters = Connection.getAllMasters(token);
+
+        // for(MasterInfo master : allMasters){
+        //     if(!mastersOnDate.contains(master.getId())){
+        //         mastersNotOnDate.add(master);
+        //     }
+        // }
+        List<MasterInfo> mastersNotOnDate = new ArrayList<>();
+        for(int i = 0; i < 5; i++){
+            MasterInfo master = new MasterInfo();
+            master.setId(Long.valueOf(i));
+            master.setName("Имя" + i);
+            master.setSurname("Фамилия" + i);
+            master.setPatronymic("Отчество" + i);
+            master.setPhone("+7909276246" + i);
+
+            mastersNotOnDate.add(master);
         }
 
-        this.fios = FXCollections.observableArrayList(fiosList);
-        this.numbers = FXCollections.observableArrayList(numbersList);
 
-        this.comboBox.setEditable(true);
-        this.comboBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        ComboBox<String> choosingMaster = new ComboBox();
 
-            @Override
-            public void handle(KeyEvent t) {
-                comboBox.hide();
+        choosingMaster.getEditor().setOnKeyReleased(new SearchingStringListenerMasters(choosingMaster, mastersNotOnDate));
+
+        choosingMaster.setEditable(true);
+        ObservableList comboBoxList = FXCollections.observableArrayList(mastersNotOnDate); 
+        choosingMaster.setItems(comboBoxList);
+        
+        Button cancelBtn = new Button("Отмена");
+        Button putMasterBtn = new Button("Назначить мастера");
+        HBox btnsBox = new HBox();
+
+        btnsBox.setSpacing(50);
+        btnsBox.setAlignment(Pos.CENTER);
+
+        VBox root = new VBox();
+        root.setAlignment(Pos.CENTER);
+        root.setSpacing(50);
+        
+        btnsBox.getChildren().addAll(cancelBtn, putMasterBtn);
+        root.getChildren().addAll(dateLbl, choosingMaster, btnsBox);
+
+        cancelBtn.setOnAction(event -> dialog.close());
+        // putMasterBtn.setOnAction(event -> {
+
+        // });
+
+
+
+        Scene dialogScene = new Scene(root, 500, 500);
+        
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+    }
+
+
+
+
+
+    public static void showAddNewClientDialog() {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Добавить клиента");
+
+        GridPane table = new GridPane();
+
+        VBox root = new VBox();
+        HBox btnsBox = new HBox();
+
+        Button cancelBtn = new Button();
+        Button addClientBtn = new Button();
+
+        Label errorMsg = new Label();
+        Label nameHeadLbl = new Label("Имя: ");
+        Label surnameHeadLbl = new Label("Фамилия: ");
+        Label patronymicHeadLbl = new Label("Отчество: ");
+        Label phoneHeadLbl = new Label("Номер телефона: ");
+        Label birthdayHeadLbl = new Label("Дата рождения: ");
+        
+        TextField nameTextField = new TextField();
+        TextField surnameTextField = new TextField();
+        TextField patronymicTextField = new TextField();
+        TextField phoneTextField = new TextField();
+        DatePicker birthdayDatePicker = new DatePicker();
+
+
+        errorMsg.setText("");
+
+        table.setAlignment(Pos.CENTER);
+
+        addClientBtn.setText("Добавить клиента");
+        addClientBtn.setWrapText(true);
+        addClientBtn.setTextAlignment(TextAlignment.CENTER);
+
+        cancelBtn.setText("Отмена");
+        cancelBtn.setWrapText(true);
+        cancelBtn.setTextAlignment(TextAlignment.CENTER);
+
+        btnsBox.setSpacing(200);
+        btnsBox.setAlignment(Pos.CENTER);
+
+        root.setSpacing(50);
+        root.setAlignment(Pos.CENTER);
+
+        table.add(nameHeadLbl, 0, 0);
+        table.add(surnameHeadLbl, 0, 1);
+        table.add(patronymicHeadLbl, 0, 2);
+        table.add(phoneHeadLbl, 0, 3);
+        table.add(birthdayHeadLbl, 0, 4);
+        
+        table.add(nameTextField, 1, 0);
+        table.add(surnameTextField, 1, 1);
+        table.add(patronymicTextField, 1, 2);
+        table.add(phoneTextField, 1, 3);
+        table.add(birthdayDatePicker, 1, 4);
+
+
+
+        GridPane.setHalignment(nameHeadLbl, HPos.CENTER);
+        GridPane.setValignment(nameHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(surnameHeadLbl, HPos.CENTER);
+        GridPane.setValignment(surnameHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(patronymicHeadLbl, HPos.CENTER);
+        GridPane.setValignment(patronymicHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(phoneHeadLbl, HPos.CENTER);
+        GridPane.setValignment(phoneHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(birthdayHeadLbl, HPos.CENTER);
+        GridPane.setValignment(birthdayHeadLbl, VPos.CENTER);
+
+        GridPane.setHalignment(nameTextField, HPos.CENTER);
+        GridPane.setValignment(nameTextField, VPos.CENTER);
+        GridPane.setHalignment(surnameTextField, HPos.CENTER);
+        GridPane.setValignment(surnameTextField, VPos.CENTER);
+        GridPane.setHalignment(patronymicTextField, HPos.CENTER);
+        GridPane.setValignment(patronymicTextField, VPos.CENTER);
+        GridPane.setHalignment(phoneTextField, HPos.CENTER);
+        GridPane.setValignment(phoneTextField, VPos.CENTER);
+        GridPane.setHalignment(birthdayDatePicker, HPos.CENTER);
+        GridPane.setValignment(birthdayDatePicker, VPos.CENTER);
+
+        table.getColumnConstraints().add(new ColumnConstraints(150));
+        table.getColumnConstraints().add(new ColumnConstraints(150));
+        table.getRowConstraints().add(new RowConstraints(50));
+        table.getRowConstraints().add(new RowConstraints(50));
+        table.getRowConstraints().add(new RowConstraints(50));
+        table.getRowConstraints().add(new RowConstraints(50));
+        table.getRowConstraints().add(new RowConstraints(50));
+        
+        cancelBtn.setOnAction(event -> dialog.close());
+        addClientBtn.setOnAction(event -> {
+            String name = nameTextField.getText();
+            String surname = surnameTextField.getText();
+            String patronymic = patronymicTextField.getText();
+            String phone = phoneTextField.getText();
+            LocalDate birthday = birthdayDatePicker.getValue();
+            
+            ClientInfo client = new ClientInfo();
+            
+            client.setName(name);
+            client.setSurname(surname);
+            client.setPatronymic(patronymic);
+            client.setPhone(phone);
+            client.setBirthday(birthday);
+            
+            Response checkInfo = client.checkInfo();
+            
+            if(checkInfo.getCode() == -1){
+                errorMsg.setText(checkInfo.getMsg());
+                return;
             }
+
+            Response addingClientResponse = Connection.addNewClient(token, client);
+            if(addingClientResponse.getCode() == 200) dialog.close();
+            else{errorMsg.setText(addingClientResponse.getMsg());}
         });
-        this.comboBox.setOnKeyReleased(AutoCompleteComboBoxListener.this);
+
+
+        btnsBox.getChildren().addAll(cancelBtn, addClientBtn);
+        root.getChildren().addAll(table, errorMsg, btnsBox);
+
+
+
+        Scene dialogScene = new Scene(root, 500, 500);
+        
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
     }
 
-    @Override
-    public void handle(KeyEvent event) {
 
-        if(event.getCode() == KeyCode.UP) {
-            caretPos = -1;
-            moveCaret(comboBox.getEditor().getText().length());
-            return;
-        } else if(event.getCode() == KeyCode.DOWN) {
-            if(!comboBox.isShowing()) {
-                comboBox.show();
-            }
-            caretPos = -1;
-            moveCaret(comboBox.getEditor().getText().length());
-            return;
-        } else if(event.getCode() == KeyCode.BACK_SPACE) {
-            moveCaretToPos = true;
-            caretPos = comboBox.getEditor().getCaretPosition();
-        } else if(event.getCode() == KeyCode.DELETE) {
-            moveCaretToPos = true;
-            caretPos = comboBox.getEditor().getCaretPosition();
-        }
-
-
-
-        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT
-                || event.isControlDown() || event.getCode() == KeyCode.HOME
-                || event.getCode() == KeyCode.END || event.getCode() == KeyCode.TAB) {
-            return;
-        }
-
-
-        ObservableList list = FXCollections.observableArrayList();
-        for (int i = 0; i < fios.size(); i++) {
-            String input = comboBox.getEditor().getText().toLowerCase().trim();
-            
-            if(input.length() > 0 && Character.isDigit(input.charAt(0))){
-                if(numbers.get(i).toString().toLowerCase().endsWith(input)){
-                    list.add(fios.get(i) + " (" + numbers.get(i) + ")"); 
-                } 
-            }
-            else{
-                if(fios.get(i).toString().toLowerCase().startsWith(input)) {
-                    list.add(fios.get(i) + " (" + numbers.get(i) + ")");
-                }    
-            }
-            
-        }
-        String t = comboBox.getEditor().getText();
-
-        comboBox.setItems(list);
-        comboBox.getEditor().setText(t);
-        if(!moveCaretToPos) {
-            caretPos = -1;
-        }
-        moveCaret(t.length());
-        if(!list.isEmpty()) {
-            comboBox.show();
-        }
-
-        if(event.getCode() == KeyCode.ENTER){
-            caretPos = -1;
-            moveCaret(t.length());
-            comboBox.hide();
-        }
-    }
-
-    private void moveCaret(int textLength) {
-        if(caretPos == -1) {
-            comboBox.getEditor().positionCaret(textLength);
-        } else {
-            comboBox.getEditor().positionCaret(caretPos);
-        }
-        moveCaretToPos = false;
-    }
 }
+
+
+
+
+
+

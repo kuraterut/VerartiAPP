@@ -7,6 +7,7 @@ public class MasterInfo extends Response{
 	private String name;
 	private String surname;
 	private String patronymic;
+	private String phone;
 	private String bio;
 	private List<ServiceInfo> services;
 
@@ -14,11 +15,21 @@ public class MasterInfo extends Response{
 		return this.id == other.getId();
 	}
 
+	@Override
+    public String toString() {
+        String view = id+" "+surname + " ";
+        view += name + " ";
+        view += patronymic + " ";
+        view += "(" + phone + ")";
+        return view;
+    }
+
 	public Long getId()						{return this.id;}
 	public String getName()					{return this.name;}
 	public String getSurname()				{return this.surname;}
 	public String getPatronymic()			{return this.patronymic;}
 	public String getBio()					{return this.bio;}
+	public String getPhone()				{return this.phone;}
 	public List<ServiceInfo> getServices()	{return this.services;}
 	public String getFio()					{return surname+" "+name+" "+patronymic;}
 
@@ -27,6 +38,7 @@ public class MasterInfo extends Response{
 	public void setSurname(String surname)				{this.surname = surname;}
 	public void setPatronymic(String patronymic)		{this.patronymic = patronymic;}
 	public void setBio(String bio)						{this.bio = bio;}
+	public void setPhone(String phone)					{this.phone = phone;}
 	public void setServices(List<ServiceInfo> services)	{this.services = services;}
 
 }

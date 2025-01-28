@@ -2,8 +2,10 @@ package src.admin.profileWindow;
 
 import src.Main;
 import src.admin.AdminInterface;
-import src.admin.connection.Connection;
+import src.admin.connection.*;
+import src.admin.connection.profile.*;
 import src.admin.sideMenu.SideMenu;
+import src.admin.utils.*;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -71,14 +73,17 @@ public class ProfileWindow extends Main{
 
         rightBox.setPrefWidth(MENU_WIDTH);
 
-        Map<String, String> masterMap   = Connection.getProfileInfo(token);
+        AdminInfo admin = (AdminInfo) ConnectionProfile.getProfileInfo(token);
+        if(admin.getCode() == 200){
+            nameField.setText(admin.getName());
+            surnameField.setText(admin.getSurname());
+            patronymicField.setText(admin.getPatronymic());
+            emailField.setText(admin.getEmail());
+            phoneField.setText(admin.getPhone());
+            bioField.setText(admin.getBio());
+        }
+
         
-        nameField.setText("Имя");
-        surnameField.setText("Фамилия");
-        patronymicField.setText("Отчество");
-        emailField.setText("Email");
-        phoneField.setText("Телефон");
-        bioField.setText("Биография");
 
         table.add(nameLbl, 0, 0);
         table.add(nameField, 1, 0);
@@ -145,9 +150,17 @@ public class ProfileWindow extends Main{
                 String newPhone         = phoneField.getText();
                 String newBio           = bioField.getText();
 
-                int status = Connection.changeProfileInfo(token, newName, newSurname, newPatronymic, newEmail, newPhone, newBio);
-                if(status == 200){AdminInterface.loadProfileWindow(cancel);}
-                else {errorMsg.setText("Ошибка отправки данных на сервер");}
+                AdminInfo newAdmin = new AdminInfo();
+                newAdmin.setName(newName);
+                newAdmin.setSurname(newSurname);
+                newAdmin.setPatronymic(newPatronymic);
+                newAdmin.setEmail(newEmail);
+                newAdmin.setPhone(newPhone);
+                newAdmin.setBio(newBio);
+
+                Response response = ConnectionProfile.changeProfileInfo(token, newAdmin);
+                if(response.getCode() == 200){AdminInterface.loadProfileWindow(cancel);}
+                else {errorMsg.setText(response.getMsg());}
             }
         });
 
@@ -226,9 +239,9 @@ public class ProfileWindow extends Main{
                 String oldPassword      = oldPasswordField.getText();
                 String newPassword       = newPasswordField.getText();
                 
-                int status = Connection.changeProfilePassword(token, oldPassword, newPassword);
-                if(status == 200){AdminInterface.loadProfileWindow(cancel);}
-                else {errorMsg.setText("Ошибка отправки данных на сервер");}
+                Response response = ConnectionProfile.changeProfilePassword(token, oldPassword, newPassword);
+                if(response.getCode() == 200){AdminInterface.loadProfileWindow(cancel);}
+                else {errorMsg.setText(response.getMsg());}
             }
         });
 
@@ -290,31 +303,29 @@ public class ProfileWindow extends Main{
         bioLbl.setText("Биография");
         roleLbl.setText("Роль");
 
-        Map<String, String> masterInfo = Connection.getProfileInfo(token);
+        AdminInfo adminInfo = (AdminInfo)ConnectionProfile.getProfileInfo(token);
         
         Image avatarImage = null;
         
-        if(masterInfo == null) {
-            avatarImage = Connection.getProfilePhoto(null);
-            name.setText("Ошибка получения данных");
-            surname.setText("Ошибка получения данных");
-            patronymic.setText("Ошибка получения данных");
-            birthday.setText("Ошибка получения данных");
-            phone.setText("Ошибка получения данных");
-            email.setText("Ошибка получения данных");
-            bio.setText("Ошибка получения данных");
-            role.setText("Ошибка получения данных");
+        if(adminInfo.getCode() != 200) {
+            avatarImage = ConnectionProfile.getProfilePhoto(null);
+            name.setText(adminInfo.getMsg());
+            surname.setText(adminInfo.getMsg());
+            patronymic.setText(adminInfo.getMsg());
+            phone.setText(adminInfo.getMsg());
+            email.setText(adminInfo.getMsg());
+            bio.setText(adminInfo.getMsg());
+            role.setText(adminInfo.getMsg());
         }
         else{
-            avatarImage = Connection.getProfilePhoto(masterInfo.get("photo"));
-            name.setText(masterInfo.get("name"));
-            surname.setText(masterInfo.get("surname"));
-            patronymic.setText(masterInfo.get("patronymic"));
-            birthday.setText(masterInfo.get("birthday"));
-            phone.setText(masterInfo.get("phone"));
-            email.setText(masterInfo.get("email"));
-            bio.setText(masterInfo.get("bio"));
-            role.setText(masterInfo.get("role"));
+            avatarImage = ConnectionProfile.getProfilePhoto(adminInfo.getPhotoURL());
+            name.setText(adminInfo.getName());
+            surname.setText(adminInfo.getSurname());
+            patronymic.setText(adminInfo.getPatronymic());
+            phone.setText(adminInfo.getPhone());
+            email.setText(adminInfo.getEmail());
+            bio.setText(adminInfo.getBio());
+            role.setText("Администратор");
         }
         
         ImageView avatarImageView = new ImageView(avatarImage);
@@ -424,7 +435,7 @@ public class ProfileWindow extends Main{
                 File file = fileChooser.showOpenDialog(changeAvatarBtn.getScene().getWindow());
                 if (file != null) {
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
-                    int status = Connection.changeProfilePhoto(token, file);
+                    Response status = ConnectionProfile.changeProfilePhoto(token, file);
                 }
                 AdminInterface.loadProfileWindow(changeAvatarBtn);
             }
