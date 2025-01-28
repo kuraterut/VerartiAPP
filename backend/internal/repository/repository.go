@@ -12,6 +12,11 @@ type Authorization interface {
 }
 
 type Appointment interface {
+	CreateAppointment(appointment models.Appointment) (int, error)
+	GetAllAppointments() ([]models.Appointment, error)
+	GetAppointmentById(appointmentId int) (models.Appointment, error)
+	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
+	DeleteAppointment(appointmentId int) error
 }
 
 type Client interface {
@@ -38,6 +43,11 @@ type Schedule interface {
 
 type User interface {
 	GetAllMasters() ([]models.Users, error)
+	GetMasterById(masterId int) (models.Users, error)
+	GetAllAdmins() ([]models.Users, error)
+	GetAdminById(masterId int) (models.Users, error)
+	GetDirector() (models.Users, error)
+	DeleteUser(userId int) error
 }
 
 type Profile interface {
@@ -63,5 +73,6 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Profile:       NewProfilePostgres(db),
 		Client:        NewClientPostgres(db),
 		User:          NewUserPostgres(db),
+		Appointment:   NewAppointmentPostgres(db),
 	}
 }

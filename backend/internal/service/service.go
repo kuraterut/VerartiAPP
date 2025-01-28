@@ -12,6 +12,11 @@ type Authorization interface {
 }
 
 type Appointment interface {
+	CreateAppointment(appointment models.Appointment) (int, error)
+	GetAllAppointments() ([]models.Appointment, error)
+	GetAppointmentById(appointmentId int) (models.Appointment, error)
+	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
+	DeleteAppointment(appointmentId int) error
 }
 
 type Client interface {
@@ -45,6 +50,11 @@ type Profile interface {
 
 type User interface {
 	GetAllMasters() ([]models.Users, error)
+	GetMasterById(masterId int) (models.Users, error)
+	GetAllAdmins() ([]models.Users, error)
+	GetAdminById(masterId int) (models.Users, error)
+	GetDirector() (models.Users, error)
+	DeleteUser(userId int) error
 }
 
 type Service struct {
@@ -65,5 +75,6 @@ func NewService(repos *repository.Repository) *Service {
 		Profile:       NewProfileService(repos),
 		Client:        NewClientService(repos),
 		User:          NewUserService(repos),
+		Appointment:   NewAppointmentService(repos),
 	}
 }

@@ -11,16 +11,16 @@ VALUES ('master'),
 
 CREATE TABLE users
 (
-    id            serial       not null unique,
-    name          varchar(255) not null,
-    surname       varchar(255) not null,
-    patronymic    varchar(255) default '',
-    password_hash varchar(255) not null,
-    email         varchar(255) not null unique,
-    phone         varchar(255) not null unique,
-    bio           varchar(511) default '',
-    photo         varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
-    current_salary        int          default 0
+    id             serial       not null unique,
+    name           varchar(255) not null,
+    surname        varchar(255) not null,
+    patronymic     varchar(255) default '',
+    password_hash  varchar(255) not null,
+    email          varchar(255) not null unique,
+    phone          varchar(255) not null unique,
+    bio            varchar(511) default '',
+    photo          varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
+    current_salary int          default 0
 );
 
 CREATE TABLE users_role
@@ -45,17 +45,17 @@ CREATE TABLE client
 CREATE TABLE appointment
 (
     id          serial       not null unique,
-    name        varchar(255) not null,
+    name        varchar(255) not null unique,
     description varchar(255) not null,
-    duration    int          not null
+    duration    VARCHAR(5)   not null,
+    price       int          not null
 );
 
 CREATE TABLE users_appointment
 (
     id             serial                                            not null unique,
     users_id       int references users (id) on delete cascade       not null,
-    appointment_id int references appointment (id) on delete cascade not null,
-    price          int                                               not null
+    appointment_id int references appointment (id) on delete cascade not null
 );
 
 CREATE TABLE status
@@ -76,8 +76,8 @@ CREATE TABLE schedule
     client_id      int references client (id) on delete cascade      not null,
     appointment_id int references appointment (id) on delete cascade not null,
     status_id      int references status (id)                        not null default 1,
-    start_schedule timestamp                                         not null,
-    end_schedule   timestamp                                         not null
+    start_time     timestamp                                         not null,
+    day            date                                              not null
 );
 
 CREATE TABLE resource
