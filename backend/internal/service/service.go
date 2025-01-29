@@ -41,6 +41,7 @@ type Resource interface {
 
 type Schedule interface {
 	PutAdminToDate(adminShift models.AdminShift) error
+	PutMasterToDate(masterShift models.MasterShift) error
 }
 
 type Profile interface {

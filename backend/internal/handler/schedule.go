@@ -29,7 +29,27 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func (h *Handler) putMasterToDate(c *gin.Context) {}
+func (h *Handler) putMasterToDate(c *gin.Context) {
+	var input models.MasterShift
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	err := domain.ValidatorDateFormat("2006-01-02", input.Day)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = h.services.Schedule.PutMasterToDate(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}
 
 func (h *Handler) getAdminByDate(c *gin.Context) {}
 
