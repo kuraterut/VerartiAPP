@@ -40,6 +40,7 @@ type Resource interface {
 }
 
 type Schedule interface {
+	PutAdminToDate(adminShift models.AdminShift) error
 }
 
 type User interface {
@@ -75,5 +76,6 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Client:        NewClientPostgres(db),
 		User:          NewUserPostgres(db),
 		Appointment:   NewAppointmentPostgres(db),
+		Schedule:      NewSchedulePostgres(db),
 	}
 }

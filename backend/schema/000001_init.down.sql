@@ -1,10 +1,14 @@
+DROP TABLE master_schedule;
+
+DROP TABLE admin_shift;
+
+DROP TABLE master_shift;
+
 DROP TABLE users_role;
 
 DROP TABLE users_resource;
 
 DROP TABLE resource;
-
-DROP TABLE schedule;
 
 DROP TABLE feedback;
 

@@ -28,7 +28,7 @@ CREATE TABLE users_role
     id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
     role_id  int references role (id) on delete cascade  not null,
-    CONSTRAINT unique_users_role UNIQUE (users_id, role_id)
+    CONSTRAINT unique_user_role UNIQUE (users_id, role_id)
 );
 
 CREATE TABLE client
@@ -57,7 +57,7 @@ CREATE TABLE users_appointment
     id             serial                                            not null unique,
     users_id       int references users (id) on delete cascade       not null,
     appointment_id int references appointment (id) on delete cascade not null,
-    CONSTRAINT unique_users_appointment UNIQUE (users_id, appointment_id)
+    CONSTRAINT unique_user_appointment UNIQUE (users_id, appointment_id)
 );
 
 CREATE TABLE status
@@ -67,11 +67,12 @@ CREATE TABLE status
 );
 
 INSERT INTO status (name)
-VALUES ('confirmed'), -- подтвержденный
+VALUES ('waiting'),   -- ждет подтверждения
+       ('confirmed'), -- подтвержденный
        ('completed'), -- завершенный
        ('cancelled'); -- отмененный
 
-CREATE TABLE schedule
+CREATE TABLE master_schedule
 (
     id             serial                                            not null unique,
     users_id       int references users (id) on delete cascade       not null,
@@ -80,6 +81,21 @@ CREATE TABLE schedule
     status_id      int references status (id)                        not null default 1,
     start_time     timestamp                                         not null,
     day            date                                              not null
+);
+
+CREATE TABLE admin_shift
+(
+    id       serial                                      not null unique,
+    users_id int references users (id) on delete cascade not null,
+    day      date                                        not null unique
+);
+
+CREATE TABLE master_shift
+(
+    id       serial                                      not null unique,
+    users_id int references users (id) on delete cascade not null,
+    day      date                                        not null,
+    CONSTRAINT unique_user_day UNIQUE (users_id, day)
 );
 
 CREATE TABLE resource
@@ -94,7 +110,7 @@ CREATE TABLE users_resource
     id          serial                                         not null unique,
     users_id    int references users (id) on delete cascade    not null,
     resource_id int references resource (id) on delete cascade not null,
-    CONSTRAINT unique_users_resource UNIQUE (users_id, resource_id)
+    CONSTRAINT unique_user_resource UNIQUE (users_id, resource_id)
 );
 
 CREATE TABLE feedback

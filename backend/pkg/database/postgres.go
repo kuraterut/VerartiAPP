@@ -14,6 +14,9 @@ const (
 	ClientTable           = "client"
 	AppointmentTable      = "appointment"
 	UsersAppointmentTable = "users_appointment"
+	AdminShiftTable       = "admin_shift"
+	MasterShiftTable      = "master_shift"
+	MasterScheduleTable   = "master_schedule"
 )
 
 type Config struct {

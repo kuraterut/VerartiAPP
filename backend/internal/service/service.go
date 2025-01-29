@@ -40,6 +40,7 @@ type Resource interface {
 }
 
 type Schedule interface {
+	PutAdminToDate(adminShift models.AdminShift) error
 }
 
 type Profile interface {
@@ -77,5 +78,6 @@ func NewService(repos *repository.Repository) *Service {
 		Client:        NewClientService(repos),
 		User:          NewUserService(repos),
 		Appointment:   NewAppointmentService(repos),
+		Schedule:      NewScheduleService(repos),
 	}
 }
