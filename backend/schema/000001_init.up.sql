@@ -27,7 +27,8 @@ CREATE TABLE users_role
 (
     id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
-    role_id  int references role (id) on delete cascade  not null
+    role_id  int references role (id) on delete cascade  not null,
+    CONSTRAINT unique_users_role UNIQUE (users_id, role_id)
 );
 
 CREATE TABLE client
@@ -55,7 +56,8 @@ CREATE TABLE users_appointment
 (
     id             serial                                            not null unique,
     users_id       int references users (id) on delete cascade       not null,
-    appointment_id int references appointment (id) on delete cascade not null
+    appointment_id int references appointment (id) on delete cascade not null,
+    CONSTRAINT unique_users_appointment UNIQUE (users_id, appointment_id)
 );
 
 CREATE TABLE status
@@ -91,7 +93,8 @@ CREATE TABLE users_resource
 (
     id          serial                                         not null unique,
     users_id    int references users (id) on delete cascade    not null,
-    resource_id int references resource (id) on delete cascade not null
+    resource_id int references resource (id) on delete cascade not null,
+    CONSTRAINT unique_users_resource UNIQUE (users_id, resource_id)
 );
 
 CREATE TABLE feedback

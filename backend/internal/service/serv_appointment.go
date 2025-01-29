@@ -32,3 +32,7 @@ func (s *AppointmentService) UpdateAppointment(appointment models.AppointmentUpd
 func (s *AppointmentService) DeleteAppointment(appointmentId int) error {
 	return s.repo.DeleteAppointment(appointmentId)
 }
+
+func (s *AppointmentService) AddAppointmentForMaster(masterId, appointmentId int) (int, error) {
+	return s.repo.AddAppointmentForMaster(masterId, appointmentId)
+}

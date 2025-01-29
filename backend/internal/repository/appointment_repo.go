@@ -43,14 +43,29 @@ func (r *AppointmentPostgres) GetAppointmentById(appointmentId int) (models.Appo
 	var appointment models.Appointment
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", database.AppointmentTable)
 	err := r.db.Get(&appointment, query, appointmentId)
-	if errors.Is(err, sql.ErrNoRows) {
-		return models.Appointment{}, internal.NewErrorResponse(404, "appointment not found")
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Appointment{}, internal.NewErrorResponse(404, "appointment not found")
+		}
+
+		return models.Appointment{}, err
 	}
 
 	return appointment, err
 }
 
 func (r *AppointmentPostgres) UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error {
+	var id int
+	queryGetAppointment := fmt.Sprintf("SELECT id FROM %s WHERE id = $1", database.AppointmentTable)
+	err := r.db.Get(&id, queryGetAppointment, appointmentId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return internal.NewErrorResponse(404, "appointment with this id was not found")
+		}
+
+		return err
+	}
+
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -89,13 +104,24 @@ func (r *AppointmentPostgres) UpdateAppointment(appointment models.AppointmentUp
 		database.AppointmentTable, setQuery, argId)
 	args = append(args, appointmentId)
 
-	_, err := r.db.Exec(query, args...)
+	_, err = r.db.Exec(query, args...)
 	return err
 }
 
 func (r *AppointmentPostgres) DeleteAppointment(appointmentId int) error {
+	var id int
+	queryGetAppointment := fmt.Sprintf("SELECT id FROM %s WHERE id = $1", database.AppointmentTable)
+	err := r.db.Get(&id, queryGetAppointment, appointmentId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return internal.NewErrorResponse(404, "appointment with this id was not found")
+		}
+
+		return err
+	}
+
 	query := fmt.Sprintf(`DELETE FROM %s WHERE id = $1`, database.AppointmentTable)
-	_, err := r.db.Exec(query, appointmentId)
+	_, err = r.db.Exec(query, appointmentId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return internal.NewErrorResponse(404, "appointment not found")
@@ -105,4 +131,44 @@ func (r *AppointmentPostgres) DeleteAppointment(appointmentId int) error {
 	}
 
 	return nil
+}
+
+func (r *AppointmentPostgres) AddAppointmentForMaster(masterId, appointmentId int) (int, error) {
+	var id int
+
+	queryGetUser := fmt.Sprintf(`
+		SELECT us.id FROM %s us
+		WHERE us.id = $1 AND EXISTS (
+			SELECT 1
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id AND rl.name = 'master'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+	err := r.db.Get(&id, queryGetUser, masterId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, internal.NewErrorResponse(404, "master with this id was not found")
+		}
+
+		return 0, err
+	}
+
+	queryGetAppointment := fmt.Sprintf("SELECT id FROM %s WHERE id = $1", database.AppointmentTable)
+	err = r.db.Get(&id, queryGetAppointment, appointmentId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, internal.NewErrorResponse(404, "appointment with this id was not found")
+		}
+
+		return 0, err
+	}
+
+	queryAddAppointment := fmt.Sprintf("INSERT INTO %s (users_id, appointment_id)"+
+		"VALUES ($1, $2) RETURNING id", database.UsersAppointmentTable)
+	row := r.db.QueryRow(queryAddAppointment, masterId, appointmentId)
+	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
