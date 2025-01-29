@@ -68,7 +68,33 @@ func (h *Handler) getAppointmentById(c *gin.Context) {
 	c.JSON(http.StatusOK, appointment)
 }
 
-func (h *Handler) addAppointmentForMaster(c *gin.Context) {}
+func (h *Handler) addAppointmentForMaster(c *gin.Context) {
+	var input models.MasterIdInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	_, err = h.services.Appointment.AddAppointmentForMaster(input.MasterId, appointmentId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
+}
 
 func (h *Handler) updateAppointment(c *gin.Context) {
 	appointmentId, err := strconv.Atoi(c.Param("id"))

@@ -17,6 +17,7 @@ type Appointment interface {
 	GetAppointmentById(appointmentId int) (models.Appointment, error)
 	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
 	DeleteAppointment(appointmentId int) error
+	AddAppointmentForMaster(masterId, appointmentId int) (int, error)
 }
 
 type Client interface {

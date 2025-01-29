@@ -27,3 +27,7 @@ type UpdatePasswordInput struct {
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`
 }
+
+type MasterIdInput struct {
+	MasterId int `json:"master_id" binding:"required"`
+}
