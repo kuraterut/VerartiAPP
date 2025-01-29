@@ -14,7 +14,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("2006-01-02", input.Day)
+	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -36,7 +36,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("2006-01-02", input.Day)
+	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

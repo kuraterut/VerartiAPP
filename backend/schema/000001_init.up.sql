@@ -80,22 +80,22 @@ CREATE TABLE master_schedule
     appointment_id int references appointment (id) on delete cascade not null,
     status_id      int references status (id)                        not null default 1,
     start_time     timestamp                                         not null,
-    day            date                                              not null
+    date            date                                              not null
 );
 
 CREATE TABLE admin_shift
 (
     id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
-    day      date                                        not null unique
+    date      date                                        not null unique
 );
 
 CREATE TABLE master_shift
 (
     id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
-    day      date                                        not null,
-    CONSTRAINT unique_user_day UNIQUE (users_id, day)
+    date      date                                        not null,
+    CONSTRAINT unique_user_date UNIQUE (users_id, date)
 );
 
 CREATE TABLE resource

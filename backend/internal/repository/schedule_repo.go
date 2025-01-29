@@ -38,9 +38,9 @@ func (r *SchedulePostgres) PutAdminToDate(adminShift models.AdminShift) error {
 		return err
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (users_id, day)"+
+	query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
 		"VALUES ($1, $2) RETURNING id", database.AdminShiftTable)
-	row := r.db.QueryRow(query, adminShift.AdminId, adminShift.Day)
+	row := r.db.QueryRow(query, adminShift.AdminId, adminShift.Date)
 	if err := row.Scan(&id); err != nil {
 		return err
 	}
@@ -68,9 +68,9 @@ func (r *SchedulePostgres) PutMasterToDate(masterShift models.MasterShift) error
 		return err
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (users_id, day)"+
+	query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
 		"VALUES ($1, $2) RETURNING id", database.MasterShiftTable)
-	row := r.db.QueryRow(query, masterShift.MasterId, masterShift.Day)
+	row := r.db.QueryRow(query, masterShift.MasterId, masterShift.Date)
 	if err := row.Scan(&id); err != nil {
 		return err
 	}
