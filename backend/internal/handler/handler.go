@@ -46,9 +46,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 			schedule := master.Group("/schedule")
 			{
+				schedule.GET("/admin", h.getAdminByDate)
+				schedule.GET("/master", h.getAllMastersByDate)
+
 				schedule.GET("/day", h.getDailySchedule)
 				schedule.GET("/month", h.getMonthlySchedule)
-				schedule.POST("/", h.cancellationRequest)
+				schedule.POST("/request", h.cancellationRequest)
 			}
 
 			appointment := master.Group("/appointment")
@@ -128,6 +131,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				appointment.PUT("/:id", h.updateAppointment)
 				appointment.DELETE("/:id", h.deleteAppointment)
 			}
+
+			schedule := admin.Group("/schedule")
+			{
+				schedule.POST("/master", h.putMasterToDate)
+				schedule.GET("/admin", h.getAdminByDate)
+				schedule.GET("/master", h.getAllMastersByDate)
+
+				schedule.GET("/day", h.getDailySchedule)
+				schedule.GET("/month", h.getMonthlySchedule)
+				schedule.POST("/request", h.cancellationRequest)
+			}
 		}
 
 		director := api.Group("/director", h.directorIdentity)
@@ -153,6 +167,18 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				feedback.GET("/")
 				feedback.GET("/:id")
+			}
+
+			schedule := director.Group("/schedule")
+			{
+				schedule.POST("/admin", h.putAdminToDate)
+				schedule.POST("/master", h.putMasterToDate)
+				schedule.GET("/admin", h.getAdminByDate)
+				schedule.GET("/master", h.getAllMastersByDate)
+
+				schedule.GET("/day", h.getDailySchedule)
+				schedule.GET("/month", h.getMonthlySchedule)
+				schedule.POST("/request", h.cancellationRequest)
 			}
 		}
 	}
