@@ -17,6 +17,14 @@ func (h *Handler) createClient(c *gin.Context) {
 		return
 	}
 
+	if input.Birthday != "" {
+		err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Birthday)
+		if err != nil {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+
 	id, err := h.services.Client.CreateClient(input)
 	if err != nil {
 		var errResp *internal.ErrorResponse
@@ -107,6 +115,14 @@ func (h *Handler) updateClient(c *gin.Context) {
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
+	}
+
+	if input.Birthday != "" {
+		err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Birthday)
+		if err != nil {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
 	}
 
 	client := models.Client{
