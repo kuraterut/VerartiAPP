@@ -51,7 +51,27 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func (h *Handler) getAdminByDate(c *gin.Context) {}
+func (h *Handler) getAdminByDate(c *gin.Context) {
+	var input models.DateInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	admin, err := h.services.Schedule.GetAdminByDate(input.Date)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, admin)
+}
 
 func (h *Handler) getAllMastersByDate(c *gin.Context) {}
 

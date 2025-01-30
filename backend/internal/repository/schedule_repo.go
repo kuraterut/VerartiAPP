@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"verarti/internal"
 	"verarti/models"
 	"verarti/pkg/database"
@@ -76,4 +77,46 @@ func (r *SchedulePostgres) PutMasterToDate(masterShift models.MasterShift) error
 	}
 
 	return nil
+}
+
+func (r *SchedulePostgres) GetAdminByDate(date string) (models.Users, error) {
+	var admins []models.Users
+
+	queryGetAdmin := fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary,
+	   (
+	   SELECT array_remove(array_agg(rl.name), NULL)
+	   FROM %s AS us_rl
+	   LEFT JOIN %s AS rl ON us_rl.role_id = rl.id
+	   WHERE us_rl.users_id = us.id
+	   ) AS roles
+		FROM %s ad_sh
+		INNER JOIN %s AS us ON us.id = ad_sh.users_id
+		WHERE ad_sh.date = $1`, database.UsersRoleTable, database.RoleTable, database.AdminShiftTable, database.UserTable)
+
+	rows, err := r.db.Query(queryGetAdmin, date)
+	if err != nil {
+		return models.Users{}, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.Users
+		err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
+		if err != nil {
+			return models.Users{}, err
+		}
+
+		if user.Roles == nil {
+			continue
+		}
+
+		admins = append(admins, user)
+	}
+
+	if len(admins) == 0 {
+		return models.Users{}, internal.NewErrorResponse(404, "there is no appointed admin for this date")
+	}
+
+	return admins[0], nil
 }
