@@ -24,3 +24,7 @@ func (s *ScheduleService) PutMasterToDate(masterShift models.MasterShift) error 
 func (s *ScheduleService) GetAdminByDate(date string) (models.Users, error) {
 	return s.repo.GetAdminByDate(date)
 }
+
+func (s *ScheduleService) GetAllMastersByDate(date string) ([]models.Users, error) {
+	return s.repo.GetAllMastersByDate(date)
+}

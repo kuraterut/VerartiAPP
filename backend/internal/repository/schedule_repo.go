@@ -120,3 +120,45 @@ func (r *SchedulePostgres) GetAdminByDate(date string) (models.Users, error) {
 
 	return admins[0], nil
 }
+
+func (r *SchedulePostgres) GetAllMastersByDate(date string) ([]models.Users, error) {
+	var masters []models.Users
+
+	queryGetMasters := fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary,
+	   (
+	   SELECT array_remove(array_agg(rl.name), NULL)
+	   FROM %s AS us_rl
+	   LEFT JOIN %s AS rl ON us_rl.role_id = rl.id
+	   WHERE us_rl.users_id = us.id
+	   ) AS roles
+		FROM %s ad_sh
+		INNER JOIN %s AS us ON us.id = ad_sh.users_id
+		WHERE ad_sh.date = $1`, database.UsersRoleTable, database.RoleTable, database.MasterShiftTable, database.UserTable)
+
+	rows, err := r.db.Query(queryGetMasters, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.Users
+		err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
+		if err != nil {
+			return nil, err
+		}
+
+		if user.Roles == nil {
+			continue
+		}
+
+		masters = append(masters, user)
+	}
+
+	if len(masters) == 0 {
+		return nil, internal.NewErrorResponse(404, "there are no appointed masters for this date")
+	}
+
+	return masters, nil
+}
