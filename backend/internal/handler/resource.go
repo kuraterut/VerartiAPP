@@ -18,6 +18,12 @@ func (h *Handler) createResource(c *gin.Context) {
 
 	resourceId, err := h.services.Resource.Create(input)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -34,6 +40,12 @@ type getAllResourcesResponse struct {
 func (h *Handler) getAllResources(c *gin.Context) {
 	resources, err := h.services.Resource.GetAll()
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -73,6 +85,12 @@ func (h *Handler) getResourcesByMasterId(c *gin.Context) {
 
 	resources, err := h.services.Resource.GetByMasterId(masterId)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
