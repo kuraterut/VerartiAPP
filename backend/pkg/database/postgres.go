@@ -6,17 +6,18 @@ import (
 )
 
 const (
-	ResourceTable         = "resource"
-	UserTable             = "users"
-	UserResourceTable     = "users_resource"
-	RoleTable             = "role"
-	UsersRoleTable        = "users_role"
-	ClientTable           = "client"
-	AppointmentTable      = "appointment"
-	UsersAppointmentTable = "users_appointment"
-	AdminShiftTable       = "admin_shift"
-	MasterShiftTable      = "master_shift"
-	MasterScheduleTable   = "master_schedule"
+	ResourceTable                  = "resource"
+	UserTable                      = "users"
+	UserResourceTable              = "users_resource"
+	RoleTable                      = "role"
+	UsersRoleTable                 = "users_role"
+	ClientTable                    = "client"
+	AppointmentTable               = "appointment"
+	UsersAppointmentTable          = "users_appointment"
+	AdminShiftTable                = "admin_shift"
+	MasterShiftTable               = "master_shift"
+	MasterScheduleTable            = "master_schedule"
+	MasterScheduleAppointmentTable = "master_schedule_appointment"
 )
 
 type Config struct {

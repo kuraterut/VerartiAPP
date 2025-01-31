@@ -74,27 +74,34 @@ VALUES ('waiting'),   -- ждет подтверждения
 
 CREATE TABLE master_schedule
 (
-    id             serial                                            not null unique,
-    users_id       int references users (id) on delete cascade       not null,
-    client_id      int references client (id) on delete cascade      not null,
-    appointment_id int references appointment (id) on delete cascade not null,
-    status_id      int references status (id)                        not null default 1,
-    start_time     timestamp                                         not null,
-    date            date                                              not null
+    id         serial                                       not null unique,
+    users_id   int references users (id) on delete cascade  not null,
+    client_id  int references client (id) on delete cascade not null,
+    status_id  int references status (id)                   not null default 1,
+    start_time VARCHAR(5)                                   not null,
+    date       date                                         not null
+);
+
+CREATE TABLE master_schedule_appointment
+(
+    id                 serial                                                not null unique,
+    appointment_id     int references appointment (id) on delete cascade     not null,
+    master_schedule_id int references master_schedule (id) on delete cascade not null,
+    CONSTRAINT unique_appointment_master_schedule UNIQUE (appointment_id, master_schedule_id)
 );
 
 CREATE TABLE admin_shift
 (
     id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
-    date      date                                        not null unique
+    date     date                                        not null unique
 );
 
 CREATE TABLE master_shift
 (
     id       serial                                      not null unique,
     users_id int references users (id) on delete cascade not null,
-    date      date                                        not null,
+    date     date                                        not null,
     CONSTRAINT unique_user_date UNIQUE (users_id, date)
 );
 

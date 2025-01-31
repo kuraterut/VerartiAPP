@@ -44,6 +44,7 @@ type Schedule interface {
 	PutMasterToDate(masterShift models.MasterShift) error
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string) ([]models.Users, error)
+	CreateSchedule(schedule models.MasterScheduleInput) (int, error)
 }
 
 type User interface {
