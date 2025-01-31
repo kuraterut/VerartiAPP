@@ -14,7 +14,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -36,7 +36,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -58,7 +58,7 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -80,7 +80,7 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("2006-01-02", input.Date)
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -94,6 +94,36 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"masters": masters,
+	})
+}
+
+func (h *Handler) createSchedule(c *gin.Context) {
+	var input models.MasterScheduleInput
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = domain.ValidatorDateAndTimeFormat("15:04", input.StartTime)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	scheduleId, err := h.services.Schedule.CreateSchedule(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"schedule_id": scheduleId,
 	})
 }
 

@@ -17,7 +17,7 @@ func (h *Handler) createAppointment(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateFormat("15:04", input.Duration)
+	err := domain.ValidatorDateAndTimeFormat("15:04", input.Duration)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -106,6 +106,12 @@ func (h *Handler) updateAppointment(c *gin.Context) {
 	var input models.AppointmentUpdate
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	err = domain.ValidatorDateAndTimeFormat("15:04", input.Duration)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 

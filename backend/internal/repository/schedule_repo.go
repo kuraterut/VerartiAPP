@@ -162,3 +162,79 @@ func (r *SchedulePostgres) GetAllMastersByDate(date string) ([]models.Users, err
 
 	return masters, nil
 }
+
+func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (int, error) {
+	var id int
+
+	queryGetMaster := fmt.Sprintf(`
+		SELECT us.id FROM %s us
+		WHERE us.id = $1 AND EXISTS (
+			SELECT 1
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id AND rl.name = 'master'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+	err := r.db.Get(&id, queryGetMaster, schedule.MasterId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, internal.NewErrorResponse(404, "master with this id was not found")
+		}
+
+		return 0, err
+	}
+
+	queryGetClient := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.ClientTable)
+	err = r.db.Get(&id, queryGetClient, schedule.ClientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, internal.NewErrorResponse(404, "client with this id was not found")
+		}
+
+		return 0, err
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback()
+
+	var scheduleId int
+	query := fmt.Sprintf("INSERT INTO %s (users_id, client_id, start_time, date)"+
+		"VALUES ($1, $2, $3, $4) RETURNING id", database.MasterScheduleTable)
+	row := tx.QueryRow(query, schedule.MasterId, schedule.ClientId, schedule.StartTime, schedule.Date)
+	if err := row.Scan(&scheduleId); err != nil {
+		return 0, err
+	}
+
+	for _, appointmentId := range schedule.AppointmentIds {
+		queryGetAppointment := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.AppointmentTable)
+		err = r.db.Get(&id, queryGetAppointment, appointmentId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return 0, internal.NewErrorResponse(404, fmt.Sprintf("appointment with this id: %d was not found", appointmentId))
+			}
+
+			return 0, err
+		}
+
+		queryGetAppointmentAndMaster := fmt.Sprintf(`SELECT id FROM %s WHERE users_id = $1 AND appointment_id = $2`, database.UsersAppointmentTable)
+		err = r.db.Get(&id, queryGetAppointmentAndMaster, schedule.MasterId, appointmentId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return 0, internal.NewErrorResponse(404, fmt.Sprintf("the master does not provide a appointment with this id: %d", appointmentId))
+			}
+
+			return 0, err
+		}
+
+		query := fmt.Sprintf("INSERT INTO %s (appointment_id, master_schedule_id)"+
+			"VALUES ($1, $2) RETURNING id", database.MasterScheduleAppointmentTable)
+		row := tx.QueryRow(query, appointmentId, scheduleId)
+		if err := row.Scan(&id); err != nil {
+			return 0, err
+		}
+	}
+
+	return scheduleId, tx.Commit()
+}
