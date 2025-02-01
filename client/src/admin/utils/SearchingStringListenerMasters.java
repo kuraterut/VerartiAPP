@@ -78,12 +78,12 @@ public class SearchingStringListenerMasters implements EventHandler<KeyEvent> {
             
             if(input.length() > 0 && Character.isDigit(input.charAt(0))){
                 if(numbers.get(i).toString().toLowerCase().endsWith(input)){
-                    list.add(masters.get(i)); 
+                    list.add(masters.get(i).toString()); 
                 } 
             }
             else{
                 if(fios.get(i).toString().toLowerCase().startsWith(input)) {
-                    list.add(masters.get(i));
+                    list.add(masters.get(i).toString());
                 }    
             }
             

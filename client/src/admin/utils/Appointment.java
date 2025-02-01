@@ -6,6 +6,7 @@ import java.time.*;
 
 public class Appointment extends Response{
 	private Long id;
+	private String status;
 	private LocalDate date;
 	private LocalTime startTime;
 	private List<ServiceInfo> services;
@@ -20,6 +21,15 @@ public class Appointment extends Response{
 	public MasterInfo getMaster()			{return this.master;}
 	public List<ServiceInfo> getServices()	{return this.services;}
 	public String getComment()				{return this.comment;}
+	public String getStatus()				{return this.status;}
+	public String getDateTimeStr()			{
+		String dateTime = date.getDayOfMonth()+".";
+		dateTime += date.getMonthValue()+".";
+		dateTime += date.getYear()+" ";
+		dateTime += startTime.getHour();
+		dateTime += startTime.getMinute();
+		return dateTime;
+	}
 
 	
 	public void setId(Long id)							{this.id = id;}
@@ -29,5 +39,5 @@ public class Appointment extends Response{
 	public void setClient(ClientInfo client)			{this.client = client;}
 	public void setMaster(MasterInfo master)			{this.master = master;}
 	public void setComment(String comment)				{this.comment = comment;}
-
+	public void setStatus(String status)				{this.status = status;}
 }
