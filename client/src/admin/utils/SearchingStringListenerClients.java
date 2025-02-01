@@ -1,5 +1,7 @@
 package src.admin.utils;
 
+import src.admin.dayInfoWindow.*;
+
 import javafx.event.*;
 import javafx.scene.input.*;    
 import javafx.scene.control.*;
@@ -12,23 +14,21 @@ public class SearchingStringListenerClients implements EventHandler<KeyEvent> {
     private ComboBox comboBox;
     private ObservableList fios;
     private ObservableList numbers;
+    private ObservableList clients;
     private boolean moveCaretToPos = false;
     private int caretPos;
 
     public SearchingStringListenerClients(final ComboBox comboBox, List<ClientInfo> clientsInfo) {
         this.comboBox = comboBox;
-        List<String> fiosList = new ArrayList<>();
-        List<String> numbersList = new ArrayList<>();
         
-
+        this.fios = FXCollections.observableArrayList();
+        this.numbers = FXCollections.observableArrayList();
+        this.clients = FXCollections.observableArrayList(clientsInfo);
 
         for(int i = 0; i < clientsInfo.size(); i++){
-            fiosList.add(clientsInfo.get(i).getFio());
-            numbersList.add(clientsInfo.get(i).getPhone());
+            this.fios.add(clientsInfo.get(i).getFio());
+            this.numbers.add(clientsInfo.get(i).getPhone());
         }
-
-        this.fios = FXCollections.observableArrayList(fiosList);
-        this.numbers = FXCollections.observableArrayList(numbersList);
 
         this.comboBox.setEditable(true);
         this.comboBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -43,7 +43,6 @@ public class SearchingStringListenerClients implements EventHandler<KeyEvent> {
 
     @Override
     public void handle(KeyEvent event) {
-
         if(event.getCode() == KeyCode.UP) {
             caretPos = -1;
             moveCaret(comboBox.getEditor().getText().length());
@@ -78,12 +77,12 @@ public class SearchingStringListenerClients implements EventHandler<KeyEvent> {
             
             if(input.length() > 0 && Character.isDigit(input.charAt(0))){
                 if(numbers.get(i).toString().toLowerCase().endsWith(input)){
-                    list.add(fios.get(i) + " (" + numbers.get(i) + ")"); 
+                    list.add(clients.get(i).toString()); 
                 } 
             }
             else{
                 if(fios.get(i).toString().toLowerCase().startsWith(input)) {
-                    list.add(fios.get(i) + " (" + numbers.get(i) + ")");
+                    list.add(clients.get(i).toString());
                 }    
             }
             

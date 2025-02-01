@@ -18,7 +18,8 @@ public class ClientInfo extends Response{
 
 	@Override
     public String toString() {
-        String view = surname + " ";
+        String view = id + " ";
+        view += surname + " ";
         view += name + " ";
         view += patronymic + " ";
         view += "(" + phone + ")";
@@ -61,6 +62,9 @@ public class ClientInfo extends Response{
 	public void setPhone(String phone)			{this.phone = phone;}
 	public void setComment(String comment)		{this.comment = comment;}
 	public void setBirthday(LocalDate birthday)	{this.birthday = birthday;}
-
+	public void setBirthdayStr(String birthday){
+		String[] arr = birthday.split("-");
+		this.birthday = LocalDate.of(Integer.valueOf(arr[0]), Integer.valueOf(arr[1]), Integer.valueOf(arr[2]));
+	}
 
 }

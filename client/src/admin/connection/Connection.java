@@ -20,10 +20,67 @@ public class Connection{
 	}
 
 
+	public static List<Appointment> getClientAppointmentsById(String token, Long clientId){
+		try{
+			getConnection("http://localhost:8000/api/admin/shedule/clients/" + clientId);
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+
+			List<Appointment> list = new ArrayList<>();
+
+			JSONObject data = getJson();
+
+			JSONArray jsonArr = (JSONArray)data.get("shedules");
+			for(Object elem : jsonArr){
+				JSONObject obj = (JSONObject)elem;
+				
+				Long appointmentId = (Long)obj.get("id");
+				Appointment appointment = getAppointmentById(token, appointmentId);
+				// String appointmentStatus = (String)obj.get("status");
+				// String[] appointmentStartTimeStr = ((String)obj.get("start_time")).split(":");
+	            // LocalTime appointmentStartTime 	= LocalTime.of(Integer.valueOf(startTimeStr[0]), Integer.valueOf(startTimeStr[1]));
+				// String[] appointmentDateStr = ((String)data.get("date")).split("-");
+				// LocalDate appointmentDate = LocalDate.of(Integer.valueOf(dateStr[0]), Integer.valueOf(dateStr[1]), Integer.valueOf(dateStr[2]));
+
+				// JSONObject clientJSON = (JSONObject)obj.get("client");
+				// JSONObject masterJSON = (JSONObject)obj.get("master");
+				// JSONObject serviceJSON = (JSONObject)obj.get("appointment");
+
+				// ClientInfo client = new ClientInfo();
+				// MasterInfo master = new MasterInfo();
+				// ServiceInfo service = new ServiceInfo();
+
+				// client.setId((Long)clientJSON.get("id"));
+				// client.setName((String)clientJSON.get("name"));
+				// client.setSurname((String)clientJSON.get("surname"));
+				// client.setPatronymic((String)clientJSON.get("patronymic"));
+				// client.setEmail((String)clientJSON.get("email"));
+				// client.setPhone((String)clientJSON.get("phone"));
+				// client.setComment((String)clientJSON.get("comment"));
+				// client.setBirthdayStr((String)clientJSON.get("birthday"));
+
+				// master.setId((Long)masterJSON.get("id"));
+				// master.setName((String)masterJSON.get("name"));
+				// master.setSurname((String)masterJSON.get("surname"));
+				// master.setPatronymic((String)masterJSON.get("patronymic"));
+				
+
+
+				list.add(appointment);
+			}	
+
+			return list;
+		}
+		catch(Exception ex){
+	    	System.out.println(ex);
+	    	return null;
+	    }
+	}
+
 	public static Response addNewClient(String token, ClientInfo client){
 		try{
-			getConnection("http://localhost:8000/api/admin/clients");
-			connection.setRequestMethod("PUT");
+			getConnection("http://localhost:8000/api/admin/clients/");
+			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Authorization", "Bearer " + token);
 			connection.setDoOutput(true);
 
@@ -206,7 +263,7 @@ public class Connection{
 			List<ClientInfo> clients = new ArrayList<>();
 			
 			JSONObject data = getJson();
-			JSONArray jsonArr = (JSONArray) data.get("users");
+			JSONArray jsonArr = (JSONArray) data.get("clients");
 	        
 	        for(Object elemObj : jsonArr) {
 	            JSONObject elem = (JSONObject)elemObj;
