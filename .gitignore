@@ -2,4 +2,4 @@
 *.class
 .env
 .database
-/target
+client/target/*
