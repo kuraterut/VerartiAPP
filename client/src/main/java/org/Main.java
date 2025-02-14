@@ -29,6 +29,8 @@ import java.time.*;
 
 
 public class Main extends Application{
+    public static Properties properties;
+
     public static String role;
     public static String token; 
     public static GridPane calendar;
@@ -55,12 +57,24 @@ public class Main extends Application{
         stage.setTitle("VerartiAPP");
 //        stage.setWidth(1920);
 //        stage.setHeight(1080);
-        stage.setFullScreen(true);
-        
+        stage.setMaximized(true);
+        stage.setFullScreen(false);
+
+        getProperties();
+
         String style = (Main.class.getClassLoader().getResource("test.css")).toExternalForm();
         scene.getStylesheets().add(style);
         stage.setScene(scene);    
          
         stage.show();
+    }
+
+    public void getProperties() {
+        this.properties = new Properties();
+        try (FileInputStream input = new FileInputStream("client/src/main/resources/application.properties")) {
+            this.properties.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
