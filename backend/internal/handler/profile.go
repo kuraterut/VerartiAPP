@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
+	"verarti/internal"
 )
 
 func (h *Handler) getUserInfo(c *gin.Context) {
@@ -14,6 +16,12 @@ func (h *Handler) getUserInfo(c *gin.Context) {
 
 	user, err := h.services.Profile.GetUserInfo(userId)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -48,6 +56,12 @@ func (h *Handler) updatePhoto(c *gin.Context) {
 
 	err = h.services.Profile.UpdatePhoto(userId, fileBytes)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

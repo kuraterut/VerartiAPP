@@ -25,6 +25,12 @@ func (h *Handler) createAppointment(c *gin.Context) {
 
 	appointmentId, err := h.services.Appointment.CreateAppointment(input)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -37,6 +43,12 @@ func (h *Handler) createAppointment(c *gin.Context) {
 func (h *Handler) getAllAppointments(c *gin.Context) {
 	appointments, err := h.services.Appointment.GetAllAppointments()
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

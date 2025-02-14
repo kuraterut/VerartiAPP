@@ -45,6 +45,7 @@ type Schedule interface {
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string) ([]models.Users, error)
 	CreateSchedule(schedule models.MasterScheduleInput) (int, error)
+	GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error)
 }
 
 type User interface {
