@@ -137,12 +137,12 @@ public class CalendarOfEmployeesWindow extends Main{
 
 
         Image arrowRightIconImg   = null;
-        try{arrowRightIconImg     = new Image(new FileInputStream("src/main/resources/photos/Arrow_right_ICON.png"));}
+        try{arrowRightIconImg     = new Image(new FileInputStream(properties.getProperty("path.arrow-right-icon")));}
         catch(Exception ex)         {System.out.println(ex);}
         ImageView arrowRightIcon   = new ImageView(arrowRightIconImg);
 
         Image arrowLeftIconImg    = null;
-        try{arrowLeftIconImg      = new Image(new FileInputStream("src/main/resources/photos/Arrow_left_ICON.png"));}
+        try{arrowLeftIconImg      = new Image(new FileInputStream(properties.getProperty("path.arrow-left-icon")));}
         catch(Exception ex)         {System.out.println(ex);}
         ImageView arrowLeftIcon    = new ImageView(arrowLeftIconImg);
 
