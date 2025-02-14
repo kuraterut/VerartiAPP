@@ -94,7 +94,8 @@ public class Connection{
 			String birthdayStr = birthday.getYear() + "-" + birthday.getMonthValue() + "-" + birthday.getDayOfMonth();
 			
 			JSONObject outJson = new JSONObject();
-			outJson.put("birthday", birthdayStr);
+//			outJson.put("birthday", birthdayStr);
+			outJson.put("birthday", "2005-06-06");
 			outJson.put("name", name);
 			outJson.put("surname", surname);
 			outJson.put("patronymic", patronymic);
@@ -106,6 +107,7 @@ public class Connection{
 			if(status == 200){
 				return new Response(200, "");
 			}
+			System.out.println(status+" "+birthdayStr);
 			return new Response(status, "Ошибка");
 
 		}

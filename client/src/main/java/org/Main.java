@@ -26,7 +26,6 @@ import java.util.*;
 import java.time.*;
 
 //INSERT INTO users (name, surname, patronymic, password_hash, email, phone) VALUES ('Ilia', 'Kurylin', 'Artemovich', '6e73766e6a6e75347538393438767568323968726866656276383339346876756233758758c5deb39e2e1c2077a3999e1cc77b2ed109ea', 'kuraterut@yandex.ru', '+79092762462');
-//INSERT INTO users_role (users_id, role_id) VALUES (1, 3);
 
 
 public class Main extends Application{
@@ -54,9 +53,9 @@ public class Main extends Application{
         Scene scene = new Scene(AuthorizationWindow.loadAuthorizationWindow());
         
         stage.setTitle("VerartiAPP");
-        stage.setWidth(1920);
-        stage.setHeight(1080);
-        // stage.setFullScreen(true);
+//        stage.setWidth(1920);
+//        stage.setHeight(1080);
+        stage.setFullScreen(true);
         
         String style = (Main.class.getClassLoader().getResource("test.css")).toExternalForm();
         scene.getStylesheets().add(style);
