@@ -2,7 +2,10 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"net/http"
+	"strconv"
+	"verarti/internal"
 	"verarti/internal/domain"
 	"verarti/models"
 )
@@ -22,6 +25,12 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 
 	err = h.services.Schedule.PutAdminToDate(input)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -44,6 +53,12 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 
 	err = h.services.Schedule.PutMasterToDate(input)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -66,6 +81,12 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 
 	admin, err := h.services.Schedule.GetAdminByDate(input.Date)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -88,6 +109,12 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 
 	masters, err := h.services.Schedule.GetAllMastersByDate(input.Date)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -118,12 +145,42 @@ func (h *Handler) createSchedule(c *gin.Context) {
 
 	scheduleId, err := h.services.Schedule.CreateSchedule(input)
 	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"schedule_id": scheduleId,
+	})
+}
+
+func (h *Handler) getScheduleByClientId(c *gin.Context) {
+	clientId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	schedules, err := h.services.Schedule.GetScheduleByClientId(clientId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"schedules": schedules,
 	})
 }
 

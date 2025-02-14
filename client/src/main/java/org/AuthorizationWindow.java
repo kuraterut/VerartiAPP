@@ -2,7 +2,6 @@ package org;
 
 import org.master.MasterInterface;
 import org.admin.AdminInterface;
-import org.director.DirectorInterface;
 
 import javafx.application.*;
 import javafx.stage.*;
@@ -43,7 +42,7 @@ public class AuthorizationWindow extends Main{
         Button authorizationBtn        = new Button();
 
 
-        ObservableList<String> rolesList = FXCollections.observableArrayList("Мастер", "Администратор", "Директор");
+        ObservableList<String> rolesList = FXCollections.observableArrayList("Мастер", "Администратор");
         ComboBox<String> rolesComboBox = new ComboBox<String>(rolesList);
         rolesComboBox.setValue("Мастер"); // устанавливаем выбранный элемент по умолчанию
          
@@ -86,7 +85,6 @@ public class AuthorizationWindow extends Main{
                 String chosenRole = null;
                 if(rolesComboBox.getValue().equals("Мастер")){chosenRole = "master";}
                 if(rolesComboBox.getValue().equals("Администратор")){chosenRole = "admin";}
-                if(rolesComboBox.getValue().equals("Директор")){chosenRole = "director";}
 
                 try{long k = Long.parseLong(login.substring(1));}
                 catch(Exception ex){
@@ -118,9 +116,7 @@ public class AuthorizationWindow extends Main{
                 else if(Main.role.equals("admin")){
                     AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
                 }
-                else if(Main.role.equals("director")){
-                    DirectorInterface.loadCalendarWindow(authorizationBtn);
-                }
+
             }
         });
 

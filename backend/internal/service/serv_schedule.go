@@ -32,3 +32,7 @@ func (s *ScheduleService) GetAllMastersByDate(date string) ([]models.Users, erro
 func (s *ScheduleService) CreateSchedule(schedule models.MasterScheduleInput) (int, error) {
 	return s.repo.CreateSchedule(schedule)
 }
+
+func (s *ScheduleService) GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error) {
+	return s.repo.GetScheduleByClientId(clientId)
+}

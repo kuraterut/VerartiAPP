@@ -238,3 +238,63 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 
 	return scheduleId, tx.Commit()
 }
+
+func (r *SchedulePostgres) GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error) {
+	var (
+		id        int
+		schedules []models.MasterSchedule
+		schedule  models.MasterScheduleInput
+		master    models.Users
+		client    models.Client
+	)
+
+	// проверка существования клиента с таким id
+	queryGetClient := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.ClientTable)
+	err := r.db.Get(&id, queryGetClient, clientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internal.NewErrorResponse(404, "client with this id was not found")
+		}
+
+		return nil, err
+	}
+
+	query := fmt.Sprintf(`
+		SELECT sch.id AS id, TO_CHAR(sch.start_time, 'HH:MM') AS start_time, TO_CHAR(sch.date, 'YYYY-MM-DD') AS date, st.name AS status
+	   	(
+			SELECT array_remove(array_agg(rl.name), NULL)
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id
+		) AS status
+		FROM %s AS sch
+		INNER JOIN %s AS st on st.id = sch.status_id
+		WHERE us.id = $1`, database.UsersRoleTable, database.RoleTable, database.UserTable)
+	rows, err := r.db.Query(query, clientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, internal.NewErrorResponse(404, "no schedules found for this client")
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
+		if err != nil {
+			return nil, err
+		}
+
+		if user.Roles == nil {
+			continue
+		}
+
+		admins = append(admins, user)
+	}
+
+	if user.Roles == nil {
+		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+	}
+
+}
