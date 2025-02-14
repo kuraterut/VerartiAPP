@@ -53,10 +53,13 @@ public class SideMenu extends Main{
     }
 
 
-    public static StackPane buildSideMenu(int state){
+    public static StackPane buildSideMenu(int state) {
         Main.isMenuVisible          = true;
         Image menuIconImg           = null;
-        try{menuIconImg             = new Image(new FileInputStream("src/main/resources/photos/Menu-ICON.png"));}
+
+        try{
+            menuIconImg             = new Image(new FileInputStream(properties.getProperty("path.sidemenu-icon")));
+        }
         catch(Exception ex)         {System.out.println(ex);}
 
         StackPane sideMenuStack     = new StackPane();

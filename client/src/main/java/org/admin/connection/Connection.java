@@ -77,6 +77,47 @@ public class Connection{
 	    }
 	}
 
+	public static Response addNewUser(String token, User user){
+		try{
+			getConnection("http://localhost:8000/api/admin/users/signup");
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+			String name = user.getName();
+			String surname = user.getSurname();
+			String patronymic = user.getPatronymic();
+			String phone = user.getPhone();
+			String email = user.getEmail();
+			String password = user.getPassword();
+			ArrayList<String> roles = user.getRoles();
+
+			JSONObject outJson = new JSONObject();
+			outJson.put("name", name);
+			outJson.put("surname", surname);
+			outJson.put("patronymic", patronymic);
+			outJson.put("phone", phone);
+			outJson.put("email", email);
+			outJson.put("password", password);
+			outJson.put("roles", roles);
+
+			sendJson(outJson);
+
+
+			int status = connection.getResponseCode();
+			System.out.println("status: " + status);
+			if(status == 200){
+				return new Response(200, "");
+			}
+			return new Response(status, "Ошибка");
+
+		}
+		catch(Exception ex){
+			System.out.println(ex);
+			return new Response(404, "Ошибка подключения к серверу");
+		}
+	}
+
 	public static Response addNewClient(String token, ClientInfo client){
 		try{
 			getConnection("http://localhost:8000/api/admin/clients/");
@@ -94,7 +135,8 @@ public class Connection{
 			String birthdayStr = birthday.getYear() + "-" + birthday.getMonthValue() + "-" + birthday.getDayOfMonth();
 			
 			JSONObject outJson = new JSONObject();
-			outJson.put("birthday", birthdayStr);
+//			outJson.put("birthday", birthdayStr);
+			outJson.put("birthday", "2005-06-06");
 			outJson.put("name", name);
 			outJson.put("surname", surname);
 			outJson.put("patronymic", patronymic);
@@ -106,6 +148,7 @@ public class Connection{
 			if(status == 200){
 				return new Response(200, "");
 			}
+			System.out.println(status+" "+birthdayStr);
 			return new Response(status, "Ошибка");
 
 		}

@@ -116,7 +116,6 @@ public class AuthorizationWindow extends Main{
                 else if(Main.role.equals("admin")){
                     AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
                 }
-
             }
         });
 
