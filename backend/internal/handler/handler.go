@@ -89,11 +89,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			users := admin.Group("/users")
 			{
+				users.POST("/signup", h.signUp)
 				users.GET("/master", h.getAllMasters)
 				users.GET("/master/:id", h.getMasterById)
 				users.GET("/admin", h.getAllAdmins)
 				users.GET("/admin/:id", h.getAdminById)
 				users.GET("/director", h.getDirector)
+				users.DELETE("/:id", h.deleteUser)
 			}
 
 			clients := admin.Group("/clients")
@@ -135,6 +137,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			schedule := admin.Group("/schedule")
 			{
 				schedule.POST("/", h.createSchedule)
+				schedule.GET("/client/:id", h.getScheduleByClientId)
 
 				schedule.POST("/master", h.putMasterToDate)
 				schedule.GET("/admin", h.getAdminByDate)
