@@ -11,6 +11,7 @@ type MasterSchedule struct {
 }
 
 type MasterScheduleInput struct {
+	Id             int    `json:"-"`
 	ClientId       int    `json:"client_id" binding:"required"`
 	MasterId       int    `json:"master_id" binding:"required"`
 	AppointmentIds []int  `json:"appointment_ids" binding:"required"`

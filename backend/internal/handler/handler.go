@@ -135,6 +135,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			schedule := admin.Group("/schedule")
 			{
 				schedule.POST("/", h.createSchedule)
+				schedule.GET("/client/:id", h.getScheduleByClientId)
 
 				schedule.POST("/master", h.putMasterToDate)
 				schedule.GET("/admin", h.getAdminByDate)
