@@ -92,6 +92,7 @@ public class Connection{
 			String password = user.getPassword();
 			ArrayList<String> roles = user.getRoles();
 
+
 			JSONObject outJson = new JSONObject();
 			outJson.put("name", name);
 			outJson.put("surname", surname);
