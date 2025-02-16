@@ -9,19 +9,20 @@ import java.util.*;
 
 
 public class SearchingStringListenerMasters implements EventHandler<KeyEvent> {
-    private ComboBox comboBox;
-    private ObservableList fios;
-    private ObservableList numbers;
-    private ObservableList masters;
+    private final ComboBox<MasterInfo> comboBox;
+    private final ObservableList<String> fios;
+    private final ObservableList<String> numbers;
+    private final ObservableList<MasterInfo> masters;
     private boolean moveCaretToPos = false;
     private int caretPos;
 
-    public SearchingStringListenerMasters(final ComboBox comboBox, List<MasterInfo> mastersInfo) {
+    public SearchingStringListenerMasters(final ComboBox<MasterInfo> comboBox, List<MasterInfo> mastersInfo) {
         this.comboBox = comboBox;
         
         this.fios = FXCollections.observableArrayList();
         this.numbers = FXCollections.observableArrayList();
-        this.masters = FXCollections.observableArrayList(mastersInfo);
+        this.masters = FXCollections.observableArrayList();
+        this.masters.addAll(mastersInfo);
 
 
         for(int i = 0; i < mastersInfo.size(); i++){
@@ -39,6 +40,7 @@ public class SearchingStringListenerMasters implements EventHandler<KeyEvent> {
             }
         });
         this.comboBox.setOnKeyReleased(SearchingStringListenerMasters.this);
+
     }
 
     @Override
@@ -72,25 +74,28 @@ public class SearchingStringListenerMasters implements EventHandler<KeyEvent> {
         }
 
 
-        ObservableList list = FXCollections.observableArrayList();
+
+        ObservableList<MasterInfo> list = FXCollections.observableArrayList();
         for (int i = 0; i < fios.size(); i++) {
             String input = comboBox.getEditor().getText().toLowerCase().trim();
-            
-            if(input.length() > 0 && Character.isDigit(input.charAt(0))){
-                if(numbers.get(i).toString().toLowerCase().endsWith(input)){
-                    list.add(masters.get(i).toString()); 
-                } 
+
+            if(!input.isEmpty() && Character.isDigit(input.charAt(0))){
+                if(numbers.get(i).toLowerCase().endsWith(input)){
+                    list.add(masters.get(i));
+                }
             }
             else{
-                if(fios.get(i).toString().toLowerCase().startsWith(input)) {
-                    list.add(masters.get(i).toString());
-                }    
+                if(fios.get(i).toLowerCase().startsWith(input)) {
+                    list.add(masters.get(i));
+                }
             }
-            
+
         }
         String t = comboBox.getEditor().getText();
 
         comboBox.setItems(list);
+//        comboBox.getItems().addAll(list);
+
         comboBox.getEditor().setText(t);
         if(!moveCaretToPos) {
             caretPos = -1;

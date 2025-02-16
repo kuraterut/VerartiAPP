@@ -63,7 +63,9 @@ public class DayInfoWindow extends Main{
 
 		table.getColumnConstraints().add(new ColumnConstraints(100));
 
-        Map<Long, List<Appointment>> dayInfo = Connection.getMastersAppointmentsByDate(token, date);
+//        Map<Long, List<Appointment>> dayInfo = Connection.getMastersSheduleByDate(token, date);
+        Map<Long, List<Appointment>> dayInfo = Connection.getMastersByDate(token, date);
+
         if(dayInfo == null){dayInfo = new HashMap<>();}
 
         int countColumn = 0;
@@ -601,39 +603,22 @@ public class DayInfoWindow extends Main{
         Label errorMsg = new Label("");
         Label dateLbl = new Label(dateStr);
 
-        // Set<Long> mastersOnDate = Connection.getMastersIdsSetByDate(token, date);
-        // List<MasterInfo> mastersNotOnDate = new ArrayList<>();
-        // List<MasterInfo> allMasters = Connection.getAllMasters(token);
-
-        // for(MasterInfo master : allMasters){
-        //     if(!mastersOnDate.contains(master.getId())){
-        //         mastersNotOnDate.add(master);
-        //     }
-        // }
-        List<MasterInfo> mastersNotOnDate = new ArrayList<>();
-        for(int i = 0; i < 5; i++){
-            MasterInfo master = new MasterInfo();
-            master.setId(Long.valueOf(i));
-            master.setName("Имя" + i);
-            master.setSurname("Фамилия" + i);
-            master.setPatronymic("Отчество" + i);
-            master.setPhone("+7909276246" + i);
-
-            mastersNotOnDate.add(master);
-        }
 
 
-        ComboBox<String> choosingMaster = new ComboBox();
+        List<MasterInfo> allMasters = Connection.getAllMasters(token);
 
-        choosingMaster.getEditor().setOnKeyReleased(new SearchingStringListenerMasters(choosingMaster, mastersNotOnDate));
+        ComboBox<MasterInfo> choosingMaster = new ComboBox<MasterInfo>();
+
+        choosingMaster.setOnKeyReleased(new SearchingStringListenerMasters(choosingMaster, allMasters));
 
         choosingMaster.setEditable(true);
-        ObservableList comboBoxList = FXCollections.observableArrayList(mastersNotOnDate); 
+        ObservableList<MasterInfo> comboBoxList = FXCollections.observableArrayList();
+        assert allMasters != null;
+        comboBoxList.addAll(allMasters);
         choosingMaster.setItems(comboBoxList);
         
         Button cancelBtn = new Button("Отмена");
         Button createMasterBtn = new Button("Создать нового мастера");
-        Button putMasterBtn = new Button("Назначить мастера");
         HBox btnsBox = new HBox();
 
         btnsBox.setSpacing(50);
@@ -642,20 +627,83 @@ public class DayInfoWindow extends Main{
         VBox root = new VBox();
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
-        
-        btnsBox.getChildren().addAll(cancelBtn, createMasterBtn, putMasterBtn);
-        root.getChildren().addAll(dateLbl, choosingMaster, btnsBox);
+
+
+        choosingMaster.setCellFactory(new Callback<ListView<MasterInfo>, ListCell<MasterInfo>>() {
+            @Override
+            public ListCell<MasterInfo> call(ListView<MasterInfo> param) {
+                return new ListCell<MasterInfo>() {
+                    @Override
+                    protected void updateItem(MasterInfo user, boolean empty) {
+                        super.updateItem(user, empty);
+                        if (user == null || empty) {
+                            setText(null);
+                        } else {
+                            setText(user.toString()); // Используем toString() для отображения
+                        }
+                    }
+                };
+            }
+        });
+
+        // Настраиваем отображение выбранного элемента
+        choosingMaster.setButtonCell(new ListCell<MasterInfo>() {
+            @Override
+            protected void updateItem(MasterInfo user, boolean empty) {
+                super.updateItem(user, empty);
+                if (user == null || empty) {
+                    setText(null);
+                } else {
+                    setText(user.toString()); // Используем toString() для отображения
+                }
+            }
+        });
+
+        // Обработка выбора элемента
+        choosingMaster.setOnAction(event -> {
+            try {
+                MasterInfo master = choosingMaster.getValue();
+                if (master != null) { // Проверка на null
+                    Long masterId = master.getId();
+                    Response response = Connection.putMasterOnDate(token, masterId, date);
+
+                    if (response.getCode() == 200) {
+                        choosingMaster.setOnAction(null); // Отключаем обработчик
+                        choosingMaster.setOnKeyReleased(null);
+                        choosingMaster.getItems().clear(); // Очистите список элементов
+                        choosingMaster.setValue(null);
+                        dialog.close();
+                    } else {
+                        errorMsg.setText(response.getCode() + " " + response.getMsg());
+                    }
+                } else {
+                    errorMsg.setText("Мастер не выбран");
+                }
+            } catch (Exception e) {
+                errorMsg.setText("Неверный формат");
+//                e.printStackTrace(); // Добавьте логирование для отладки
+            }
+        });
+
+        btnsBox.getChildren().addAll(cancelBtn, createMasterBtn);
+        root.getChildren().addAll(dateLbl, choosingMaster, errorMsg, btnsBox);
 
         cancelBtn.setOnAction(event -> dialog.close());
-        createMasterBtn.setOnAction(event -> showCreateMasterDialog());
-        // putMasterBtn.setOnAction(event -> {
+        createMasterBtn.setOnAction(event -> {
+            dialog.close();
+            showCreateMasterDialog();
+        });
 
-        // });
 
 
 
         Scene dialogScene = new Scene(root, 500, 500);
-        
+        dialog.setOnHidden(event -> {
+            choosingMaster.setOnAction(null); // Отключаем обработчик
+            choosingMaster.setOnKeyReleased(null);
+            choosingMaster.getItems().clear(); // Очистите список элементов
+            choosingMaster.setValue(null);
+        });
         dialog.setScene(dialogScene);
         dialog.showAndWait();
     }

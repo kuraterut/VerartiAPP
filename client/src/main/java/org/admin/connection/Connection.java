@@ -5,6 +5,8 @@ import org.admin.utils.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 import javafx.scene.image.*;
+
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.nio.file.*;
 import java.net.*;
@@ -106,7 +108,6 @@ public class Connection{
 
 
 			int status = connection.getResponseCode();
-			System.out.println("status: " + status);
 			if(status == 200){
 				return new Response(200, "");
 			}
@@ -157,6 +158,35 @@ public class Connection{
 	    	System.out.println(ex);
 	    	return new Response(404, "Ошибка подключения к серверу");
 	    }
+	}
+
+	public static Response putMasterOnDate(String token, Long masterId, LocalDate date){
+		try{
+			getConnection("http://localhost:8000/api/admin/schedule/master");
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
+
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String dateStr = date.format(formatter);
+
+			JSONObject outJson = new JSONObject();
+			outJson.put("date", dateStr);
+			outJson.put("master_id", masterId);
+
+			sendJson(outJson);
+			int status = connection.getResponseCode();
+			if(status == 200){
+				return new Response(200, "");
+			}
+
+			return new Response(status, getErrorMsg());
+		}
+		catch (Exception ex){
+			System.out.println(ex);
+			return new Response();
+		}
 	}
 
 
@@ -269,7 +299,7 @@ public class Connection{
 
 	public static List<MasterInfo> getAllMasters(String token){
 		try{
-			getConnection("http://localhost:8000/api/admin/users/masters");
+			getConnection("http://localhost:8000/api/admin/users/master");
 
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -281,9 +311,24 @@ public class Connection{
 			JSONArray jsonArr = (JSONArray) data.get("masters");
 
 			for(Object elem: jsonArr){
-				Long masterId = (Long) elem;
+				JSONObject masterJSON = (JSONObject) elem;
+				MasterInfo master = new MasterInfo();
 
-				masters.add(getMasterById(token, masterId));
+				Long id = (Long) masterJSON.get("id");
+				String name = (String) masterJSON.get("name");
+				String surname = (String) masterJSON.get("surname");
+				String patronymic = (String) masterJSON.get("patronymic");
+				String phone = (String) masterJSON.get("phone");
+				String bio = (String) masterJSON.get("bio");
+
+				master.setId(id);
+				master.setName(name);
+				master.setSurname(surname);
+				master.setPatronymic(patronymic);
+				master.setPhone(phone);
+				master.setBio(bio);
+
+				masters.add(master);
 			}
 			return masters;
 
@@ -627,16 +672,28 @@ public class Connection{
 
 	public static Map<Long, List<Appointment>> getMastersByDate(String token, LocalDate date){
 		try{
-			getConnection("http://localhost:8000/api/admin/appointment/masters");
+			getConnection("http://localhost:8000/api/admin/schedule/master");
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Authorization", "Bearer " + token);
+			connection.setDoOutput(true);
 
 			Map<Long, List<Appointment>> mastersMap = new HashMap<>();
 
+			JSONObject outJson = new JSONObject();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String dateStr = formatter.format(date);
+
+			System.out.println(dateStr);
+
+			outJson.put("date", dateStr);
+			sendJson(outJson);
+
 			JSONObject data = getJson();
-			JSONArray mastersArr = (JSONArray)data.get("master_ids");
+			JSONArray mastersArr = (JSONArray)data.get("masters");
 			for(Object elem: mastersArr){
-				Long id = (Long)elem;
+				JSONObject masterJSON = (JSONObject)elem;
+				Long id = (Long)masterJSON.get("id");
+
 				mastersMap.put(id, new ArrayList<>());
 			}
 
@@ -649,7 +706,7 @@ public class Connection{
 	    }
 	}
 
-	public static Map<Long, List<Appointment>> getMastersAppointmentsByDate(String token, LocalDate date){
+	public static Map<Long, List<Appointment>> getMastersSheduleByDate(String token, LocalDate date){
 		try{
 			getConnection("http://localhost:8000/api/admin/shedule/day");
 
@@ -657,8 +714,9 @@ public class Connection{
 			connection.setRequestProperty("Authorization", "Bearer " + token);
 			connection.setDoOutput(true);
 
-			String dateStr = date.getYear() + "-" + date.getMonthValue() + "-" + date.getDayOfMonth();
-			
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String dateStr = formatter.format(date);
+
 			JSONObject outJson = new JSONObject();
 			outJson.put("date", dateStr);
 
@@ -836,5 +894,22 @@ public class Connection{
 	    	System.out.println(ex);
 	    	return null;
 	    }
+	}
+
+	public static String getErrorMsg(){
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+			String line;
+			StringBuilder response = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				response.append(line);
+			}
+			reader.close();
+			return response.toString();
+		}
+		catch(Exception ex){
+			System.out.println(ex);
+			return "";
+		}
 	}
 }
