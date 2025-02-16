@@ -9,7 +9,7 @@ import java.net.*;
 import java.io.*;
 
 public class Connection{
-	private static HttpURLConnection connection;
+	public static HttpURLConnection connection;
 	
 	public static void getConnection(String urlAddr) throws Exception{
 		URL url = new URL(urlAddr);

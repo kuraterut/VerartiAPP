@@ -3,6 +3,8 @@ package org.admin.calendarOfEmployeesWindow;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.Connection;
+import org.admin.connection.getRequests.GetAdmin;
+import org.admin.connection.getRequests.GetMaster;
 import org.admin.sideMenu.SideMenu;
 import org.admin.utils.*;
 
@@ -66,8 +68,8 @@ public class CalendarOfEmployeesWindow extends Main{
             Label dayLbl = new Label(String.valueOf(day));
             
             LocalDate date = LocalDate.of(year, month, day);
-            AdminInfo admin = Connection.getAdminByDate(token, date);
-            List<MasterInfo> masters = Connection.getMastersListByDate(token, date);
+            AdminInfo admin = GetAdmin.getByDate(token, date);
+            List<MasterInfo> masters = GetMaster.getListByDate(token, date);
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 
