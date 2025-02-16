@@ -646,6 +646,7 @@ public class DayInfoWindow extends Main{
             }
         });
 
+
         // Настраиваем отображение выбранного элемента
         choosingMaster.setButtonCell(new ListCell<MasterInfo>() {
             @Override
