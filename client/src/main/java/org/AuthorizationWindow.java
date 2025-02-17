@@ -109,6 +109,8 @@ public class AuthorizationWindow extends Main{
 
                 Main.token = checkResponse[0];
                 Main.role = chosenRole;
+                System.out.println(token);
+
 
                 if(Main.role.equals("master")){
                     MasterInterface.loadCalendarWindow(authorizationBtn);

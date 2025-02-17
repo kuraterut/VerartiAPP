@@ -69,7 +69,7 @@ public class CalendarOfEmployeesWindow extends Main{
             
             LocalDate date = LocalDate.of(year, month, day);
             AdminInfo admin = GetAdmin.getByDate(token, date);
-            List<MasterInfo> masters = GetMaster.getListByDate(token, date);
+            List<MasterInfo> masters = GetMaster.getListByDate(token, date, true);
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 

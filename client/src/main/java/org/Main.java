@@ -55,8 +55,6 @@ public class Main extends Application{
         Scene scene = new Scene(AuthorizationWindow.loadAuthorizationWindow());
         
         stage.setTitle("VerartiAPP");
-//        stage.setWidth(1920);
-//        stage.setHeight(1080);
         stage.setMaximized(true);
         stage.setFullScreen(false);
 
