@@ -57,7 +57,7 @@ public class DayInfoTable extends Main {
         table.getColumnConstraints().add(new ColumnConstraints(100));
 
 //        Map<Long, List<Appointment>> dayInfo = Connection.getMastersSheduleByDate(token, date);
-        List<MasterInfo> masters = GetMaster.getListByDate(token, date);
+        List<MasterInfo> masters = GetMaster.getListByDate(token, date, true);
 
         Map<Long, List<Appointment>> dayInfo = new HashMap<>();
         for(MasterInfo master : masters){
@@ -71,15 +71,12 @@ public class DayInfoTable extends Main {
             table.getColumnConstraints().add(new ColumnConstraints(200));
             MasterInfo master = GetMaster.getById(token, masterId);
 
-            Label masterIdLbl = new Label(Long.toString(masterId));
-            Label masterFioLbl = new Label(master.getFio());
 
-            table.add(masterIdLbl, countColumn, 0);
-            table.add(masterFioLbl, countColumn, 0);
-            GridPane.setHalignment(masterIdLbl, HPos.CENTER);
-            GridPane.setValignment(masterIdLbl, VPos.CENTER);
-            GridPane.setHalignment(masterFioLbl, HPos.CENTER);
-            GridPane.setValignment(masterFioLbl, VPos.CENTER);
+            Label masterSurnameLbl = new Label(master.getSurname());
+
+            table.add(masterSurnameLbl, countColumn, 0);
+            GridPane.setHalignment(masterSurnameLbl, HPos.CENTER);
+            GridPane.setValignment(masterSurnameLbl, VPos.CENTER);
 
             List<Appointment> appointments = dayInfo.get(masterId);
             Set<Integer> startCellsSet = new HashSet<>();
@@ -123,22 +120,21 @@ public class DayInfoTable extends Main {
 
                 for(int i = 1; i < cellNumber; i++){
                     if(startCellsSet.contains(cellStart+i)) break;
-                    Rectangle rectFill = new Rectangle(150, 100, Color.AQUA);
+                    Rectangle rectFill = new Rectangle(200, 40, Color.AQUA);
                     table.add(rectFill, countColumn, cellStart+i);
                     usedCells.add(cellStart+i);
                 }
-
-                for(int i = 1; i <= CELLS_IN_COLUMN_COUNT; i++){
-                    if(!usedCells.contains(i)){
-                        Rectangle unusedRect = new Rectangle(150, 100, Color.TRANSPARENT);
-                        Integer startCellToCreate = i;
-                        unusedRect.setOnMouseClicked(event -> CreateAppointmentDialog.show(master, date, startCellToCreate, appointments));
-                        table.add(unusedRect, countColumn, i);
-                        unusedRect.setOnMouseEntered(event -> {
-                            unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
-                        });
-                        unusedRect.setOnMouseExited(event -> unusedRect.setStyle(""));
-                    }
+            }
+            for(int i = 1; i <= CELLS_IN_COLUMN_COUNT; i++){
+                if(!usedCells.contains(i)){
+                    Rectangle unusedRect = new Rectangle(200, 40, Color.TRANSPARENT);
+                    Integer startCellToCreate = i;
+                    unusedRect.setOnMouseClicked(event -> CreateAppointmentDialog.show(master, date, startCellToCreate, appointments));
+                    table.add(unusedRect, countColumn, i);
+                    unusedRect.setOnMouseEntered(event -> {
+                        unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
+                    });
+                    unusedRect.setOnMouseExited(event -> unusedRect.setStyle(""));
                 }
             }
         }

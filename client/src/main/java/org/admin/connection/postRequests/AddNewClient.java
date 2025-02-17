@@ -2,6 +2,7 @@ package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
 import org.admin.utils.ClientInfo;
+import org.admin.utils.HelpFuncs;
 import org.admin.utils.Response;
 import org.json.simple.JSONObject;
 
@@ -22,11 +23,9 @@ public class AddNewClient extends Connection {
             String phone = client.getPhone();
             LocalDate birthday = client.getBirthday();
 
-            String birthdayStr = birthday.getYear() + "-" + birthday.getMonthValue() + "-" + birthday.getDayOfMonth();
-
+            String birthdayStr = HelpFuncs.localDateToString(birthday, "yyyy-MM-dd");
             JSONObject outJson = new JSONObject();
-//			outJson.put("birthday", birthdayStr);
-            outJson.put("birthday", "2005-06-06");
+			outJson.put("birthday", birthdayStr);
             outJson.put("name", name);
             outJson.put("surname", surname);
             outJson.put("patronymic", patronymic);

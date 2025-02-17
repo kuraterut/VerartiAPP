@@ -61,7 +61,7 @@ public class GetMaster extends Connection {
 
     public static MasterInfo getById(String token, Long id){
         try{
-            getConnection("http://localhost:8000/api/admin/master/" + id);
+            getConnection("http://localhost:8000/api/admin/users/master/" + id);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -75,22 +75,12 @@ public class GetMaster extends Connection {
             String bio = (String)data.get("bio");
             String phone = (String)data.get("phone");
 
-            List<ServiceInfo> services = new ArrayList<>();
-            JSONArray servicesArr = (JSONArray)data.get("services_id");
-            for(Object elem: servicesArr){
-                Long serviceId = (Long)elem;
-                ServiceInfo service = GetService.getById(token, serviceId);
-                services.add(service);
-            }
-
-
             master.setId(id);
             master.setName(name);
             master.setSurname(surname);
             master.setPatronymic(patronymic);
             master.setBio(bio);
             master.setPhone(phone);
-            master.setServices(services);
 
             return master;
 
@@ -101,12 +91,14 @@ public class GetMaster extends Connection {
         }
     }
 
-    public static List<MasterInfo> getListByDate(String token, LocalDate date){
+    public static List<MasterInfo> getListByDate(String token, LocalDate date, boolean appointed){
         try{
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String dateStr = formatter.format(date);
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/schedule/master?date=" + encodedDate);
+            String url = "http://localhost:8000/api/admin/schedule/master?";
+            url += "date=" + encodedDate + "&appointed=" + appointed;
+            getConnection(url);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

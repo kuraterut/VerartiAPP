@@ -36,19 +36,6 @@ public class PutMasterOnDateDialog extends Main {
         Label dateLbl = new Label(dateStr);
 
 
-
-        List<MasterInfo> allMasters = GetMaster.getAll(token);
-
-        ComboBox<MasterInfo> choosingMaster = new ComboBox<MasterInfo>();
-
-        choosingMaster.setOnKeyReleased(new SearchingStringListenerMasters(choosingMaster, allMasters));
-
-        choosingMaster.setEditable(true);
-        ObservableList<MasterInfo> comboBoxList = FXCollections.observableArrayList();
-        assert allMasters != null;
-        comboBoxList.addAll(allMasters);
-        choosingMaster.setItems(comboBoxList);
-
         Button cancelBtn = new Button("Отмена");
         Button createMasterBtn = new Button("Создать нового мастера");
         HBox btnsBox = new HBox();
@@ -60,6 +47,13 @@ public class PutMasterOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
+        List<MasterInfo> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
+
+        ComboBox<MasterInfo> choosingMaster = new ComboBox<MasterInfo>();
+        choosingMaster.setOnKeyReleased(new SearchingStringListenerMasters(choosingMaster, mastersNotOnDate));
+        choosingMaster.setEditable(true);
+        ObservableList<MasterInfo> comboBoxList = FXCollections.observableArrayList(mastersNotOnDate);
+        choosingMaster.setItems(comboBoxList);
 
         choosingMaster.setCellFactory(new Callback<ListView<MasterInfo>, ListCell<MasterInfo>>() {
             @Override
