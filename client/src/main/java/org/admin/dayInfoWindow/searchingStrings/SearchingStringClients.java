@@ -16,7 +16,7 @@ import org.admin.utils.ClientInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchingStringClient extends Main {
+public class SearchingStringClients extends Main {
     public static VBox build(){
         VBox root = new VBox();
 

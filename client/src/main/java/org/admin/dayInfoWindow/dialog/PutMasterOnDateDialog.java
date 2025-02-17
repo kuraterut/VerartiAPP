@@ -14,6 +14,7 @@ import org.Main;
 import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.postRequests.PutMasterOnDate;
+import org.admin.dayInfoWindow.searchingStrings.SearchingStringMasters;
 import org.admin.utils.MasterInfo;
 import org.admin.utils.Response;
 import org.admin.utils.SearchingStringListenerMasters;
@@ -28,12 +29,12 @@ public class PutMasterOnDateDialog extends Main {
         final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM yyyy", Locale.ENGLISH);
         String dateStr = dtf.format(date);
 
-        Stage dialog = new Stage();
+        Stage dialog            = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Назначить мастера");
 
-        Label errorMsg = new Label("");
-        Label dateLbl = new Label(dateStr);
+        Label errorMsg          = new Label("");
+        Label dateLbl           = new Label(dateStr);
 
 
         Button cancelBtn = new Button("Отмена");
@@ -49,68 +50,19 @@ public class PutMasterOnDateDialog extends Main {
 
         List<MasterInfo> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
 
-        ComboBox<MasterInfo> choosingMaster = new ComboBox<MasterInfo>();
-        choosingMaster.setOnKeyReleased(new SearchingStringListenerMasters(choosingMaster, mastersNotOnDate));
-        choosingMaster.setEditable(true);
-        ObservableList<MasterInfo> comboBoxList = FXCollections.observableArrayList(mastersNotOnDate);
-        choosingMaster.setItems(comboBoxList);
-
-        choosingMaster.setCellFactory(new Callback<ListView<MasterInfo>, ListCell<MasterInfo>>() {
-            @Override
-            public ListCell<MasterInfo> call(ListView<MasterInfo> param) {
-                return new ListCell<MasterInfo>() {
-                    @Override
-                    protected void updateItem(MasterInfo user, boolean empty) {
-                        super.updateItem(user, empty);
-                        if (user == null || empty) {
-                            setText(null);
-                        } else {
-                            setText(user.toString()); // Используем toString() для отображения
-                        }
-                    }
-                };
-            }
-        });
-
-
-        // Настраиваем отображение выбранного элемента
-        choosingMaster.setButtonCell(new ListCell<MasterInfo>() {
-            @Override
-            protected void updateItem(MasterInfo user, boolean empty) {
-                super.updateItem(user, empty);
-                if (user == null || empty) {
-                    setText(null);
+        VBox choosingMaster = SearchingStringMasters.build(mastersNotOnDate, masterInfo -> {
+            if(masterInfo != null) {
+                Long masterId = masterInfo.getId();
+                Response response = PutMasterOnDate.post(token, masterId, date);
+                if(response.getCode() == 200) {
+                    dialog.close();
                 } else {
-                    setText(user.toString()); // Используем toString() для отображения
+                    errorMsg.setText(response.getCode() + " " + response.getMsg());
                 }
             }
         });
 
-        // Обработка выбора элемента
-        choosingMaster.setOnAction(event -> {
-            try {
-                MasterInfo master = choosingMaster.getValue();
-                if (master != null) { // Проверка на null
-                    Long masterId = master.getId();
-                    Response response = PutMasterOnDate.post(token, masterId, date);
 
-                    if (response.getCode() == 200) {
-                        choosingMaster.setOnAction(null); // Отключаем обработчик
-                        choosingMaster.setOnKeyReleased(null);
-                        choosingMaster.getItems().clear(); // Очистите список элементов
-                        choosingMaster.setValue(null);
-                        dialog.close();
-                    } else {
-                        errorMsg.setText(response.getCode() + " " + response.getMsg());
-                    }
-                } else {
-                    errorMsg.setText("Мастер не выбран");
-                }
-            } catch (Exception e) {
-                errorMsg.setText("Неверный формат");
-//                e.printStackTrace(); // Добавьте логирование для отладки
-            }
-        });
 
         btnsBox.getChildren().addAll(cancelBtn, createMasterBtn);
         root.getChildren().addAll(dateLbl, choosingMaster, errorMsg, btnsBox);
@@ -125,12 +77,6 @@ public class PutMasterOnDateDialog extends Main {
 
 
         Scene dialogScene = new Scene(root, 500, 500);
-        dialog.setOnHidden(event -> {
-            choosingMaster.setOnAction(null); // Отключаем обработчик
-            choosingMaster.setOnKeyReleased(null);
-            choosingMaster.getItems().clear(); // Очистите список элементов
-            choosingMaster.setValue(null);
-        });
         dialog.setScene(dialogScene);
         dialog.showAndWait();
     }
