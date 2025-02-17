@@ -30,7 +30,3 @@ type AdminShift struct {
 	AdminId int    `json:"admin_id" binding:"required"`
 	Date    string `json:"date" binding:"required"`
 }
-
-type DateInput struct {
-	Date string `json:"date" binding:"required"`
-}

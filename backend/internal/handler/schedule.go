@@ -67,19 +67,19 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 }
 
 func (h *Handler) getAdminByDate(c *gin.Context) {
-	var input models.DateInput
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	admin, err := h.services.Schedule.GetAdminByDate(input.Date)
+	admin, err := h.services.Schedule.GetAdminByDate(date)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -95,19 +95,19 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 }
 
 func (h *Handler) getAllMastersByDate(c *gin.Context) {
-	var input models.DateInput
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidatorDateAndTimeFormat("2006-01-02", date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	masters, err := h.services.Schedule.GetAllMastersByDate(input.Date)
+	masters, err := h.services.Schedule.GetAllMastersByDate(date)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
