@@ -121,10 +121,12 @@ func (r *SchedulePostgres) GetAdminByDate(date string) (models.Users, error) {
 	return admins[0], nil
 }
 
-func (r *SchedulePostgres) GetAllMastersByDate(date string) ([]models.Users, error) {
+func (r *SchedulePostgres) GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error) {
 	var masters []models.Users
 
-	queryGetMasters := fmt.Sprintf(`
+	queryGetMasters := ""
+	if isAppointed {
+		queryGetMasters = fmt.Sprintf(`
 		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary,
 	   (
 	   SELECT array_remove(array_agg(rl.name), NULL)
@@ -132,9 +134,27 @@ func (r *SchedulePostgres) GetAllMastersByDate(date string) ([]models.Users, err
 	   LEFT JOIN %s AS rl ON us_rl.role_id = rl.id
 	   WHERE us_rl.users_id = us.id
 	   ) AS roles
-		FROM %s ad_sh
-		INNER JOIN %s AS us ON us.id = ad_sh.users_id
-		WHERE ad_sh.date = $1`, database.UsersRoleTable, database.RoleTable, database.MasterShiftTable, database.UserTable)
+		FROM %s ms_sh
+		INNER JOIN %s AS us ON us.id = ms_sh.users_id
+		WHERE ms_sh.date = $1`, database.UsersRoleTable, database.RoleTable, database.MasterShiftTable, database.UserTable)
+	} else {
+		queryGetMasters = fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary,
+	   (
+	   SELECT array_remove(array_agg(rl.name), NULL)
+	   FROM %s AS us_rl
+	   LEFT JOIN %s AS rl ON us_rl.role_id = rl.id
+	   WHERE us_rl.users_id = us.id
+	   ) AS roles
+		FROM %s us
+			WHERE EXISTS (
+			SELECT 1 FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON us_rl.role_id = rl.id
+			WHERE us_rl.users_id = us.id AND rl.name = 'master'
+		) AND us.id NOT IN (
+			SELECT users_id FROM %s WHERE date = $1
+		    )`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable, database.MasterShiftTable)
+	}
 
 	rows, err := r.db.Query(queryGetMasters, date)
 	if err != nil {
@@ -157,7 +177,11 @@ func (r *SchedulePostgres) GetAllMastersByDate(date string) ([]models.Users, err
 	}
 
 	if len(masters) == 0 {
-		return nil, internal.NewErrorResponse(404, "there are no appointed masters for this date")
+		if isAppointed {
+			return nil, internal.NewErrorResponse(404, "there are no appointed masters for this date")
+		}
+
+		return nil, internal.NewErrorResponse(404, "no free masters. Everything is booked for this date")
 	}
 
 	return masters, nil

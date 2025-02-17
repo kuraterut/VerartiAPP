@@ -25,8 +25,8 @@ func (s *ScheduleService) GetAdminByDate(date string) (models.Users, error) {
 	return s.repo.GetAdminByDate(date)
 }
 
-func (s *ScheduleService) GetAllMastersByDate(date string) ([]models.Users, error) {
-	return s.repo.GetAllMastersByDate(date)
+func (s *ScheduleService) GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error) {
+	return s.repo.GetAllMastersByDate(date, isAppointed)
 }
 
 func (s *ScheduleService) CreateSchedule(schedule models.MasterScheduleInput) (int, error) {
