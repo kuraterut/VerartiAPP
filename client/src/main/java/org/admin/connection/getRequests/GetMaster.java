@@ -102,6 +102,7 @@ public class GetMaster extends Connection {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
+
             List<MasterInfo> masters = new ArrayList<>();
 
             JSONObject data = getJson();
