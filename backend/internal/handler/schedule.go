@@ -107,7 +107,20 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 		return
 	}
 
-	masters, err := h.services.Schedule.GetAllMastersByDate(date)
+	appointed := c.Query("appointed")
+	if appointed == "" {
+		newErrorResponse(c, http.StatusBadRequest, "appointed is required")
+		return
+	}
+
+	isAppointed := true
+	if appointed == "false" {
+		isAppointed = false
+	} else if appointed != "true" {
+		newErrorResponse(c, http.StatusBadRequest, "invalid 'appointed' parameter")
+	}
+
+	masters, err := h.services.Schedule.GetAllMastersByDate(date, isAppointed)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
