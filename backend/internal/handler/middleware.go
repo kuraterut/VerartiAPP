@@ -84,25 +84,6 @@ func (h *Handler) adminIdentity(c *gin.Context) {
 	}
 }
 
-func (h *Handler) directorIdentity(c *gin.Context) {
-	role, ok := c.Get(roleCtx)
-	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "role not found")
-		return
-	}
-
-	roleStr, ok := role.(string)
-	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "role is of invalid type")
-		return
-	}
-
-	if roleStr != "director" {
-		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
-		return
-	}
-}
-
 func getUserId(c *gin.Context) (int, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {

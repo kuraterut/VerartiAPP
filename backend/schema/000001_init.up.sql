@@ -6,8 +6,7 @@ CREATE TABLE role
 
 INSERT INTO role (name)
 VALUES ('master'),
-       ('admin'),
-       ('director');
+       ('admin');
 
 CREATE TABLE users
 (
