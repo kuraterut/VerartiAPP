@@ -81,6 +81,7 @@ public class GetMaster extends Connection {
             master.setPatronymic(patronymic);
             master.setBio(bio);
             master.setPhone(phone);
+            master.setServices(new ArrayList<>());
 
             return master;
 

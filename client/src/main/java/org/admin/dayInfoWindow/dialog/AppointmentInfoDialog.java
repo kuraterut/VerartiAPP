@@ -67,15 +67,15 @@ public class AppointmentInfoDialog extends Main {
         for(ServiceInfo service: services){
             numServiceRow++;
             Label serviceLbl = new Label(service.getName());
-            Label timeLbl = new Label(service.getTimeString());
+            Label durationLbl = new Label(service.getDurationString());
             Label priceLbl = new Label(Double.toString(service.getPrice()));
             servicesTable.add(serviceLbl, 0, numServiceRow);
-            servicesTable.add(timeLbl, 1, numServiceRow);
+            servicesTable.add(durationLbl, 1, numServiceRow);
             servicesTable.add(priceLbl, 2, numServiceRow);
             GridPane.setHalignment(serviceLbl, HPos.CENTER);
             GridPane.setValignment(serviceLbl, VPos.CENTER);
-            GridPane.setHalignment(timeLbl, HPos.CENTER);
-            GridPane.setValignment(timeLbl, VPos.CENTER);
+            GridPane.setHalignment(durationLbl, HPos.CENTER);
+            GridPane.setValignment(durationLbl, VPos.CENTER);
             GridPane.setHalignment(priceLbl, HPos.CENTER);
             GridPane.setValignment(priceLbl, VPos.CENTER);
         }

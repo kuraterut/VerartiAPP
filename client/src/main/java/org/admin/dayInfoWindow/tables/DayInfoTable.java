@@ -162,8 +162,8 @@ public class DayInfoTable extends Main {
     public static Integer calculateCellNumber(List<ServiceInfo> services){
         int totalCount = 0;
         for(ServiceInfo service : services){
-            totalCount += service.getTime().getHour()*2;
-            totalCount += service.getTime().getMinute()==30?1:0;
+            totalCount += service.getDuration().getHour()*2;
+            totalCount += service.getDuration().getMinute()==30?1:0;
         }
 
         return totalCount;
