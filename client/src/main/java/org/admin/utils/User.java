@@ -2,7 +2,7 @@ package org.admin.utils;
 
 import java.util.ArrayList;
 
-public class User {
+public class User extends Response{
     private String name;
     private String surname;
     private String patronymic;
