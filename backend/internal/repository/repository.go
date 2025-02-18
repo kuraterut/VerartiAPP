@@ -11,13 +11,13 @@ type Authorization interface {
 	GetUser(phone, password string) (models.Users, error)
 }
 
-type Appointment interface {
-	CreateAppointment(appointment models.Appointment) (int, error)
-	GetAllAppointments() ([]models.Appointment, error)
-	GetAppointmentById(appointmentId int) (models.Appointment, error)
-	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
-	DeleteAppointment(appointmentId int) error
-	AddAppointmentForMaster(masterId, appointmentId int) (int, error)
+type Option interface {
+	CreateOption(option models.Option) (int, error)
+	GetAllOptions() ([]models.Option, error)
+	GetOptionById(optionId int) (models.Option, error)
+	UpdateOption(option models.OptionUpdate, optionId int) error
+	DeleteOption(optionId int) error
+	AddOptionForMaster(masterId, optionId int) (int, error)
 }
 
 type Client interface {
@@ -63,7 +63,7 @@ type Profile interface {
 }
 
 type Repository struct {
-	Appointment
+	Option
 	Authorization
 	Client
 	Feedback
@@ -80,7 +80,7 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Profile:       NewProfilePostgres(db),
 		Client:        NewClientPostgres(db),
 		User:          NewUserPostgres(db),
-		Appointment:   NewAppointmentPostgres(db),
+		Option:        NewOptionPostgres(db),
 		Schedule:      NewSchedulePostgres(db),
 	}
 }

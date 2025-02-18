@@ -1,4 +1,4 @@
-DROP TABLE master_schedule_appointment;
+DROP TABLE master_schedule_option;
 
 DROP TABLE master_schedule;
 
@@ -14,13 +14,13 @@ DROP TABLE resource;
 
 DROP TABLE feedback;
 
-DROP TABLE users_appointment;
+DROP TABLE users_option;
 
 DROP TABLE users;
 
 DROP TABLE client;
 
-DROP TABLE appointment;
+DROP TABLE option;
 
 DROP TABLE status;
 

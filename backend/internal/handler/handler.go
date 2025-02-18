@@ -54,10 +54,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				schedule.POST("/request", h.cancellationRequest)
 			}
 
-			appointment := master.Group("/appointment")
+			option := master.Group("/option")
 			{
-				appointment.GET("/", h.getAllAppointments)
-				appointment.GET("/:id", h.getAppointmentById)
+				option.GET("/", h.getAllOptions)
+				option.GET("/:id", h.getOptionById)
 			}
 
 			users := master.Group("/users")
@@ -124,14 +124,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				//resource.GET("/response", h.getResponseByRequestId)
 			}
 
-			appointment := admin.Group("/appointment")
+			option := admin.Group("/option")
 			{
-				appointment.POST("/", h.createAppointment)
-				appointment.POST("/:id", h.addAppointmentForMaster)
-				appointment.GET("/", h.getAllAppointments)
-				appointment.GET("/:id", h.getAppointmentById)
-				appointment.PUT("/:id", h.updateAppointment)
-				appointment.DELETE("/:id", h.deleteAppointment)
+				option.POST("/", h.createOption)
+				option.POST("/:id", h.addOptionForMaster)
+				option.GET("/", h.getAllOptions)
+				option.GET("/:id", h.getOptionById)
+				option.PUT("/:id", h.updateOption)
+				option.DELETE("/:id", h.deleteOption)
 			}
 
 			schedule := admin.Group("/schedule")

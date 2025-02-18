@@ -11,13 +11,13 @@ type Authorization interface {
 	ParseToken(token string) (int, string, error)
 }
 
-type Appointment interface {
-	CreateAppointment(appointment models.Appointment) (int, error)
-	GetAllAppointments() ([]models.Appointment, error)
-	GetAppointmentById(appointmentId int) (models.Appointment, error)
-	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
-	DeleteAppointment(appointmentId int) error
-	AddAppointmentForMaster(masterId, appointmentId int) (int, error)
+type Option interface {
+	CreateOption(option models.Option) (int, error)
+	GetAllOptions() ([]models.Option, error)
+	GetOptionById(optionId int) (models.Option, error)
+	UpdateOption(option models.OptionUpdate, optionId int) error
+	DeleteOption(optionId int) error
+	AddOptionForMaster(masterId, optionId int) (int, error)
 }
 
 type Client interface {
@@ -65,7 +65,7 @@ type User interface {
 }
 
 type Service struct {
-	Appointment
+	Option
 	Authorization
 	Client
 	Feedback
@@ -82,7 +82,7 @@ func NewService(repos *repository.Repository) *Service {
 		Profile:       NewProfileService(repos),
 		Client:        NewClientService(repos),
 		User:          NewUserService(repos),
-		Appointment:   NewAppointmentService(repos),
+		Option:        NewOptionService(repos),
 		Schedule:      NewScheduleService(repos),
 	}
 }

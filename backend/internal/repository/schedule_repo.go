@@ -231,30 +231,30 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 		return 0, err
 	}
 
-	for _, appointmentId := range schedule.AppointmentIds {
-		queryGetAppointment := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.AppointmentTable)
-		err = r.db.Get(&id, queryGetAppointment, appointmentId)
+	for _, optionId := range schedule.OptionIds {
+		queryGetOption := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.OptionTable)
+		err = r.db.Get(&id, queryGetOption, optionId)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return 0, internal.NewErrorResponse(404, fmt.Sprintf("appointment with this id: %d was not found", appointmentId))
+				return 0, internal.NewErrorResponse(404, fmt.Sprintf("option with this id: %d was not found", optionId))
 			}
 
 			return 0, err
 		}
 
-		queryGetAppointmentAndMaster := fmt.Sprintf(`SELECT id FROM %s WHERE users_id = $1 AND appointment_id = $2`, database.UsersAppointmentTable)
-		err = r.db.Get(&id, queryGetAppointmentAndMaster, schedule.MasterId, appointmentId)
+		queryGetOptionAndMaster := fmt.Sprintf(`SELECT id FROM %s WHERE users_id = $1 AND option_id = $2`, database.UsersOptionTable)
+		err = r.db.Get(&id, queryGetOptionAndMaster, schedule.MasterId, optionId)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return 0, internal.NewErrorResponse(404, fmt.Sprintf("the master does not provide a appointment with this id: %d", appointmentId))
+				return 0, internal.NewErrorResponse(404, fmt.Sprintf("the master does not provide a option with this id: %d", optionId))
 			}
 
 			return 0, err
 		}
 
-		query := fmt.Sprintf("INSERT INTO %s (appointment_id, master_schedule_id)"+
-			"VALUES ($1, $2) RETURNING id", database.MasterScheduleAppointmentTable)
-		row := tx.QueryRow(query, appointmentId, scheduleId)
+		query := fmt.Sprintf("INSERT INTO %s (option_id, master_schedule_id)"+
+			"VALUES ($1, $2) RETURNING id", database.MasterScheduleOptionTable)
+		row := tx.QueryRow(query, optionId, scheduleId)
 		if err := row.Scan(&id); err != nil {
 			return 0, err
 		}
