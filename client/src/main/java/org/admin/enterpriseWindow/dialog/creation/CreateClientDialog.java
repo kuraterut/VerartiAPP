@@ -1,4 +1,4 @@
-package org.admin.dayInfoWindow.dialog;
+package org.admin.enterpriseWindow.dialog.creation;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -21,8 +21,8 @@ import org.admin.utils.Response;
 
 import java.time.LocalDate;
 
-public class AddNewClientDialog extends Main {
-    public static void show(Node node, LocalDate date) {
+public class CreateClientDialog extends Main {
+    public static void show(Node node) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Добавить клиента");
@@ -33,13 +33,13 @@ public class AddNewClientDialog extends Main {
         HBox btnsBox = new HBox();
 
         Button cancelBtn = new Button();
-        Button addClientBtn = new Button();
+        Button addBtn = new Button();
 
         Label errorMsg = new Label();
         Label nameHeadLbl = new Label("Имя: ");
         Label surnameHeadLbl = new Label("Фамилия: ");
         Label patronymicHeadLbl = new Label("Отчество: ");
-        Label phoneHeadLbl = new Label("Номер телефона: ");
+        Label phoneHeadLbl = new Label("Телефон: ");
         Label birthdayHeadLbl = new Label("Дата рождения: ");
 
         TextField nameTextField = new TextField();
@@ -53,9 +53,9 @@ public class AddNewClientDialog extends Main {
 
         table.setAlignment(Pos.CENTER);
 
-        addClientBtn.setText("Добавить клиента");
-        addClientBtn.setWrapText(true);
-        addClientBtn.setTextAlignment(TextAlignment.CENTER);
+        addBtn.setText("Добавить клиента");
+        addBtn.setWrapText(true);
+        addBtn.setTextAlignment(TextAlignment.CENTER);
 
         cancelBtn.setText("Отмена");
         cancelBtn.setWrapText(true);
@@ -67,18 +67,8 @@ public class AddNewClientDialog extends Main {
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
-        table.add(nameHeadLbl, 0, 0);
-        table.add(surnameHeadLbl, 0, 1);
-        table.add(patronymicHeadLbl, 0, 2);
-        table.add(phoneHeadLbl, 0, 3);
-        table.add(birthdayHeadLbl, 0, 4);
-
-        table.add(nameTextField, 1, 0);
-        table.add(surnameTextField, 1, 1);
-        table.add(patronymicTextField, 1, 2);
-        table.add(phoneTextField, 1, 3);
-        table.add(birthdayDatePicker, 1, 4);
-
+        table.addColumn(0, nameHeadLbl, surnameHeadLbl, patronymicHeadLbl, phoneHeadLbl, birthdayHeadLbl);
+        table.addColumn(1, nameTextField, surnameTextField, patronymicTextField, phoneTextField, birthdayDatePicker);
 
 
         GridPane.setHalignment(nameHeadLbl, HPos.CENTER);
@@ -112,7 +102,7 @@ public class AddNewClientDialog extends Main {
         table.getRowConstraints().add(new RowConstraints(50));
 
         cancelBtn.setOnAction(event -> dialog.close());
-        addClientBtn.setOnAction(event -> {
+        addBtn.setOnAction(event -> {
             String name = nameTextField.getText();
             String surname = surnameTextField.getText();
             String patronymic = patronymicTextField.getText();
@@ -134,21 +124,21 @@ public class AddNewClientDialog extends Main {
                 return;
             }
 
-            Response addingClientResponse = CreateClient.post(token, client);
-            if(addingClientResponse.getCode() == 200) {
-                AdminInterface.loadDayInfoWindow(node, date);
+            Response response = CreateClient.post(token, client);
+            if(response.getCode() == 200) {
+                AdminInterface.loadEnterpriseWindow(node);
                 dialog.close();
             }
-            else{errorMsg.setText(addingClientResponse.getMsg());}
+            else{errorMsg.setText(response.getMsg());}
         });
 
 
-        btnsBox.getChildren().addAll(cancelBtn, addClientBtn);
+        btnsBox.getChildren().addAll(cancelBtn, addBtn);
         root.getChildren().addAll(table, errorMsg, btnsBox);
 
 
 
-        Scene dialogScene = new Scene(root, 500, 500);
+        Scene dialogScene = new Scene(root, 1200, 600);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();

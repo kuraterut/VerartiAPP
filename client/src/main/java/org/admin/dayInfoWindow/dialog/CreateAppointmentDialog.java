@@ -69,7 +69,7 @@ public class CreateAppointmentDialog extends Main {
             if(serviceInfo != null){
                 Long seriveId = serviceInfo.getId();
                 String seriveName = serviceInfo.getName();
-                Double serivePrice = serviceInfo.getPrice();
+                Long serivePrice = serviceInfo.getPrice();
                 Integer serviceCount = 1;
 
                 Label serviceIdLabel = new Label(seriveId.toString());

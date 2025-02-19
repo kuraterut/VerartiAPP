@@ -1,4 +1,4 @@
-package org.admin.enterpriseWindow.infos;
+package org.admin.enterpriseWindow.dialog.infos;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -10,13 +10,22 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.AdminInterface;
+import org.admin.connection.deleteRequests.DeleteMaster;
 import org.admin.connection.deleteRequests.DeleteService;
 import org.admin.connection.getRequests.GetMaster;
+import org.admin.connection.getRequests.GetService;
+import org.admin.connection.putRequests.UpdateMaster;
+import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
 import org.admin.utils.MasterInfo;
+import org.admin.utils.Response;
 import org.admin.utils.ServiceInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MasterInfoDialog extends Main {
-    public static void show(Long id){
+    public static void show(Long id, Node node){
         MasterInfo master = GetMaster.getById(token, id);
 
         Stage dialog = new Stage();
@@ -24,8 +33,10 @@ public class MasterInfoDialog extends Main {
         dialog.setTitle("Информация о Мастере");
 
         VBox root = new VBox();
+        Label messageLabel = new Label("");
 
         Button cancelButton = new Button("Отмена");
+        Button deleteMasterButton = new Button("Удалить мастера");
         Button addServiceButton = new Button("Добавить услугу");
         Button saveButton = new Button("Сохранить");
         HBox btns = new HBox();
@@ -91,22 +102,79 @@ public class MasterInfoDialog extends Main {
         masterInfoTabel.setAlignment(Pos.CENTER);
 
 
-        VBox tableVBox = new VBox();
-        tableVBox.setSpacing(20);
-        tableVBox.setAlignment(Pos.CENTER);
+        VBox servicesBox = new VBox();
+        servicesBox.setSpacing(20);
+        servicesBox.setAlignment(Pos.CENTER);
 
-        tableVBox.getChildren().addAll(servicesLabel, buildServiceTable(master, tableVBox));
+        servicesBox.getChildren().addAll(servicesLabel, buildServiceTable(master, servicesBox));
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(20);
 
-        btns.getChildren().addAll(cancelButton, addServiceButton, saveButton);
-        root.getChildren().addAll(masterInfoTabel, tableVBox, btns);
+        btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton, saveButton);
+        root.getChildren().addAll(masterInfoTabel, servicesBox, messageLabel, btns);
 
-        Scene dialogScene = new Scene(root, 1500, 800);
+
+        cancelButton.setOnAction(event -> dialog.close());
+
+        deleteMasterButton.setOnAction(event -> {
+            //TODO ALERT DELETE
+            Response response = DeleteMaster.deleteById(token, master.getId());
+            if(response.getCode() == 200){
+                dialog.close();
+                AdminInterface.loadEnterpriseWindow(node);
+            }
+            else{messageLabel.setText(response.getMsg());}
+        });
+
+        addServiceButton.setOnAction(event -> {
+            List<ServiceInfo> allServices = GetService.getAll(token);
+            List<ServiceInfo> masterServices = GetService.getListByMasterId(token, master.getId());
+            List<ServiceInfo> notMasterServices = new ArrayList<>();
+            for(ServiceInfo service : allServices){
+                if(!masterServices.contains(service)){
+                    notMasterServices.add(service);
+                }
+            }
+            showChooseServiceDialog(notMasterServices, master);
+        });
+
+        saveButton.setOnAction(event -> {
+            Response response = UpdateMaster.updateInfo(token, master);
+            if(response.getCode() == 200){messageLabel.setText("Сохранено");}
+            else{messageLabel.setText(response.getMsg());}
+        });
+
+        Scene dialogScene = new Scene(root, 1200, 600);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
+    }
+
+    private static void showChooseServiceDialog(List<ServiceInfo> services, MasterInfo master) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Выберите услугу");
+
+        VBox root = new VBox();
+        root.setSpacing(50);
+        Label headerLabel = new Label("Выберите услугу");
+        Button cancelButton = new Button("Отмена");
+
+        VBox searchingStringServices = SearchingStringServices.build(services, service->{
+            master.addService(service);
+            dialog.close();
+        });
+        searchingStringServices.setMaxWidth(500);
+
+        cancelButton.setOnAction(event -> dialog.close());
+        root.getChildren().addAll(headerLabel, searchingStringServices, cancelButton);
+
+        Scene dialogScene = new Scene(root, 800, 500);
+
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+
     }
 
     private static ScrollPane buildServiceTable(MasterInfo master, VBox tableVBox){

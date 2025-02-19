@@ -32,13 +32,14 @@ public class MasterInfo extends Response{
 	public String getPhone()				{return this.phone;}
 	public List<ServiceInfo> getServices()	{return this.services;}
 	public String getFio()					{return surname+" "+name+" "+patronymic;}
-
 	public void setId(Long id)							{this.id = id;}
+
 	public void setName(String name)					{this.name = name;}
 	public void setSurname(String surname)				{this.surname = surname;}
 	public void setPatronymic(String patronymic)		{this.patronymic = patronymic;}
 	public void setBio(String bio)						{this.bio = bio;}
 	public void setPhone(String phone)					{this.phone = phone;}
-	public void setServices(List<ServiceInfo> services)	{this.services = services;}
 
+	public void addService(ServiceInfo service)	{this.services.add(service);}
+	public void setServices(List<ServiceInfo> services)	{this.services = services;}
 }

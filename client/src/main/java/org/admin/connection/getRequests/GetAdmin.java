@@ -27,12 +27,12 @@ public class GetAdmin extends Connection {
                 JSONObject adminJSON = (JSONObject) adminObj;
                 AdminInfo admin = new AdminInfo();
 
-                Long id = (Long) data.get("id");
-                String name = (String)data.get("name");
-                String surname = (String)data.get("surname");
-                String patronymic = (String)data.get("patronymic");
-                String phone = (String)data.get("phone");
-                String bio = (String)data.get("bio");
+                Long id = (Long) adminJSON.get("id");
+                String name = (String)adminJSON.get("name");
+                String surname = (String)adminJSON.get("surname");
+                String patronymic = (String)adminJSON.get("patronymic");
+                String phone = (String)adminJSON.get("phone");
+                String bio = (String)adminJSON.get("bio");
 
                 admin.setId(id);
                 admin.setName(name);
@@ -84,7 +84,7 @@ public class GetAdmin extends Connection {
 
     public static AdminInfo getById(String token, Long id){
         try{
-            getConnection("http://localhost:8000/api/admin/users/" + id);
+            getConnection("http://localhost:8000/api/admin/users/admin/" + id);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

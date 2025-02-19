@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class AddNewAppointment extends Connection {
+public class CreateAppointment extends Connection {
     public static Response post(String token, Appointment appointment){
         try{
             getConnection("http://localhost:8000/api/admin/appointment");

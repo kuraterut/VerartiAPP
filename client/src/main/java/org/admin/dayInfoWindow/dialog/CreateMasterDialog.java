@@ -12,8 +12,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.Connection;
-import org.admin.connection.postRequests.AddNewUser;
+import org.admin.connection.postRequests.CreateUser;
 import org.admin.utils.Response;
 import org.admin.utils.User;
 
@@ -143,7 +142,7 @@ public class CreateMasterDialog extends Main {
             }
 
 
-            Response addingClientResponse = AddNewUser.post(token, user);
+            Response addingClientResponse = CreateUser.post(token, user);
             if(addingClientResponse.getCode() == 200) dialog.close();
             else{errorMsg.setText(addingClientResponse.getMsg());}
         });

@@ -1,5 +1,6 @@
 package org.admin.enterpriseWindow.searchingStrings;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,8 +24,6 @@ public class SearchingStringAdmins extends Main {
     public static VBox build(List<AdminInfo> startList, Consumer<AdminInfo> func){
         VBox root = new VBox();
 
-        Label headLabel = new Label("Админы");
-        headLabel.setPadding(new Insets(0, 0, 10, 0));
         root.setPrefSize(300, 600);
         root.setMaxSize(300, 600);
 
@@ -33,29 +32,41 @@ public class SearchingStringAdmins extends Main {
         ObservableList<AdminInfo> observableList = FXCollections.observableArrayList(startList);
         ListView<AdminInfo> listView = new ListView<>(observableList);
 
+        MultipleSelectionModel<AdminInfo> selectionModel = listView.getSelectionModel();
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            root.getChildren().remove(listView);
-            List<AdminInfo> filterClients = filter(startList, newValue);
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    selectionModel.clearSelection();
+                    root.getChildren().remove(listView);
+                    List<AdminInfo> filterClients = filter(startList, newValue);
 
-            ObservableList<AdminInfo> filteredListObservable = FXCollections.observableArrayList(filterClients);
-            listView.setItems(filteredListObservable);
-            if(!filterClients.isEmpty() && !newValue.isEmpty()){
-                root.getChildren().add(listView);
-            }
+                    ObservableList<AdminInfo> filteredListObservable = FXCollections.observableArrayList(filterClients);
+                    listView.setItems(filteredListObservable);
+                    if (!filterClients.isEmpty()) {
+                        root.getChildren().add(listView);
+                    }
+                }
+            });
         });
 
-        MultipleSelectionModel<AdminInfo> selectionModel = listView.getSelectionModel();
-        // устанавливаем слушатель для отслеживания изменений
         selectionModel.selectedItemProperty().addListener(new ChangeListener<AdminInfo>(){
             public void changed(ObservableValue<? extends AdminInfo> changed, AdminInfo oldValue, AdminInfo newValue){
-                func.accept(newValue);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(newValue != null){
+                            selectionModel.clearSelection();
+                            func.accept(newValue);
+                        }
+                    }
+                });
             }
         });
         listView.setPrefSize(300, 600);
         searchTextField.setPrefSize(300, 30);
 
 
-        root.getChildren().addAll(headLabel, searchTextField);
+        root.getChildren().addAll(searchTextField);
         root.setAlignment(Pos.TOP_CENTER);
         return root;
     }
