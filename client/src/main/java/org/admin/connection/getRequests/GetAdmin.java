@@ -63,18 +63,25 @@ public class GetAdmin extends Connection {
 
             AdminInfo admin = null;
 
-            Long adminId = (Long) data.get("admin_id");
+            Long adminId = (Long) data.get("id");
             if(adminId != -1){
-                admin = getById(token, adminId);
-            }
-            else{
                 admin = new AdminInfo();
-                admin.setName("");
-                admin.setSurname("Не назначен");
+                String name = (String)data.get("name");
+                String surname = (String)data.get("surname");
+                String patronymic = (String)data.get("patronymic");
+                String email = (String)data.get("email");
+                String phone = (String)data.get("phone");
+                String bio = (String)data.get("bio");
+
+                admin.setId(adminId);
+                admin.setName(name);
+                admin.setSurname(surname);
+                admin.setPatronymic(patronymic);
+                admin.setEmail(email);
+                admin.setPhone(phone);
+                admin.setBio(bio);
             }
-
             return admin;
-
         }
         catch(Exception ex){
             System.out.println(ex);
