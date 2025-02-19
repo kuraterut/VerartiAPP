@@ -23,9 +23,6 @@ public class SearchingStringMasters extends Main {
     public static VBox build(List<MasterInfo> startList, Consumer<MasterInfo> func){
         VBox root = new VBox();
 
-        Label headLabel = new Label("Мастера");
-        headLabel.setPadding(new Insets(0, 0, 10, 0));
-
         root.setPrefSize(300, 600);
         root.setMaxSize(300, 600);
         TextField searchTextField = new TextField();
@@ -47,8 +44,8 @@ public class SearchingStringMasters extends Main {
                     if(!filterClients.isEmpty()){
                         root.getChildren().add(listView);
                     }
-                }});
-
+                }
+            });
         });
 
         // устанавливаем слушатель для отслеживания изменений
@@ -68,7 +65,7 @@ public class SearchingStringMasters extends Main {
         searchTextField.setPrefSize(300, 30);
         listView.setPrefSize(300, 600);
 
-        root.getChildren().addAll(headLabel, searchTextField);
+        root.getChildren().addAll(searchTextField);
         root.setAlignment(Pos.TOP_CENTER);
         return root;
     }

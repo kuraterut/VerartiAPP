@@ -1,4 +1,4 @@
-package org.admin.dayInfoWindow.dialog;
+package org.admin.enterpriseWindow.dialog.creation;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -6,7 +6,6 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -15,17 +14,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.postRequests.CreateClient;
-import org.admin.utils.ClientInfo;
+import org.admin.connection.postRequests.CreateUser;
 import org.admin.utils.Response;
+import org.admin.utils.User;
 
-import java.time.LocalDate;
-
-public class AddNewClientDialog extends Main {
-    public static void show(Node node, LocalDate date) {
+public class CreateAdminDialog extends Main {
+    public static void show(Node node){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("Добавить клиента");
+        dialog.setTitle("Создать Админа");
 
         GridPane table = new GridPane();
 
@@ -33,29 +30,30 @@ public class AddNewClientDialog extends Main {
         HBox btnsBox = new HBox();
 
         Button cancelBtn = new Button();
-        Button addClientBtn = new Button();
+        Button addBtn = new Button();
 
         Label errorMsg = new Label();
         Label nameHeadLbl = new Label("Имя: ");
         Label surnameHeadLbl = new Label("Фамилия: ");
         Label patronymicHeadLbl = new Label("Отчество: ");
-        Label phoneHeadLbl = new Label("Номер телефона: ");
-        Label birthdayHeadLbl = new Label("Дата рождения: ");
+        Label emailHeadLbl = new Label("Email: ");
+        Label phoneHeadLbl = new Label("Телефон: ");
+        Label passwordHeadLbl = new Label("Пароль: ");
 
         TextField nameTextField = new TextField();
         TextField surnameTextField = new TextField();
         TextField patronymicTextField = new TextField();
+        TextField emailTextField = new TextField();
         TextField phoneTextField = new TextField();
-        DatePicker birthdayDatePicker = new DatePicker();
-
+        TextField passwordTextField = new TextField();
 
         errorMsg.setText("");
 
         table.setAlignment(Pos.CENTER);
 
-        addClientBtn.setText("Добавить клиента");
-        addClientBtn.setWrapText(true);
-        addClientBtn.setTextAlignment(TextAlignment.CENTER);
+        addBtn.setText("Создать админа");
+        addBtn.setWrapText(true);
+        addBtn.setTextAlignment(TextAlignment.CENTER);
 
         cancelBtn.setText("Отмена");
         cancelBtn.setWrapText(true);
@@ -67,19 +65,8 @@ public class AddNewClientDialog extends Main {
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
-        table.add(nameHeadLbl, 0, 0);
-        table.add(surnameHeadLbl, 0, 1);
-        table.add(patronymicHeadLbl, 0, 2);
-        table.add(phoneHeadLbl, 0, 3);
-        table.add(birthdayHeadLbl, 0, 4);
-
-        table.add(nameTextField, 1, 0);
-        table.add(surnameTextField, 1, 1);
-        table.add(patronymicTextField, 1, 2);
-        table.add(phoneTextField, 1, 3);
-        table.add(birthdayDatePicker, 1, 4);
-
-
+        table.addColumn(0, nameHeadLbl, surnameHeadLbl, patronymicHeadLbl, emailHeadLbl, phoneHeadLbl, passwordHeadLbl);
+        table.addColumn(1, nameTextField, surnameTextField, patronymicTextField, emailTextField, phoneTextField, passwordTextField);
 
         GridPane.setHalignment(nameHeadLbl, HPos.CENTER);
         GridPane.setValignment(nameHeadLbl, VPos.CENTER);
@@ -87,10 +74,12 @@ public class AddNewClientDialog extends Main {
         GridPane.setValignment(surnameHeadLbl, VPos.CENTER);
         GridPane.setHalignment(patronymicHeadLbl, HPos.CENTER);
         GridPane.setValignment(patronymicHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(emailHeadLbl, HPos.CENTER);
+        GridPane.setValignment(emailHeadLbl, VPos.CENTER);
         GridPane.setHalignment(phoneHeadLbl, HPos.CENTER);
         GridPane.setValignment(phoneHeadLbl, VPos.CENTER);
-        GridPane.setHalignment(birthdayHeadLbl, HPos.CENTER);
-        GridPane.setValignment(birthdayHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(passwordHeadLbl, HPos.CENTER);
+        GridPane.setValignment(passwordHeadLbl, VPos.CENTER);
 
         GridPane.setHalignment(nameTextField, HPos.CENTER);
         GridPane.setValignment(nameTextField, VPos.CENTER);
@@ -98,13 +87,16 @@ public class AddNewClientDialog extends Main {
         GridPane.setValignment(surnameTextField, VPos.CENTER);
         GridPane.setHalignment(patronymicTextField, HPos.CENTER);
         GridPane.setValignment(patronymicTextField, VPos.CENTER);
+        GridPane.setHalignment(emailTextField, HPos.CENTER);
+        GridPane.setValignment(emailTextField, VPos.CENTER);
         GridPane.setHalignment(phoneTextField, HPos.CENTER);
         GridPane.setValignment(phoneTextField, VPos.CENTER);
-        GridPane.setHalignment(birthdayDatePicker, HPos.CENTER);
-        GridPane.setValignment(birthdayDatePicker, VPos.CENTER);
+        GridPane.setHalignment(passwordTextField, HPos.CENTER);
+        GridPane.setValignment(passwordTextField, VPos.CENTER);
 
         table.getColumnConstraints().add(new ColumnConstraints(150));
         table.getColumnConstraints().add(new ColumnConstraints(150));
+        table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
@@ -112,43 +104,47 @@ public class AddNewClientDialog extends Main {
         table.getRowConstraints().add(new RowConstraints(50));
 
         cancelBtn.setOnAction(event -> dialog.close());
-        addClientBtn.setOnAction(event -> {
+        addBtn.setOnAction(event -> {
             String name = nameTextField.getText();
             String surname = surnameTextField.getText();
             String patronymic = patronymicTextField.getText();
+            String email = emailTextField.getText();
             String phone = phoneTextField.getText();
-            LocalDate birthday = birthdayDatePicker.getValue();
+            String password = passwordTextField.getText();
 
-            ClientInfo client = new ClientInfo();
+            User user = new User();
 
-            client.setName(name);
-            client.setSurname(surname);
-            client.setPatronymic(patronymic);
-            client.setPhone(phone);
-            client.setBirthday(birthday);
+            user.setName(name);
+            user.setSurname(surname);
+            user.setPatronymic(patronymic);
+            user.setEmail(email);
+            user.setPhone(phone);
+            user.setPassword(password);
+            user.addRole("admin");
 
-            Response checkInfo = client.checkInfo();
+            Response checkInfo = user.checkInfo();
 
             if(checkInfo.getCode() == -1){
                 errorMsg.setText(checkInfo.getMsg());
                 return;
             }
 
-            Response addingClientResponse = CreateClient.post(token, client);
+
+            Response addingClientResponse = CreateUser.post(token, user);
             if(addingClientResponse.getCode() == 200) {
-                AdminInterface.loadDayInfoWindow(node, date);
+                AdminInterface.loadEnterpriseWindow(node);
                 dialog.close();
             }
             else{errorMsg.setText(addingClientResponse.getMsg());}
         });
 
 
-        btnsBox.getChildren().addAll(cancelBtn, addClientBtn);
+        btnsBox.getChildren().addAll(cancelBtn, addBtn);
         root.getChildren().addAll(table, errorMsg, btnsBox);
 
 
 
-        Scene dialogScene = new Scene(root, 500, 500);
+        Scene dialogScene = new Scene(root, 1200, 600);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();

@@ -1,35 +1,37 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.HelpFuncs;
 import org.admin.utils.Response;
+import org.admin.utils.User;
 import org.json.simple.JSONObject;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 
-public class AddNewClient extends Connection {
-    public static Response post(String token, ClientInfo client){
+public class CreateUser extends Connection {
+    public static Response post(String token, User user){
         try{
-            getConnection("http://localhost:8000/api/admin/clients/");
+            getConnection("http://localhost:8000/api/admin/users/signup");
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
+            String name = user.getName();
+            String surname = user.getSurname();
+            String patronymic = user.getPatronymic();
+            String phone = user.getPhone();
+            String email = user.getEmail();
+            String password = user.getPassword();
+            ArrayList<String> roles = user.getRoles();
 
-            String name = client.getName();
-            String surname = client.getSurname();
-            String patronymic = client.getPatronymic();
-            String phone = client.getPhone();
-            LocalDate birthday = client.getBirthday();
-
-            String birthdayStr = HelpFuncs.localDateToString(birthday, "yyyy-MM-dd");
             JSONObject outJson = new JSONObject();
-			outJson.put("birthday", birthdayStr);
             outJson.put("name", name);
             outJson.put("surname", surname);
             outJson.put("patronymic", patronymic);
             outJson.put("phone", phone);
+            outJson.put("email", email);
+            outJson.put("password", password);
+            outJson.put("roles", roles);
+            System.out.println(outJson);
 
             sendJson(outJson);
 
@@ -37,9 +39,7 @@ public class AddNewClient extends Connection {
             if(status == 200){
                 return new Response(200, "");
             }
-            System.out.println(status+" "+birthdayStr);
             return new Response(status, "Ошибка");
-
         }
         catch(Exception ex){
             System.out.println(ex);

@@ -1,5 +1,6 @@
 package org.admin.enterpriseWindow.searchingStrings;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,8 +24,7 @@ public class SearchingStringClients extends Main {
     public static VBox build(List<ClientInfo> clients, Consumer<ClientInfo> func){
         VBox root = new VBox();
 
-        Label headLabel = new Label("Клиенты");
-        headLabel.setPadding(new Insets(0, 0, 10, 0));
+
         root.setPrefSize(300, 600);
         root.setMaxSize(300, 600);
 
@@ -33,28 +33,43 @@ public class SearchingStringClients extends Main {
         ObservableList<ClientInfo> clientsObservable = FXCollections.observableArrayList(clients);
         ListView<ClientInfo> clientsListView = new ListView<>(clientsObservable);
 
-        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            root.getChildren().remove(clientsListView);
-            List<ClientInfo> filterClients = filter(clients, newValue);
+        MultipleSelectionModel<ClientInfo> selectionModel = clientsListView.getSelectionModel();
 
-            ObservableList<ClientInfo> filterClientsObservable = FXCollections.observableArrayList(filterClients);
-            clientsListView.setItems(filterClientsObservable);
-            if(!filterClients.isEmpty() && !newValue.isEmpty()){
-                root.getChildren().add(clientsListView);
-            }
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    selectionModel.clearSelection();
+                    root.getChildren().remove(clientsListView);
+                    List<ClientInfo> filterClients = filter(clients, newValue);
+
+                    ObservableList<ClientInfo> filterClientsObservable = FXCollections.observableArrayList(filterClients);
+                    clientsListView.setItems(filterClientsObservable);
+                    if (!filterClients.isEmpty() && !newValue.isEmpty()) {
+                        root.getChildren().add(clientsListView);
+                    }
+                }
+            });
         });
 
-        MultipleSelectionModel<ClientInfo> clientsSelectionModel = clientsListView.getSelectionModel();
         // устанавливаем слушатель для отслеживания изменений
-        clientsSelectionModel.selectedItemProperty().addListener(new ChangeListener<ClientInfo>(){
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<ClientInfo>(){
             public void changed(ObservableValue<? extends ClientInfo> changed, ClientInfo oldValue, ClientInfo newValue){
-                func.accept(newValue);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(newValue != null){
+                            selectionModel.clearSelection();
+                            func.accept(newValue);
+                        }
+                    }
+                });
             }
         });
         clientsListView.setPrefSize(300, 600);
         searchTextField.setPrefSize(300, 30);
 
-        root.getChildren().addAll(headLabel, searchTextField);
+        root.getChildren().addAll(searchTextField);
         root.setAlignment(Pos.TOP_CENTER);
         return root;
     }

@@ -14,6 +14,15 @@ public class AdminInfo extends Response{
 		return this.id == other.getId();
 	}
 
+	@Override
+	public String toString() {
+		String view = id+" "+surname + " ";
+		view += name + " ";
+		view += patronymic + " ";
+		view += "(" + phone + ")";
+		return view;
+	}
+
 	public Long getId()						{return this.id;}
 	public String getName()					{return this.name;}
 	public String getSurname()				{return this.surname;}
