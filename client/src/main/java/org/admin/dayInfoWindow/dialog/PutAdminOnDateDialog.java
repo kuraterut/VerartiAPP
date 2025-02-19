@@ -1,33 +1,34 @@
 package org.admin.dayInfoWindow.dialog;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.Connection;
+import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetMaster;
+import org.admin.connection.postRequests.PutAdminOnDate;
 import org.admin.connection.postRequests.PutMasterOnDate;
+import org.admin.dayInfoWindow.searchingStrings.SearchingStringAdmins;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringMasters;
-import org.admin.enterpriseWindow.dialog.creation.CreateMasterDialog;
+import org.admin.enterpriseWindow.dialog.creation.CreateAdminDialog;
+import org.admin.utils.AdminInfo;
 import org.admin.utils.MasterInfo;
 import org.admin.utils.Response;
-import org.admin.utils.SearchingStringListenerMasters;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class PutMasterOnDateDialog extends Main {
+public class PutAdminOnDateDialog extends Main {
     public static void show(LocalDate date, Node node) {
         final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.ENGLISH);
         String dateStr = dtf.format(date);
@@ -41,7 +42,7 @@ public class PutMasterOnDateDialog extends Main {
 
 
         Button cancelBtn = new Button("Отмена");
-        Button createMasterBtn = new Button("Создать нового мастера");
+        Button createAdminBtn = new Button("Создать Админа");
         HBox btnsBox = new HBox();
 
         btnsBox.setSpacing(50);
@@ -51,15 +52,24 @@ public class PutMasterOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
-        List<MasterInfo> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
-
-        VBox choosingMaster = SearchingStringMasters.build(mastersNotOnDate, masterInfo -> {
-            if(masterInfo != null) {
-                Long masterId = masterInfo.getId();
-                Response response = PutMasterOnDate.post(token, masterId, date);
+        AdminInfo adminOnDate = GetAdmin.getByDate(token, date);
+        List<AdminInfo> allAdmins = GetAdmin.getAll(token);
+        List<AdminInfo> adminsNotOnDate = null;
+        if(adminOnDate == null) {adminsNotOnDate = allAdmins;}
+        else{
+            for(AdminInfo admin : allAdmins){
+                if(!admin.equals(adminOnDate)){
+                    adminsNotOnDate.add(admin);
+                }
+            }
+        }
+        VBox choosingAdmin = SearchingStringAdmins.build(adminsNotOnDate, admin -> {
+            if(admin != null) {
+                Long adminId = admin.getId();
+                Response response = PutAdminOnDate.post(token, adminId, date);
                 if(response.getCode() == 200) {
-                    dialog.close();
                     AdminInterface.loadDayInfoWindow(node, date);
+                    dialog.close();
                 } else {
                     errorMsg.setText(response.getCode() + " " + response.getMsg());
                 }
@@ -68,17 +78,14 @@ public class PutMasterOnDateDialog extends Main {
 
 
 
-        btnsBox.getChildren().addAll(cancelBtn, createMasterBtn);
-        root.getChildren().addAll(dateLbl, choosingMaster, errorMsg, btnsBox);
+        btnsBox.getChildren().addAll(cancelBtn, createAdminBtn);
+        root.getChildren().addAll(dateLbl, choosingAdmin, errorMsg, btnsBox);
 
         cancelBtn.setOnAction(event -> dialog.close());
-        createMasterBtn.setOnAction(event -> {
+        createAdminBtn.setOnAction(event -> {
             dialog.close();
-            CreateMasterDialog.show(node);
+            CreateAdminDialog.show(node);
         });
-
-
-
 
         Scene dialogScene = new Scene(root, 1200, 600);
         dialog.setScene(dialogScene);

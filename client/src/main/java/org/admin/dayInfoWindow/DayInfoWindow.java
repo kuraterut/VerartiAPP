@@ -5,6 +5,7 @@ import org.admin.AdminInterface;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.dayInfoWindow.dialog.AddNewClientDialog;
 import org.admin.dayInfoWindow.dialog.ClientInfoDialog;
+import org.admin.dayInfoWindow.dialog.PutAdminOnDateDialog;
 import org.admin.dayInfoWindow.dialog.PutMasterOnDateDialog;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringClients;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
@@ -22,6 +23,7 @@ import java.time.*;
 
 public class DayInfoWindow extends Main{
 	public static StackPane loadWindow(LocalDate date){
+            //TODO Сделать заголовок с ФИО Админа
         StackPane stackPane = new StackPane();
         BorderPane root             = new BorderPane();
 
@@ -114,8 +116,8 @@ public class DayInfoWindow extends Main{
         });
 
 
-        putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date));
-        // putAdminOnDayBtn.setOnAction(event -> showPutAdminOnDayDialog());
+        putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date, putMasterOnDayBtn));
+        putAdminOnDayBtn.setOnAction(event -> PutAdminOnDateDialog.show(date, putAdminOnDayBtn));
         // сash.setOnAction(event -> showCashDialog());
         // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
         addNewClientBtn.setOnAction(event -> AddNewClientDialog.show(addNewClientBtn, date));
