@@ -44,20 +44,20 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				resource.GET("/response", h.getResponseByRequestId)
 			}
 
-			schedule := master.Group("/schedule")
-			{
-				schedule.GET("/admin", h.getAdminByDate)
-				schedule.GET("/master", h.getAllMastersByDate)
-
-				schedule.GET("/day", h.getDailySchedule)
-				schedule.GET("/month", h.getMonthlySchedule)
-				schedule.POST("/request", h.cancellationRequest)
-			}
-
 			appointment := master.Group("/appointment")
 			{
-				appointment.GET("/", h.getAllAppointments)
-				appointment.GET("/:id", h.getAppointmentById)
+				appointment.GET("/admin", h.getAdminByDate)
+				appointment.GET("/master", h.getAllMastersByDate)
+
+				appointment.GET("/day", h.getDailyAppointment)
+				appointment.GET("/month", h.getMonthlyAppointment)
+				appointment.POST("/request", h.cancellationRequest)
+			}
+
+			option := master.Group("/option")
+			{
+				option.GET("/", h.getAllOptions)
+				option.GET("/:id", h.getOptionById)
 			}
 
 			users := master.Group("/users")
@@ -66,7 +66,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				users.GET("/master/:id", h.getMasterById)
 				users.GET("/admin", h.getAllAdmins)
 				users.GET("/admin/:id", h.getAdminById)
-				users.GET("/director", h.getDirector)
 			}
 
 			clients := master.Group("/clients")
@@ -94,7 +93,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				users.GET("/master/:id", h.getMasterById)
 				users.GET("/admin", h.getAllAdmins)
 				users.GET("/admin/:id", h.getAdminById)
-				users.GET("/director", h.getDirector)
 				users.DELETE("/:id", h.deleteUser)
 			}
 
@@ -124,68 +122,33 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				//resource.GET("/response", h.getResponseByRequestId)
 			}
 
+			option := admin.Group("/option")
+			{
+				option.POST("/", h.createOption)
+				option.POST("/:id", h.addOptionForMaster)
+				option.GET("/", h.getAllOptions)
+				option.GET("/master", h.getOptionsByMasterId)
+				option.GET("/:id", h.getOptionById)
+				option.PUT("/:id", h.updateOption)
+				option.DELETE("/:id", h.deleteOption)
+			}
+
 			appointment := admin.Group("/appointment")
 			{
 				appointment.POST("/", h.createAppointment)
-				appointment.POST("/:id", h.addAppointmentForMaster)
-				appointment.GET("/", h.getAllAppointments)
-				appointment.GET("/:id", h.getAppointmentById)
-				appointment.PUT("/:id", h.updateAppointment)
-				appointment.DELETE("/:id", h.deleteAppointment)
-			}
+				appointment.GET("/client/:id", h.getAppointmentByClientId)
 
-			schedule := admin.Group("/schedule")
-			{
-				schedule.POST("/", h.createSchedule)
-				schedule.GET("/client/:id", h.getScheduleByClientId)
+				appointment.POST("/admin", h.putAdminToDate)
+				appointment.POST("/master", h.putMasterToDate)
+				appointment.GET("/admin", h.getAdminByDate)
+				appointment.GET("/master", h.getAllMastersByDate)
 
-				schedule.POST("/master", h.putMasterToDate)
-				schedule.GET("/admin", h.getAdminByDate)
-				schedule.GET("/master", h.getAllMastersByDate)
-
-				schedule.GET("/day", h.getDailySchedule)
-				schedule.GET("/month", h.getMonthlySchedule)
-				schedule.POST("/request", h.cancellationRequest)
+				appointment.GET("/day", h.getDailyAppointment)
+				appointment.GET("/month", h.getMonthlyAppointment)
+				appointment.POST("/request", h.cancellationRequest)
 			}
 		}
 
-		director := api.Group("/director", h.directorIdentity)
-		{
-			users := director.Group("/users")
-			{
-				users.POST("/signup", h.signUp)
-				users.GET("/master", h.getAllMasters)
-				users.GET("/master/:id", h.getMasterById)
-				users.GET("/admin", h.getAllAdmins)
-				users.GET("/admin/:id", h.getAdminById)
-				users.GET("/director", h.getDirector)
-				users.DELETE("/:id", h.deleteUser)
-			}
-
-			clients := director.Group("/clients")
-			{
-				clients.GET("/")
-				clients.GET("/:id")
-			}
-
-			feedback := director.Group("/feedback")
-			{
-				feedback.GET("/")
-				feedback.GET("/:id")
-			}
-
-			schedule := director.Group("/schedule")
-			{
-				schedule.POST("/admin", h.putAdminToDate)
-				schedule.POST("/master", h.putMasterToDate)
-				schedule.GET("/admin", h.getAdminByDate)
-				schedule.GET("/master", h.getAllMastersByDate)
-
-				schedule.GET("/day", h.getDailySchedule)
-				schedule.GET("/month", h.getMonthlySchedule)
-				schedule.POST("/request", h.cancellationRequest)
-			}
-		}
 	}
 
 	return router

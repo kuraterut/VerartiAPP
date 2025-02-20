@@ -10,14 +10,13 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.Main;
-import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetMaster;
 import org.admin.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.dayInfoWindow.dialog.CreateAppointmentDialog;
-import org.admin.utils.Appointment;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.MasterInfo;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Client;
+import org.admin.utils.entities.Master;
+import org.admin.utils.entities.Option;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -57,10 +56,10 @@ public class DayInfoTable extends Main {
         table.getColumnConstraints().add(new ColumnConstraints(100));
 
 //        Map<Long, List<Appointment>> dayInfo = Connection.getMastersSheduleByDate(token, date);
-        List<MasterInfo> masters = GetMaster.getListByDate(token, date);
+        List<Master> masters = GetMaster.getListByDate(token, date, true);
 
         Map<Long, List<Appointment>> dayInfo = new HashMap<>();
-        for(MasterInfo master : masters){
+        for(Master master : masters){
             dayInfo.put(master.getId(), new ArrayList<>());
         }
 
@@ -69,17 +68,14 @@ public class DayInfoTable extends Main {
             Set<Integer> usedCells = new HashSet<>();
             countColumn++;
             table.getColumnConstraints().add(new ColumnConstraints(200));
-            MasterInfo master = GetMaster.getById(token, masterId);
+            Master master = GetMaster.getById(token, masterId);
 
-            Label masterIdLbl = new Label(Long.toString(masterId));
-            Label masterFioLbl = new Label(master.getFio());
 
-            table.add(masterIdLbl, countColumn, 0);
-            table.add(masterFioLbl, countColumn, 0);
-            GridPane.setHalignment(masterIdLbl, HPos.CENTER);
-            GridPane.setValignment(masterIdLbl, VPos.CENTER);
-            GridPane.setHalignment(masterFioLbl, HPos.CENTER);
-            GridPane.setValignment(masterFioLbl, VPos.CENTER);
+            Label masterSurnameLbl = new Label(master.getSurname());
+
+            table.add(masterSurnameLbl, countColumn, 0);
+            GridPane.setHalignment(masterSurnameLbl, HPos.CENTER);
+            GridPane.setValignment(masterSurnameLbl, VPos.CENTER);
 
             List<Appointment> appointments = dayInfo.get(masterId);
             Set<Integer> startCellsSet = new HashSet<>();
@@ -90,11 +86,11 @@ public class DayInfoTable extends Main {
 
             for(Appointment appointment: appointments){
                 Long id = appointment.getId();
-                ClientInfo client = appointment.getClient();
-                List<ServiceInfo> services = appointment.getServices();
-                ServiceInfo firstService = services.get(0);
+                Client client = appointment.getClient();
+                List<Option> options = appointment.getServices();
+                Option firstOption = options.get(0);
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
-                Integer cellNumber = calculateCellNumber(services);
+                Integer cellNumber = calculateCellNumber(options);
 
                 Rectangle rectStart = new Rectangle(150, 100, Color.AQUAMARINE);
                 rectStart.setOnMouseClicked(event -> AppointmentInfoDialog.show(id));
@@ -107,11 +103,11 @@ public class DayInfoTable extends Main {
                 Label clientLbl = new Label(client.getFio());
                 Label serviceLbl = new Label();
 
-                if(services.size() == 1){
-                    serviceLbl.setText(firstService.getName());
+                if(options.size() == 1){
+                    serviceLbl.setText(firstOption.getName());
                 }
                 else{
-                    serviceLbl.setText(firstService.getName()+"...");
+                    serviceLbl.setText(firstOption.getName()+"...");
                 }
 
                 table.add(appointmentHeadLbl, countColumn, cellStart);
@@ -123,22 +119,21 @@ public class DayInfoTable extends Main {
 
                 for(int i = 1; i < cellNumber; i++){
                     if(startCellsSet.contains(cellStart+i)) break;
-                    Rectangle rectFill = new Rectangle(150, 100, Color.AQUA);
+                    Rectangle rectFill = new Rectangle(200, 40, Color.AQUA);
                     table.add(rectFill, countColumn, cellStart+i);
                     usedCells.add(cellStart+i);
                 }
-
-                for(int i = 1; i <= CELLS_IN_COLUMN_COUNT; i++){
-                    if(!usedCells.contains(i)){
-                        Rectangle unusedRect = new Rectangle(150, 100, Color.TRANSPARENT);
-                        Integer startCellToCreate = i;
-                        unusedRect.setOnMouseClicked(event -> CreateAppointmentDialog.show(master, date, startCellToCreate, appointments));
-                        table.add(unusedRect, countColumn, i);
-                        unusedRect.setOnMouseEntered(event -> {
-                            unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
-                        });
-                        unusedRect.setOnMouseExited(event -> unusedRect.setStyle(""));
-                    }
+            }
+            for(int i = 1; i <= CELLS_IN_COLUMN_COUNT; i++){
+                if(!usedCells.contains(i)){
+                    Rectangle unusedRect = new Rectangle(200, 40, Color.TRANSPARENT);
+                    Integer startCellToCreate = i;
+                    unusedRect.setOnMouseClicked(event -> CreateAppointmentDialog.show(master, date, startCellToCreate, appointments));
+                    table.add(unusedRect, countColumn, i);
+                    unusedRect.setOnMouseEntered(event -> {
+                        unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
+                    });
+                    unusedRect.setOnMouseExited(event -> unusedRect.setStyle(""));
                 }
             }
         }
@@ -163,11 +158,11 @@ public class DayInfoTable extends Main {
         int ans = (hour-8)*2 + 1 + ((minute == 30)?1:0);
         return ans;
     }
-    public static Integer calculateCellNumber(List<ServiceInfo> services){
+    public static Integer calculateCellNumber(List<Option> options){
         int totalCount = 0;
-        for(ServiceInfo service : services){
-            totalCount += service.getTime().getHour()*2;
-            totalCount += service.getTime().getMinute()==30?1:0;
+        for(Option option : options){
+            totalCount += option.getDuration().getHour()*2;
+            totalCount += option.getDuration().getMinute()==30?1:0;
         }
 
         return totalCount;

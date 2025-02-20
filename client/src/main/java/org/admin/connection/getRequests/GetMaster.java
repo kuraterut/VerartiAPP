@@ -1,9 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Appointment;
-import org.admin.utils.MasterInfo;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Master;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -12,26 +10,24 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GetMaster extends Connection {
-    public static List<MasterInfo> getAll(String token){
+    public static List<Master> getAll(String token){
         try{
             getConnection("http://localhost:8000/api/admin/users/master");
 
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
-            List<MasterInfo> masters = new ArrayList<>();
+            List<Master> masters = new ArrayList<>();
 
             JSONObject data = getJson();
             JSONArray jsonArr = (JSONArray) data.get("masters");
 
             for(Object elem: jsonArr){
                 JSONObject masterJSON = (JSONObject) elem;
-                MasterInfo master = new MasterInfo();
+                Master master = new Master();
 
                 Long id = (Long) masterJSON.get("id");
                 String name = (String) masterJSON.get("name");
@@ -59,15 +55,15 @@ public class GetMaster extends Connection {
         }
     }
 
-    public static MasterInfo getById(String token, Long id){
+    public static Master getById(String token, Long id){
         try{
-            getConnection("http://localhost:8000/api/admin/master/" + id);
+            getConnection("http://localhost:8000/api/admin/users/master/" + id);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
 
-            MasterInfo master = new MasterInfo();
+            Master master = new Master();
 
             String name = (String)data.get("name");
             String surname = (String)data.get("surname");
@@ -75,22 +71,13 @@ public class GetMaster extends Connection {
             String bio = (String)data.get("bio");
             String phone = (String)data.get("phone");
 
-            List<ServiceInfo> services = new ArrayList<>();
-            JSONArray servicesArr = (JSONArray)data.get("services_id");
-            for(Object elem: servicesArr){
-                Long serviceId = (Long)elem;
-                ServiceInfo service = GetService.getById(token, serviceId);
-                services.add(service);
-            }
-
-
             master.setId(id);
             master.setName(name);
             master.setSurname(surname);
             master.setPatronymic(patronymic);
             master.setBio(bio);
             master.setPhone(phone);
-            master.setServices(services);
+            master.setServices(new ArrayList<>());
 
             return master;
 
@@ -101,22 +88,25 @@ public class GetMaster extends Connection {
         }
     }
 
-    public static List<MasterInfo> getListByDate(String token, LocalDate date){
+    public static List<Master> getListByDate(String token, LocalDate date, boolean appointed){
         try{
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String dateStr = formatter.format(date);
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/schedule/master?date=" + encodedDate);
+            String url = "http://localhost:8000/api/admin/schedule/master?";
+            url += "date=" + encodedDate + "&appointed=" + appointed;
+            getConnection(url);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
-            List<MasterInfo> masters = new ArrayList<>();
+
+            List<Master> masters = new ArrayList<>();
 
             JSONObject data = getJson();
             JSONArray mastersArr = (JSONArray)data.get("masters");
             for(Object elem: mastersArr){
                 JSONObject masterJSON = (JSONObject)elem;
-                MasterInfo master = new MasterInfo();
+                Master master = new Master();
                 Long id = (Long)masterJSON.get("id");
                 String name = (String)masterJSON.get("name");
                 String surname = (String)masterJSON.get("surname");

@@ -15,9 +15,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.Connection;
-import org.admin.connection.postRequests.AddNewClient;
-import org.admin.utils.ClientInfo;
+import org.admin.connection.postRequests.CreateClient;
+import org.admin.utils.entities.Client;
 import org.admin.utils.Response;
 
 import java.time.LocalDate;
@@ -120,7 +119,7 @@ public class AddNewClientDialog extends Main {
             String phone = phoneTextField.getText();
             LocalDate birthday = birthdayDatePicker.getValue();
 
-            ClientInfo client = new ClientInfo();
+            Client client = new Client();
 
             client.setName(name);
             client.setSurname(surname);
@@ -135,7 +134,7 @@ public class AddNewClientDialog extends Main {
                 return;
             }
 
-            Response addingClientResponse = AddNewClient.post(token, client);
+            Response addingClientResponse = CreateClient.post(token, client);
             if(addingClientResponse.getCode() == 200) {
                 AdminInterface.loadDayInfoWindow(node, date);
                 dialog.close();

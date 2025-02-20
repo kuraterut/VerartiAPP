@@ -6,8 +6,7 @@ CREATE TABLE role
 
 INSERT INTO role (name)
 VALUES ('master'),
-       ('admin'),
-       ('director');
+       ('admin');
 
 CREATE TABLE users
 (
@@ -43,7 +42,7 @@ CREATE TABLE client
     birthday   date
 );
 
-CREATE TABLE appointment
+CREATE TABLE option
 (
     id          serial       not null unique,
     name        varchar(255) not null unique,
@@ -52,12 +51,12 @@ CREATE TABLE appointment
     price       int          not null
 );
 
-CREATE TABLE users_appointment
+CREATE TABLE users_option
 (
     id             serial                                            not null unique,
     users_id       int references users (id) on delete cascade       not null,
-    appointment_id int references appointment (id) on delete cascade not null,
-    CONSTRAINT unique_user_appointment UNIQUE (users_id, appointment_id)
+    option_id int references option (id) on delete cascade not null,
+    CONSTRAINT unique_user_option UNIQUE (users_id, option_id)
 );
 
 CREATE TABLE status
@@ -72,7 +71,7 @@ VALUES ('waiting'),   -- ждет подтверждения
        ('completed'), -- завершенный
        ('cancelled'); -- отмененный
 
-CREATE TABLE master_schedule
+CREATE TABLE master_appointment
 (
     id         serial                                       not null unique,
     users_id   int references users (id) on delete cascade  not null,
@@ -82,12 +81,12 @@ CREATE TABLE master_schedule
     date       date                                         not null
 );
 
-CREATE TABLE master_schedule_appointment
+CREATE TABLE master_appointment_option
 (
     id                 serial                                                not null unique,
-    appointment_id     int references appointment (id) on delete cascade     not null,
-    master_schedule_id int references master_schedule (id) on delete cascade not null,
-    CONSTRAINT unique_appointment_master_schedule UNIQUE (appointment_id, master_schedule_id)
+    option_id     int references option (id) on delete cascade     not null,
+    master_appointment_id int references master_appointment (id) on delete cascade not null,
+    CONSTRAINT unique_option_master_appointment UNIQUE (option_id, master_appointment_id)
 );
 
 CREATE TABLE admin_shift

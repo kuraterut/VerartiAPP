@@ -88,22 +88,6 @@ func (h *Handler) getAdminById(c *gin.Context) {
 	c.JSON(http.StatusOK, admin)
 }
 
-func (h *Handler) getDirector(c *gin.Context) {
-	director, err := h.services.User.GetDirector()
-	if err != nil {
-		var errResp *internal.ErrorResponse
-		if errors.As(err, &errResp) {
-			newErrorResponse(c, errResp.Code, errResp.Text)
-			return
-		}
-
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, director)
-}
-
 func (h *Handler) deleteUser(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

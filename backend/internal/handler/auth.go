@@ -17,8 +17,6 @@ func checkRoles(roles []string) ([]int, error) {
 			roleIds[i] = 1
 		} else if role == "admin" {
 			roleIds[i] = 2
-		} else if role == "director" {
-			roleIds[i] = 3
 		} else {
 			return nil, errors.New(fmt.Sprintf("invalid role: %s", role))
 		}

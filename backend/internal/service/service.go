@@ -11,13 +11,14 @@ type Authorization interface {
 	ParseToken(token string) (int, string, error)
 }
 
-type Appointment interface {
-	CreateAppointment(appointment models.Appointment) (int, error)
-	GetAllAppointments() ([]models.Appointment, error)
-	GetAppointmentById(appointmentId int) (models.Appointment, error)
-	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
-	DeleteAppointment(appointmentId int) error
-	AddAppointmentForMaster(masterId, appointmentId int) (int, error)
+type Option interface {
+	CreateOption(option models.Option) (int, error)
+	GetAllOptions() ([]models.Option, error)
+	GetOptionsByMasterId(masterId int) ([]models.Option, error)
+	GetOptionById(optionId int) (models.Option, error)
+	UpdateOption(option models.OptionUpdate, optionId int) error
+	DeleteOption(optionId int) error
+	AddOptionForMaster(masterId, optionId int) (int, error)
 }
 
 type Client interface {
@@ -39,13 +40,13 @@ type Resource interface {
 	Add(masterId, resourceId int) (int, error)
 }
 
-type Schedule interface {
+type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
 	GetAdminByDate(date string) (models.Users, error)
-	GetAllMastersByDate(date string) ([]models.Users, error)
-	CreateSchedule(schedule models.MasterScheduleInput) (int, error)
-	GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error)
+	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
+	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
+	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 }
 
 type Profile interface {
@@ -65,12 +66,12 @@ type User interface {
 }
 
 type Service struct {
-	Appointment
+	Option
 	Authorization
 	Client
 	Feedback
 	Resource
-	Schedule
+	Appointment
 	User
 	Profile
 }
@@ -82,7 +83,7 @@ func NewService(repos *repository.Repository) *Service {
 		Profile:       NewProfileService(repos),
 		Client:        NewClientService(repos),
 		User:          NewUserService(repos),
+		Option:        NewOptionService(repos),
 		Appointment:   NewAppointmentService(repos),
-		Schedule:      NewScheduleService(repos),
 	}
 }

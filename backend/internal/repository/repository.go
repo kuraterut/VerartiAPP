@@ -11,13 +11,14 @@ type Authorization interface {
 	GetUser(phone, password string) (models.Users, error)
 }
 
-type Appointment interface {
-	CreateAppointment(appointment models.Appointment) (int, error)
-	GetAllAppointments() ([]models.Appointment, error)
-	GetAppointmentById(appointmentId int) (models.Appointment, error)
-	UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error
-	DeleteAppointment(appointmentId int) error
-	AddAppointmentForMaster(masterId, appointmentId int) (int, error)
+type Option interface {
+	CreateOption(option models.Option) (int, error)
+	GetAllOptions() ([]models.Option, error)
+	GetOptionsByMasterId(masterId int) ([]models.Option, error)
+	GetOptionById(optionId int) (models.Option, error)
+	UpdateOption(option models.OptionUpdate, optionId int) error
+	DeleteOption(optionId int) error
+	AddOptionForMaster(masterId, optionId int) (int, error)
 }
 
 type Client interface {
@@ -39,13 +40,13 @@ type Resource interface {
 	Add(masterId, resourceId int) (int, error)
 }
 
-type Schedule interface {
+type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
 	GetAdminByDate(date string) (models.Users, error)
-	GetAllMastersByDate(date string) ([]models.Users, error)
-	CreateSchedule(schedule models.MasterScheduleInput) (int, error)
-	GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error)
+	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
+	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
+	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 }
 
 type User interface {
@@ -63,12 +64,12 @@ type Profile interface {
 }
 
 type Repository struct {
-	Appointment
+	Option
 	Authorization
 	Client
 	Feedback
 	Resource
-	Schedule
+	Appointment
 	User
 	Profile
 }
@@ -80,7 +81,7 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Profile:       NewProfilePostgres(db),
 		Client:        NewClientPostgres(db),
 		User:          NewUserPostgres(db),
+		Option:        NewOptionPostgres(db),
 		Appointment:   NewAppointmentPostgres(db),
-		Schedule:      NewSchedulePostgres(db),
 	}
 }

@@ -3,14 +3,12 @@ package org.admin.connection.profile;
 import org.admin.utils.*;
 import org.admin.connection.Connection;
 
+import org.admin.utils.entities.Admin;
 import org.json.simple.*;
-import org.json.simple.parser.*;
 import javafx.scene.image.*;
 import java.util.*;
 import java.nio.file.*;
-import java.net.*;
 import java.io.*;
-import java.time.*;
 
 public class ConnectionProfile extends Connection{
 	public static Response getProfileInfo(String token){
@@ -25,7 +23,7 @@ public class ConnectionProfile extends Connection{
 			int status = connection.getResponseCode();
 	        if(status != 200) return new Response(status, "Ошибка");
 
-			AdminInfo admin = new AdminInfo();
+			Admin admin = new Admin();
 			
 			admin.setId((Long) data.get("id"));
 			admin.setName((String) data.get("name"));
@@ -46,7 +44,7 @@ public class ConnectionProfile extends Connection{
 	    }
 	}
 
-	public static Response changeProfileInfo(String token, AdminInfo admin){
+	public static Response changeProfileInfo(String token, Admin admin){
 		try{
 			getConnection("http://localhost:8000/api/admin/profile/info");
 

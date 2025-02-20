@@ -2,51 +2,38 @@ package org.admin.dayInfoWindow;
 
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.dayInfoWindow.dialog.AddNewClientDialog;
-import org.admin.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.dayInfoWindow.dialog.ClientInfoDialog;
+import org.admin.dayInfoWindow.dialog.PutAdminOnDateDialog;
 import org.admin.dayInfoWindow.dialog.PutMasterOnDateDialog;
+import org.admin.dayInfoWindow.searchingStrings.SearchingStringClients;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
 import org.admin.sideMenu.SideMenu;
 import org.admin.utils.*;
 
-import javafx.application.*;
-import javafx.stage.*;
-
-import javafx.scene.*;
-
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.image.*;
 import javafx.scene.text.*;
-import javafx.scene.shape.*;
-import javafx.scene.paint.*;
 import javafx.geometry.*;
-import javafx.event.*;
-import javafx.animation.*;
 import javafx.collections.*;
-import javafx.util.*;
 
-import java.io.*;
 import java.util.*;
 import java.time.*;
-import java.time.format.*;
 
 public class DayInfoWindow extends Main{
-	public static BorderPane loadWindow(LocalDate date){
+	public static StackPane loadWindow(LocalDate date){
+            //TODO Сделать заголовок с ФИО Админа
+        StackPane stackPane = new StackPane();
         BorderPane root             = new BorderPane();
-        
+
         StackPane sideMenuStack     = SideMenu.buildSideMenu(0);
-        
+
         DatePicker miniCalendar		= new DatePicker();
 
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();
-        
+
         HBox sheduleHeaders			= new HBox();
         HBox rightSheduleHeaders	= new HBox();
         HBox leftSheduleHeaders		= new HBox();
@@ -61,36 +48,11 @@ public class DayInfoWindow extends Main{
 
         Region spacer               = new Region();
 
-        ComboBox<String> comboBox   = new ComboBox<>();
 
-        List<ClientInfo> clientsInfo = GetClient.getAll(token);
-        if(clientsInfo == null){clientsInfo = new ArrayList<>();}
-
-        comboBox.getEditor().setOnKeyReleased(new SearchingStringListenerClients(comboBox, clientsInfo));
-        comboBox.setOnAction(event -> {
-            String[] val = comboBox.getValue().split(" ");
-            try{
-                Long clientId = Long.parseLong(val[0]);
-                ClientInfoDialog.show(clientId);
-            }
-            catch (Exception e){
-                return;
-            }
-        });
-
-        comboBox.setEditable(true);
-
-        ObservableList fiosList = FXCollections.observableArrayList(); 
-        for(ClientInfo client: clientsInfo){
-            fiosList.add(client.toString());
-        }
-        comboBox.setItems(fiosList);
-
-        comboBox.setPrefWidth(500);
-        comboBox.setPrefHeight(30);
         addNewClientBtn.setMinHeight(30);
-        addNewClientBtn.setMinWidth(100);        
-        
+        addNewClientBtn.setMinWidth(120);
+        addNewClientBtn.setPrefHeight(30);
+        addNewClientBtn.setPrefWidth(120);
 
         centerBox.setAlignment(Pos.CENTER);
         searchStringBox.setAlignment(Pos.CENTER);
@@ -133,11 +95,11 @@ public class DayInfoWindow extends Main{
         VBox.setMargin(sheduleHeaders, new Insets(100, 0, 0, 0));
 
         sheduleHeaders.setAlignment(Pos.CENTER);
-        // sheduleHeaders.setSpacing(300);
         miniCalendar.setValue(date);
 
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        VBox searchStringClients = SearchingStringClients.build();
         ScrollPane scrollTable = DayInfoTable.create(date);
 
         TextArea textArea = new TextArea();
@@ -145,29 +107,39 @@ public class DayInfoWindow extends Main{
         textArea.setScrollLeft(Double.MAX_VALUE);
 
         searchStringBox.setSpacing(25);
+        searchStringBox.setAlignment(Pos.TOP_CENTER);
+        searchStringBox.setMaxSize(500, 100);
+        searchStringBox.setPadding(new Insets(10, 0, 0, 0));
 
         miniCalendar.valueProperty().addListener((observable, oldValue, newValue) -> {
             AdminInterface.loadDayInfoWindow(miniCalendar, newValue);
-	    });
+        });
 
 
-        putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date));
-        // putAdminOnDayBtn.setOnAction(event -> showPutAdminOnDayDialog());
+        putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date, putMasterOnDayBtn));
+        putAdminOnDayBtn.setOnAction(event -> PutAdminOnDateDialog.show(date, putAdminOnDayBtn));
         // сash.setOnAction(event -> showCashDialog());
         // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
         addNewClientBtn.setOnAction(event -> AddNewClientDialog.show(addNewClientBtn, date));
 
-        searchStringBox.getChildren().addAll(comboBox, addNewClientBtn);
+        stackPane.setAlignment(Pos.CENTER);
+        StackPane.setAlignment(searchStringBox, Pos.TOP_CENTER);
+        StackPane.setAlignment(root, Pos.CENTER);
+
+        searchStringBox.getChildren().addAll(searchStringClients, addNewClientBtn);
         rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, cashBtn, totalSumBtn);
         leftSheduleHeaders.getChildren().addAll(miniCalendar);
         sheduleHeaders.getChildren().addAll(leftSheduleHeaders, spacer, rightSheduleHeaders);
         centerInfo.getChildren().addAll(scrollTable, textArea);
-        centerBox.getChildren().addAll(searchStringBox, sheduleHeaders, centerInfo);
+        centerBox.getChildren().addAll(sheduleHeaders, centerInfo);
         root.setLeft(sideMenuStack);
         root.setCenter(centerBox);
         root.setRight(rightBox);
-        return root;
-	}
+
+        stackPane.getChildren().addAll(root, searchStringBox);
+
+        return stackPane;
+    }
 }
 
 

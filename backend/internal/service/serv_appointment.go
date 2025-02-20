@@ -13,26 +13,26 @@ func NewAppointmentService(repo repository.Appointment) *AppointmentService {
 	return &AppointmentService{repo: repo}
 }
 
-func (s *AppointmentService) CreateAppointment(appointment models.Appointment) (int, error) {
+func (s *AppointmentService) PutAdminToDate(adminShift models.AdminShift) error {
+	return s.repo.PutAdminToDate(adminShift)
+}
+
+func (s *AppointmentService) PutMasterToDate(masterShift models.MasterShift) error {
+	return s.repo.PutMasterToDate(masterShift)
+}
+
+func (s *AppointmentService) GetAdminByDate(date string) (models.Users, error) {
+	return s.repo.GetAdminByDate(date)
+}
+
+func (s *AppointmentService) GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error) {
+	return s.repo.GetAllMastersByDate(date, isAppointed)
+}
+
+func (s *AppointmentService) CreateAppointment(appointment models.MasterAppointmentInput) (int, error) {
 	return s.repo.CreateAppointment(appointment)
 }
 
-func (s *AppointmentService) GetAllAppointments() ([]models.Appointment, error) {
-	return s.repo.GetAllAppointments()
-}
-
-func (s *AppointmentService) GetAppointmentById(appointmentId int) (models.Appointment, error) {
-	return s.repo.GetAppointmentById(appointmentId)
-}
-
-func (s *AppointmentService) UpdateAppointment(appointment models.AppointmentUpdate, appointmentId int) error {
-	return s.repo.UpdateAppointment(appointment, appointmentId)
-}
-
-func (s *AppointmentService) DeleteAppointment(appointmentId int) error {
-	return s.repo.DeleteAppointment(appointmentId)
-}
-
-func (s *AppointmentService) AddAppointmentForMaster(masterId, appointmentId int) (int, error) {
-	return s.repo.AddAppointmentForMaster(masterId, appointmentId)
+func (s *AppointmentService) GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error) {
+	return s.repo.GetAppointmentByClientId(clientId)
 }
