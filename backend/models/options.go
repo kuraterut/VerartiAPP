@@ -1,6 +1,6 @@
 package models
 
-type Appointment struct {
+type Option struct {
 	Id          int    `json:"id" db:"id"`
 	Price       int    `json:"price" db:"price" binding:"required"`
 	Name        string `json:"name" db:"name" binding:"required"`
@@ -8,7 +8,7 @@ type Appointment struct {
 	Duration    string `json:"duration" db:"duration" binding:"required"`
 }
 
-type AppointmentUpdate struct {
+type OptionUpdate struct {
 	Price       int    `json:"price,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`

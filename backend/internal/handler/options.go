@@ -10,8 +10,8 @@ import (
 	"verarti/models"
 )
 
-func (h *Handler) createAppointment(c *gin.Context) {
-	var input models.Appointment
+func (h *Handler) createOption(c *gin.Context) {
+	var input models.Option
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
@@ -23,7 +23,7 @@ func (h *Handler) createAppointment(c *gin.Context) {
 		return
 	}
 
-	appointmentId, err := h.services.Appointment.CreateAppointment(input)
+	optionId, err := h.services.Option.CreateOption(input)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -36,12 +36,12 @@ func (h *Handler) createAppointment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"appointmentId": appointmentId,
+		"optionId": optionId,
 	})
 }
 
-func (h *Handler) getAllAppointments(c *gin.Context) {
-	appointments, err := h.services.Appointment.GetAllAppointments()
+func (h *Handler) getAllOptions(c *gin.Context) {
+	options, err := h.services.Option.GetAllOptions()
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -54,18 +54,18 @@ func (h *Handler) getAllAppointments(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"appointments": appointments,
+		"options": options,
 	})
 }
 
-func (h *Handler) getAppointmentById(c *gin.Context) {
-	appointmentId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) getOptionById(c *gin.Context) {
+	optionId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	appointment, err := h.services.Appointment.GetAppointmentById(appointmentId)
+	option, err := h.services.Option.GetOptionById(optionId)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -77,23 +77,47 @@ func (h *Handler) getAppointmentById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, appointment)
+	c.JSON(http.StatusOK, option)
 }
 
-func (h *Handler) addAppointmentForMaster(c *gin.Context) {
+func (h *Handler) getOptionsByMasterId(c *gin.Context) {
+	masterId, err := strconv.Atoi(c.Query("master_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is query, master_id is required")
+		return
+	}
+
+	options, err := h.services.Option.GetOptionsByMasterId(masterId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"options": options,
+	})
+}
+
+func (h *Handler) addOptionForMaster(c *gin.Context) {
 	var input models.MasterIdInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	appointmentId, err := strconv.Atoi(c.Param("id"))
+	optionId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	_, err = h.services.Appointment.AddAppointmentForMaster(input.MasterId, appointmentId)
+	_, err = h.services.Option.AddOptionForMaster(input.MasterId, optionId)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -108,14 +132,14 @@ func (h *Handler) addAppointmentForMaster(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func (h *Handler) updateAppointment(c *gin.Context) {
-	appointmentId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) updateOption(c *gin.Context) {
+	optionId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	var input models.AppointmentUpdate
+	var input models.OptionUpdate
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
@@ -127,7 +151,7 @@ func (h *Handler) updateAppointment(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Appointment.UpdateAppointment(input, appointmentId)
+	err = h.services.Option.UpdateOption(input, optionId)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -142,14 +166,14 @@ func (h *Handler) updateAppointment(c *gin.Context) {
 	c.JSON(http.StatusOK, "OK")
 }
 
-func (h *Handler) deleteAppointment(c *gin.Context) {
-	appointmentId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) deleteOption(c *gin.Context) {
+	optionId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	err = h.services.Appointment.DeleteAppointment(appointmentId)
+	err = h.services.Option.DeleteOption(optionId)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
