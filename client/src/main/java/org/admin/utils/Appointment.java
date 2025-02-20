@@ -40,4 +40,5 @@ public class Appointment extends Response{
 	public void setMaster(MasterInfo master)			{this.master = master;}
 	public void setComment(String comment)				{this.comment = comment;}
 	public void setStatus(String status)				{this.status = status;}
+	public void addService(ServiceInfo service)			{this.services.add(service);}
 }

@@ -15,6 +15,7 @@ import org.admin.connection.deleteRequests.DeleteMaster;
 import org.admin.connection.deleteRequests.DeleteService;
 import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.getRequests.GetService;
+import org.admin.connection.postRequests.AddServiceToMaster;
 import org.admin.connection.putRequests.UpdateMaster;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
 import org.admin.utils.MasterInfo;
@@ -136,7 +137,7 @@ public class MasterInfoDialog extends Main {
                     notMasterServices.add(service);
                 }
             }
-            showChooseServiceDialog(notMasterServices, master);
+            showChooseServiceDialog(notMasterServices, master, servicesBox);
         });
 
         saveButton.setOnAction(event -> {
@@ -151,24 +152,35 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<ServiceInfo> services, MasterInfo master) {
+    private static void showChooseServiceDialog(List<ServiceInfo> services, MasterInfo master, VBox servicesBox) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
 
         VBox root = new VBox();
         root.setSpacing(50);
+        Label errorMsg = new Label("");
         Label headerLabel = new Label("Выберите услугу");
         Button cancelButton = new Button("Отмена");
 
         VBox searchingStringServices = SearchingStringServices.build(services, service->{
             master.addService(service);
-            dialog.close();
+            Response response = AddServiceToMaster.post(token, master.getId(), service.getId());
+            if(response.getCode() == 200){
+                Label servicesBoxLabel = new Label("Услуги");
+                servicesBox.getChildren().clear();
+                servicesBox.getChildren().addAll(servicesBoxLabel, buildServiceTable(master, servicesBox));
+                dialog.close();
+            }
+            else{
+                errorMsg.setText(response.getMsg());
+            }
+            //TODO Отправить данные на сервер
         });
         searchingStringServices.setMaxWidth(500);
 
         cancelButton.setOnAction(event -> dialog.close());
-        root.getChildren().addAll(headerLabel, searchingStringServices, cancelButton);
+        root.getChildren().addAll(headerLabel, searchingStringServices, errorMsg, cancelButton);
 
         Scene dialogScene = new Scene(root, 800, 500);
 
@@ -178,6 +190,7 @@ public class MasterInfoDialog extends Main {
     }
 
     private static ScrollPane buildServiceTable(MasterInfo master, VBox tableVBox){
+        //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
         servicesTableHeaders[0] = new Label("ID услуги");
@@ -205,7 +218,7 @@ public class MasterInfoDialog extends Main {
 
             deleteService.setOnAction(event -> {
                 DeleteService.deleteByMasterId(token, service.getId(), master.getId());
-                tableVBox.getChildren().removeAll();
+                tableVBox.getChildren().clear();
                 Label servicesHeadLabel = new Label("Услуги: ");
                 tableVBox.getChildren().addAll(servicesHeadLabel, buildServiceTable(master, tableVBox));
             });
