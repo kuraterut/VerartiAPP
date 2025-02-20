@@ -1,13 +1,15 @@
-package org.admin.utils;
+package org.admin.utils.entities;
 
 
-public class ResourceInfo extends Response{
+import org.admin.utils.Response;
+
+public class Resource extends Response {
 	private Long id;
 	private String name;
 	private String description;
 	private Double price;
 	
-	public Boolean equals(ResourceInfo other){
+	public Boolean equals(Resource other){
 		return this.id == other.getId();
 	}
 

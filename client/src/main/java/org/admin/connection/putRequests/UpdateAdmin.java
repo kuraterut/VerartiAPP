@@ -1,15 +1,12 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.AdminInfo;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Admin;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class UpdateAdmin extends Connection {
-    public static Response updateInfo(String token, AdminInfo admin){
+    public static Response updateInfo(String token, Admin admin){
         try {
             getConnection("http://localhost:8000/api/admin/users/admin/" + admin.getId());
             connection.setRequestMethod("PUT");

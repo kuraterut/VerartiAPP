@@ -1,7 +1,5 @@
 package org.admin.dayInfoWindow.dialog;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -12,12 +10,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.Main;
 import org.admin.connection.getRequests.GetService;
-import org.admin.dayInfoWindow.searchingStrings.SearchingStringServices;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
 import org.admin.utils.*;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Master;
+import org.admin.utils.entities.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateAppointmentDialog extends Main {
-
-
-    public static void show(MasterInfo master, LocalDate date, Integer startCell, List<Appointment> appointments){
+    public static void show(Master master, LocalDate date, Integer startCell, List<Appointment> appointments){
         Appointment appointment = new Appointment();
         appointment.setServices(new ArrayList<>());
 
@@ -41,7 +38,7 @@ public class CreateAppointmentDialog extends Main {
 
         LocalTime startTime = DayInfoTable.startCellToStartTime(startCell);
 
-        List<ServiceInfo> services = GetService.getListByMasterId(token, master.getId());
+        List<Service> services = GetService.getListByMasterId(token, master.getId());
 
         Label masterFioLabel = new Label(master.getFio());
         Label dateLabel = new Label(HelpFuncs.localDateToString(date, "dd.MM.yyyy"));
@@ -75,7 +72,7 @@ public class CreateAppointmentDialog extends Main {
 
     }
 
-    public static ScrollPane buildTableServices(List<ServiceInfo> services){
+    public static ScrollPane buildTableServices(List<Service> services){
         //TODO Кнопка удаления услуги из таблицы
         ScrollPane scrollPane = new ScrollPane();
         GridPane table = new GridPane();
@@ -83,6 +80,8 @@ public class CreateAppointmentDialog extends Main {
         table.setGridLinesVisible(true);
         scrollPane.setPrefViewportHeight(300);
         scrollPane.setPrefViewportWidth(600);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
         table.setAlignment(Pos.CENTER);
 
         Label serviceIdTableHeadLabel = new Label("ID Услуги");
@@ -104,10 +103,10 @@ public class CreateAppointmentDialog extends Main {
         GridPane.setValignment(serviceCountTableHeadLabel, VPos.CENTER);
 
         int rowNum = 1;
-        for (ServiceInfo serviceInfo : services) {
-            Long seriveId = serviceInfo.getId();
-            String seriveName = serviceInfo.getName();
-            Long serivePrice = serviceInfo.getPrice();
+        for (Service service : services) {
+            Long seriveId = service.getId();
+            String seriveName = service.getName();
+            Long serivePrice = service.getPrice();
             Integer serviceCount = 1;
 
             Label serviceIdLabel = new Label(seriveId.toString());

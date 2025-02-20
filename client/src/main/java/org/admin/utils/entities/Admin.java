@@ -1,6 +1,8 @@
-package org.admin.utils;
+package org.admin.utils.entities;
 
-public class AdminInfo extends Response{
+import org.admin.utils.Response;
+
+public class Admin extends User {
 	private Long id;
 	private String name;
 	private String surname;
@@ -9,8 +11,9 @@ public class AdminInfo extends Response{
 	private String email;
 	private String bio;
 	private String photoURL;
+	private Boolean isMaster;
 	
-	public Boolean equals(AdminInfo other){
+	public Boolean equals(Admin other){
 		return this.id == other.getId();
 	}
 
@@ -32,6 +35,7 @@ public class AdminInfo extends Response{
 	public String getEmail()				{return this.email;}
 	public String getPhotoURL()				{return this.photoURL;}
 	public String getFio()					{return surname+" "+name+" "+patronymic;}
+	public Boolean getIsMaster()			{return isMaster;}
 
 	public void setId(Long id)							{this.id = id;}
 	public void setName(String name)					{this.name = name;}
@@ -41,5 +45,5 @@ public class AdminInfo extends Response{
 	public void setEmail(String email)					{this.email = email;}
 	public void setPhone(String phone)					{this.phone = phone;}
 	public void setPhotoURL(String photoURL)			{this.photoURL = photoURL;}
-	
+	public void setIsMaster(Boolean isMaster)			{this.isMaster = isMaster;}
 }

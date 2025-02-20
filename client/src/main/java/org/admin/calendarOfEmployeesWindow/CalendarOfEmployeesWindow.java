@@ -2,19 +2,10 @@ package org.admin.calendarOfEmployeesWindow;
 
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetMaster;
 import org.admin.sideMenu.SideMenu;
-import org.admin.utils.*;
 
-import javafx.application.*;
-import javafx.stage.*;
-
-import javafx.scene.*;
-
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.*;
@@ -23,14 +14,13 @@ import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 import javafx.geometry.*;
 import javafx.event.*;
-import javafx.animation.*;
 import javafx.collections.*;
-import javafx.util.*;
+import org.admin.utils.entities.Admin;
+import org.admin.utils.entities.Master;
 
 import java.io.*;
 import java.util.*;
 import java.time.*;
-import java.time.format.*;
 
 public class CalendarOfEmployeesWindow extends Main{
     public static GridPane buildCalendarByYM(int year, int month){
@@ -68,13 +58,13 @@ public class CalendarOfEmployeesWindow extends Main{
             Label dayLbl = new Label(String.valueOf(day));
             
             LocalDate date = LocalDate.of(year, month, day);
-            AdminInfo admin = GetAdmin.getByDate(token, date);
-            List<MasterInfo> masters = GetMaster.getListByDate(token, date, true);
+            Admin admin = GetAdmin.getByDate(token, date);
+            List<Master> masters = GetMaster.getListByDate(token, date, true);
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 
             if(admin == null){
-                admin = new AdminInfo();
+                admin = new Admin();
                 admin.setSurname("Ошибка подключения");
                 admin.setName(" ");
             }
@@ -83,7 +73,7 @@ public class CalendarOfEmployeesWindow extends Main{
             Label adminLbl = new Label(admin.getSurname() + " " + admin.getName().charAt(0) + ".");
             adminLbl.setFont(Font.font("Open Sans Bold"));
             cellInfo.getChildren().add(adminLbl);
-            for(MasterInfo master: masters){
+            for(Master master: masters){
                 Label masterLbl = new Label(master.getSurname() + " " + master.getName().charAt(0) + ".");
                 cellInfo.getChildren().add(masterLbl);
             }

@@ -11,14 +11,14 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.utils.AdminInfo;
+import org.admin.utils.entities.Admin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class SearchingStringAdmins extends Main {
-    public static VBox build(List<AdminInfo> startList, Consumer<AdminInfo> func){
+    public static VBox build(List<Admin> startList, Consumer<Admin> func){
         VBox root = new VBox();
 
         root.setPrefSize(300, 600);
@@ -26,18 +26,18 @@ public class SearchingStringAdmins extends Main {
 
         TextField searchTextField = new TextField();
 
-        ObservableList<AdminInfo> observableList = FXCollections.observableArrayList(startList);
-        ListView<AdminInfo> listView = new ListView<>(observableList);
+        ObservableList<Admin> observableList = FXCollections.observableArrayList(startList);
+        ListView<Admin> listView = new ListView<>(observableList);
 
-        MultipleSelectionModel<AdminInfo> selectionModel = listView.getSelectionModel();
+        MultipleSelectionModel<Admin> selectionModel = listView.getSelectionModel();
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     selectionModel.clearSelection();
                     root.getChildren().remove(listView);
-                    List<AdminInfo> filterClients = filter(startList, newValue);
+                    List<Admin> filterClients = filter(startList, newValue);
 
-                    ObservableList<AdminInfo> filteredListObservable = FXCollections.observableArrayList(filterClients);
+                    ObservableList<Admin> filteredListObservable = FXCollections.observableArrayList(filterClients);
                     listView.setItems(filteredListObservable);
                     if (!filterClients.isEmpty()) {
                         root.getChildren().add(listView);
@@ -46,8 +46,8 @@ public class SearchingStringAdmins extends Main {
             });
         });
 
-        selectionModel.selectedItemProperty().addListener(new ChangeListener<AdminInfo>(){
-            public void changed(ObservableValue<? extends AdminInfo> changed, AdminInfo oldValue, AdminInfo newValue){
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<Admin>(){
+            public void changed(ObservableValue<? extends Admin> changed, Admin oldValue, Admin newValue){
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -68,9 +68,9 @@ public class SearchingStringAdmins extends Main {
         return root;
     }
 
-    private static List<AdminInfo> filter(List<AdminInfo> admins, String start){
-        List<AdminInfo> result = new ArrayList<>();
-        for(AdminInfo admin : admins){
+    private static List<Admin> filter(List<Admin> admins, String start){
+        List<Admin> result = new ArrayList<>();
+        for(Admin admin : admins){
             if(admin.getFio().startsWith(start) || admin.getPhone().startsWith(start)){
                 result.add(admin);
             }

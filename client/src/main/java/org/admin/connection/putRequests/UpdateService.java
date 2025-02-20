@@ -1,14 +1,12 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.MasterInfo;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
-import org.json.simple.JSONArray;
+import org.admin.utils.entities.Service;
 import org.json.simple.JSONObject;
 
 public class UpdateService extends Connection {
-    public static Response updateInfo(String token, ServiceInfo service){
+    public static Response updateInfo(String token, Service service){
         try {
             getConnection("http://localhost:8000/api/admin/appointment/" + service.getId());
             connection.setRequestMethod("PUT");

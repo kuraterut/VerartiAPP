@@ -12,19 +12,14 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.postRequests.PutAdminOnDate;
-import org.admin.connection.postRequests.PutMasterOnDate;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringAdmins;
-import org.admin.dayInfoWindow.searchingStrings.SearchingStringMasters;
 import org.admin.enterpriseWindow.dialog.creation.CreateAdminDialog;
-import org.admin.utils.AdminInfo;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Admin;
 import org.admin.utils.Response;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,12 +47,12 @@ public class PutAdminOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
-        AdminInfo adminOnDate = GetAdmin.getByDate(token, date);
-        List<AdminInfo> allAdmins = GetAdmin.getAll(token);
-        List<AdminInfo> adminsNotOnDate = null;
+        Admin adminOnDate = GetAdmin.getByDate(token, date);
+        List<Admin> allAdmins = GetAdmin.getAll(token);
+        List<Admin> adminsNotOnDate = null;
         if(adminOnDate == null) {adminsNotOnDate = allAdmins;}
         else{
-            for(AdminInfo admin : allAdmins){
+            for(Admin admin : allAdmins){
                 if(!admin.equals(adminOnDate)){
                     adminsNotOnDate.add(admin);
                 }

@@ -1,7 +1,5 @@
 package org.admin.dayInfoWindow.dialog;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -10,17 +8,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.postRequests.PutMasterOnDate;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringMasters;
 import org.admin.enterpriseWindow.dialog.creation.CreateMasterDialog;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Master;
 import org.admin.utils.Response;
-import org.admin.utils.SearchingStringListenerMasters;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +46,7 @@ public class PutMasterOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
-        List<MasterInfo> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
+        List<Master> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
 
         VBox choosingMaster = SearchingStringMasters.build(mastersNotOnDate, masterInfo -> {
             if(masterInfo != null) {

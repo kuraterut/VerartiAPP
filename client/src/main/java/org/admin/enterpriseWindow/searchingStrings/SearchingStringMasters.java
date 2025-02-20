@@ -5,22 +5,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Master;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class SearchingStringMasters extends Main {
-    public static VBox build(List<MasterInfo> startList, Consumer<MasterInfo> func){
+    public static VBox build(List<Master> startList, Consumer<Master> func){
         VBox root = new VBox();
 
         root.setPrefSize(300, 600);
@@ -28,18 +26,18 @@ public class SearchingStringMasters extends Main {
         TextField searchTextField = new TextField();
 //        searchTextField.setPrefWidth(300);
 
-        ObservableList<MasterInfo> observableList = FXCollections.observableArrayList(startList);
-        ListView<MasterInfo> listView = new ListView<>(observableList);
+        ObservableList<Master> observableList = FXCollections.observableArrayList(startList);
+        ListView<Master> listView = new ListView<>(observableList);
 
-        MultipleSelectionModel<MasterInfo> selectionModel = listView.getSelectionModel();
+        MultipleSelectionModel<Master> selectionModel = listView.getSelectionModel();
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     selectionModel.clearSelection();
                     root.getChildren().remove(listView);
-                    List<MasterInfo> filterClients = filter(startList, newValue);
+                    List<Master> filterClients = filter(startList, newValue);
 
-                    ObservableList<MasterInfo> filteredListObservable = FXCollections.observableArrayList(filterClients);
+                    ObservableList<Master> filteredListObservable = FXCollections.observableArrayList(filterClients);
                     listView.setItems(filteredListObservable);
                     if(!filterClients.isEmpty()){
                         root.getChildren().add(listView);
@@ -49,8 +47,8 @@ public class SearchingStringMasters extends Main {
         });
 
         // устанавливаем слушатель для отслеживания изменений
-        selectionModel.selectedItemProperty().addListener(new ChangeListener<MasterInfo>(){
-            public void changed(ObservableValue<? extends MasterInfo> changed, MasterInfo oldValue, MasterInfo newValue){
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<Master>(){
+            public void changed(ObservableValue<? extends Master> changed, Master oldValue, Master newValue){
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -70,9 +68,9 @@ public class SearchingStringMasters extends Main {
         return root;
     }
 
-    private static List<MasterInfo> filter(List<MasterInfo> masters, String start){
-        List<MasterInfo> result = new ArrayList<>();
-        for(MasterInfo master : masters){
+    private static List<Master> filter(List<Master> masters, String start){
+        List<Master> result = new ArrayList<>();
+        for(Master master : masters){
             if(master.getFio().startsWith(start) || master.getPhone().startsWith(start)){
                 result.add(master);
             }

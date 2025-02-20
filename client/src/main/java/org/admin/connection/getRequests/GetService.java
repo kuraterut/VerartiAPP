@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetService extends Connection {
-    public static List<ServiceInfo> getAll(String token){
+    public static List<Service> getAll(String token){
         try{
             getConnection("http://localhost:8000/api/admin/appointment/");
             connection.setRequestMethod("GET");
@@ -18,11 +18,11 @@ public class GetService extends Connection {
 
             JSONObject data = getJson();
 
-            List<ServiceInfo> services = new ArrayList<>();
+            List<Service> services = new ArrayList<>();
             JSONArray servicesArray = (JSONArray) data.get("appointments");
             for (Object serviceObj : servicesArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
-                ServiceInfo service = new ServiceInfo();
+                Service service = new Service();
 
                 Long id = (Long) serviceJSON.get("id");
                 String name = (String) serviceJSON.get("name");
@@ -47,7 +47,7 @@ public class GetService extends Connection {
         }
     }
 
-    public static ServiceInfo getById(String token, Long id){
+    public static Service getById(String token, Long id){
         try{
             getConnection("http://localhost:8000/api/admin/appointment/" + id);
             connection.setRequestMethod("GET");
@@ -56,7 +56,7 @@ public class GetService extends Connection {
             JSONObject data = getJson();
 
 
-            ServiceInfo service = new ServiceInfo();
+            Service service = new Service();
             String name = (String)data.get("name");
             String description = (String)data.get("description");
             Long price = (Long)data.get("price");
@@ -77,7 +77,7 @@ public class GetService extends Connection {
             return null;
         }
     }
-    public static List<ServiceInfo> getListByMasterId(String token, Long masterId){
+    public static List<Service> getListByMasterId(String token, Long masterId){
         try{
             getConnection("http://localhost:8000/api/admin/appointment/master/" + masterId);
             connection.setRequestMethod("GET");
@@ -85,11 +85,11 @@ public class GetService extends Connection {
 
             JSONObject data = getJson();
 
-            List<ServiceInfo> services = new ArrayList<>();
+            List<Service> services = new ArrayList<>();
             JSONArray servicesArray = (JSONArray) data.get("appointments");
             for (Object serviceObj : servicesArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
-                ServiceInfo service = new ServiceInfo();
+                Service service = new Service();
 
                 Long id = (Long) serviceJSON.get("id");
                 String name = (String) serviceJSON.get("name");

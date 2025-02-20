@@ -11,7 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
 import org.admin.connection.getRequests.GetClient;
-import org.admin.utils.ClientInfo;
+import org.admin.utils.entities.Client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,27 +20,27 @@ public class SearchingStringClients extends Main {
     public static VBox build(){
         VBox root = new VBox();
 
-        List<ClientInfo> clients = GetClient.getAll(token);
+        List<Client> clients = GetClient.getAll(token);
         TextField searchTextField = new TextField();
 
-        ObservableList<ClientInfo> clientsObservable = FXCollections.observableArrayList(clients);
-        ListView<ClientInfo> clientsListView = new ListView<>(clientsObservable);
+        ObservableList<Client> clientsObservable = FXCollections.observableArrayList(clients);
+        ListView<Client> clientsListView = new ListView<>(clientsObservable);
 
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             root.getChildren().remove(clientsListView);
-            List<ClientInfo> filterClients = filter(clients, newValue);
+            List<Client> filterClients = filter(clients, newValue);
 
-            ObservableList<ClientInfo> filterClientsObservable = FXCollections.observableArrayList(filterClients);
+            ObservableList<Client> filterClientsObservable = FXCollections.observableArrayList(filterClients);
             clientsListView.setItems(filterClientsObservable);
             if(!filterClients.isEmpty() && !newValue.isEmpty()){
                 root.getChildren().add(clientsListView);
             }
         });
 
-        MultipleSelectionModel<ClientInfo> clientsSelectionModel = clientsListView.getSelectionModel();
+        MultipleSelectionModel<Client> clientsSelectionModel = clientsListView.getSelectionModel();
         // устанавливаем слушатель для отслеживания изменений
-        clientsSelectionModel.selectedItemProperty().addListener(new ChangeListener<ClientInfo>(){
-            public void changed(ObservableValue<? extends ClientInfo> changed, ClientInfo oldValue, ClientInfo newValue){
+        clientsSelectionModel.selectedItemProperty().addListener(new ChangeListener<Client>(){
+            public void changed(ObservableValue<? extends Client> changed, Client oldValue, Client newValue){
                 System.out.println(newValue);
             }
         });
@@ -52,9 +52,9 @@ public class SearchingStringClients extends Main {
         return root;
     }
 
-    private static List<ClientInfo> filter(List<ClientInfo> clients, String start){
-        List<ClientInfo> result = new ArrayList<>();
-        for(ClientInfo client : clients){
+    private static List<Client> filter(List<Client> clients, String start){
+        List<Client> result = new ArrayList<>();
+        for(Client client : clients){
             if(client.getFio().startsWith(start) || client.getPhone().startsWith(start)){
                 result.add(client);
             }

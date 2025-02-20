@@ -1,10 +1,10 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Appointment;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.MasterInfo;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Client;
+import org.admin.utils.entities.Master;
+import org.admin.utils.entities.Service;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -79,7 +79,7 @@ public class GetAppointment extends Connection {
 
             Appointment appointment = new Appointment();
 
-            List<ServiceInfo> services = new ArrayList<>();
+            List<Service> services = new ArrayList<>();
 
             Long masterId 			= (Long)data.get("master_id");
             Long clientId 			= (Long)data.get("client_id");
@@ -92,12 +92,12 @@ public class GetAppointment extends Connection {
             JSONArray servicesArr = (JSONArray)data.get("services");
             for(Object serviceObj: servicesArr){
                 Long serviceId = (Long)serviceObj;
-                ServiceInfo service = GetService.getById(token, serviceId);
+                Service service = GetService.getById(token, serviceId);
                 services.add(service);
             }
 
-            MasterInfo master = GetMaster.getById(token, masterId);
-            ClientInfo client = GetClient.getById(token, clientId);
+            Master master = GetMaster.getById(token, masterId);
+            Client client = GetClient.getById(token, clientId);
 
             appointment.setId(id);
             appointment.setStartTime(startTime);

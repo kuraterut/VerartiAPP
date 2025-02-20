@@ -18,16 +18,16 @@ import org.admin.connection.getRequests.GetService;
 import org.admin.connection.postRequests.AddServiceToMaster;
 import org.admin.connection.putRequests.UpdateMaster;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Master;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MasterInfoDialog extends Main {
     public static void show(Long id, Node node){
-        MasterInfo master = GetMaster.getById(token, id);
+        Master master = GetMaster.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -129,10 +129,10 @@ public class MasterInfoDialog extends Main {
         });
 
         addServiceButton.setOnAction(event -> {
-            List<ServiceInfo> allServices = GetService.getAll(token);
-            List<ServiceInfo> masterServices = GetService.getListByMasterId(token, master.getId());
-            List<ServiceInfo> notMasterServices = new ArrayList<>();
-            for(ServiceInfo service : allServices){
+            List<Service> allServices = GetService.getAll(token);
+            List<Service> masterServices = GetService.getListByMasterId(token, master.getId());
+            List<Service> notMasterServices = new ArrayList<>();
+            for(Service service : allServices){
                 if(!masterServices.contains(service)){
                     notMasterServices.add(service);
                 }
@@ -152,7 +152,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<ServiceInfo> services, MasterInfo master, VBox servicesBox) {
+    private static void showChooseServiceDialog(List<Service> services, Master master, VBox servicesBox) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -189,7 +189,7 @@ public class MasterInfoDialog extends Main {
 
     }
 
-    private static ScrollPane buildServiceTable(MasterInfo master, VBox tableVBox){
+    private static ScrollPane buildServiceTable(Master master, VBox tableVBox){
         //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
@@ -209,7 +209,7 @@ public class MasterInfoDialog extends Main {
         GridPane.setValignment(servicesTableHeaders[3], VPos.CENTER);
 
         int index = 1;
-        for(ServiceInfo service: master.getServices()){
+        for(Service service: master.getServices()){
             Label serviceIdLabel = new Label(service.getId().toString());
             Label serviceNameLabel = new Label(service.getName());
             Label servicePriceLabel = new Label(service.getPrice().toString());

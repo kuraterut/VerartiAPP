@@ -3,17 +3,14 @@ package org.admin.connection.resources;
 import org.admin.utils.*;
 import org.admin.connection.Connection;
 
+import org.admin.utils.entities.Resource;
+import org.admin.utils.entities.ResourceRequest;
 import org.json.simple.*;
-import org.json.simple.parser.*;
-import javafx.scene.image.*;
+
 import java.util.*;
-import java.nio.file.*;
-import java.net.*;
-import java.io.*;
-import java.time.*;
 
 public class ConnectionResources extends Connection{
-	public static ArrayList<ResourceInfo> getResourcesList(String token) {
+	public static ArrayList<Resource> getResourcesList(String token) {
 		try{
 			getConnection("http://localhost:8000/api/admin/resource/all");
 
@@ -22,12 +19,12 @@ public class ConnectionResources extends Connection{
 			
 	        JSONObject data = getJson();
 
-	        ArrayList<ResourceInfo> resources = new ArrayList<>();
+	        ArrayList<Resource> resources = new ArrayList<>();
 
 			JSONArray jsonArr = (JSONArray) data.get("data");
 	        for (Object elem : jsonArr) {
 	            JSONObject resourceJson = (JSONObject) elem;
-	            ResourceInfo resource = new ResourceInfo();
+	            Resource resource = new Resource();
 	            resource.setId((Long)resourceJson.get("id"));
 	            resource.setName((String)resourceJson.get("name"));
 	            resource.setDescription((String)resourceJson.get("description"));
@@ -56,7 +53,7 @@ public class ConnectionResources extends Connection{
 	        int status = connection.getResponseCode();
 	        if(status != 200) return new Response(status, "Ошибка");
 
-            ResourceInfo resource = new ResourceInfo();
+            Resource resource = new Resource();
             
             resource.setId((Long)data.get("id"));
             resource.setName((String)data.get("name"));
@@ -71,7 +68,7 @@ public class ConnectionResources extends Connection{
 	    }
 	}
 
-	public static ArrayList<ResourceRequestInfo> getResourcesRequestsList(String token) {
+	public static ArrayList<ResourceRequest> getResourcesRequestsList(String token) {
 		try{
 			getConnection("http://localhost:8000/api/admin/resource/request");
 
@@ -80,16 +77,16 @@ public class ConnectionResources extends Connection{
 			
 	        JSONObject data = getJson();
 
-	        ArrayList<ResourceRequestInfo> requests = new ArrayList<>();
+	        ArrayList<ResourceRequest> requests = new ArrayList<>();
 
 			JSONArray jsonArr = (JSONArray) data.get("data");
 	        
 	        for (Object elem : jsonArr) {
 	            JSONObject requestJson = (JSONObject) elem;
-	            ResourceRequestInfo request = new ResourceRequestInfo();
+	            ResourceRequest request = new ResourceRequest();
 	            request.setId((Long)requestJson.get("id"));
 	            Long resourceId = (Long)requestJson.get("resource_id");
-	            ResourceInfo resource = (ResourceInfo) getResourceById(token, resourceId);
+	            Resource resource = (Resource) getResourceById(token, resourceId);
 	            request.setResource(resource);
 	            request.setCount((Integer)requestJson.get("count"));
 	            request.setStatus((Integer)requestJson.get("status"));

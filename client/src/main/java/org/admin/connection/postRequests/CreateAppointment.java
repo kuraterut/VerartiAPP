@@ -1,9 +1,9 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Appointment;
+import org.admin.utils.entities.Appointment;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -29,7 +29,7 @@ public class CreateAppointment extends Connection {
             String startTimeStr = startTime.getHour()+":"+startTime.getMinute();
 
             JSONArray servicesJSON = new JSONArray();
-            for(ServiceInfo service : appointment.getServices()){
+            for(Service service : appointment.getServices()){
                 servicesJSON.add(service.getId());
             }
 

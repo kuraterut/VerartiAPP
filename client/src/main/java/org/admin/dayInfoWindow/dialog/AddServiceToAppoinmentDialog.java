@@ -1,7 +1,6 @@
 package org.admin.dayInfoWindow.dialog;
 
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,13 +9,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
-import org.admin.utils.Appointment;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Service;
 
 import java.util.List;
 
 public class AddServiceToAppoinmentDialog extends Main {
-    public static void show(VBox tableBox, Appointment appointment, List<ServiceInfo> services){
+    public static void show(VBox tableBox, Appointment appointment, List<Service> services){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Добавить услугу");

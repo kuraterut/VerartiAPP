@@ -1,17 +1,19 @@
-package org.admin.utils;
+package org.admin.utils.entities;
+
+import org.admin.utils.Response;
 
 import java.util.*;
 import java.time.*;
 import java.time.format.*;
 
-public class ServiceInfo extends Response{
+public class Service extends Response {
 	private Long id;
 	private String name;
 	private String description;
 	private LocalTime duration;
 	private Long price;
 
-	public Boolean equals(ServiceInfo other){
+	public Boolean equals(Service other){
 		return this.id == other.getId();
 	}
 
