@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class CreateAppointment extends Connection {
     public static Response post(String token, Appointment appointment){
         try{
-            getConnection("http://localhost:8000/api/admin/appointment");
+            getConnection("http://localhost:8000/api/admin/schedule/");
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
