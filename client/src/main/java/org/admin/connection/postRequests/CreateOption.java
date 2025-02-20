@@ -5,7 +5,7 @@ import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 import org.json.simple.JSONObject;
 
-public class CreateService extends Connection {
+public class CreateOption extends Connection {
     public static Response post(String token, Option option){
         try{
             getConnection("http://localhost:8000/api/admin/option/");

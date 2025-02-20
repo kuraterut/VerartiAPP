@@ -77,7 +77,6 @@ public class GetMaster extends Connection {
             master.setPatronymic(patronymic);
             master.setBio(bio);
             master.setPhone(phone);
-            master.setServices(new ArrayList<>());
 
             return master;
 
@@ -93,7 +92,7 @@ public class GetMaster extends Connection {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String dateStr = formatter.format(date);
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            String url = "http://localhost:8000/api/admin/schedule/master?";
+            String url = "http://localhost:8000/api/admin/appointment/master?";
             url += "date=" + encodedDate + "&appointed=" + appointed;
             getConnection(url);
             connection.setRequestMethod("GET");

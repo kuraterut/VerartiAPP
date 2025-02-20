@@ -20,11 +20,6 @@ public class UpdateMaster extends Connection {
             out.put("patronymic", master.getPatronymic());
             out.put("phone", master.getPhone());
             out.put("bio", master.getBio());
-            JSONArray servicesArray = new JSONArray();
-            for(Option option : master.getServices()){
-                servicesArray.add(option.getId());
-            }
-            out.put("options", servicesArray);
             sendJson(out);
 
             int status = connection.getResponseCode();
