@@ -11,7 +11,7 @@ public class Appointment extends Response {
 	private String status;
 	private LocalDate date;
 	private LocalTime startTime;
-	private List<Service> services;
+	private List<Option> options;
 	private Client client;
 	private Master master;
 	private String comment;
@@ -21,7 +21,7 @@ public class Appointment extends Response {
 	public LocalTime getStartTime()			{return this.startTime;}
 	public Client getClient()			{return this.client;}
 	public Master getMaster()			{return this.master;}
-	public List<Service> getServices()	{return this.services;}
+	public List<Option> getServices()	{return this.options;}
 	public String getComment()				{return this.comment;}
 	public String getStatus()				{return this.status;}
 	public String getDateTimeStr()			{
@@ -37,10 +37,10 @@ public class Appointment extends Response {
 	public void setId(Long id)							{this.id = id;}
 	public void setDate(LocalDate date)					{this.date = date;}
 	public void setStartTime(LocalTime startTime)		{this.startTime = startTime;} 	
-	public void setServices(List<Service> services)	{this.services = services;}
+	public void setServices(List<Option> options)	{this.options = options;}
 	public void setClient(Client client)			{this.client = client;}
 	public void setMaster(Master master)			{this.master = master;}
 	public void setComment(String comment)				{this.comment = comment;}
 	public void setStatus(String status)				{this.status = status;}
-	public void addService(Service service)			{this.services.add(service);}
+	public void addService(Option option)			{this.options.add(option);}
 }

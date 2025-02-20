@@ -1,7 +1,5 @@
 package org.admin.utils.entities;
 
-import org.admin.utils.Response;
-
 import java.util.*;
 
 public class Master extends User {
@@ -11,7 +9,7 @@ public class Master extends User {
 	private String patronymic;
 	private String phone;
 	private String bio;
-	private List<Service> services;
+	private List<Option> options;
 	private Boolean isAdmin;
 
 	public Boolean equals(Master other){
@@ -33,7 +31,7 @@ public class Master extends User {
 	public String getPatronymic()			{return this.patronymic;}
 	public String getBio()					{return this.bio;}
 	public String getPhone()				{return this.phone;}
-	public List<Service> getServices()		{return this.services;}
+	public List<Option> getServices()		{return this.options;}
 	public Boolean getIsAdmin()				{return this.isAdmin;}
 
 	public String getFio()					{return surname+" "+name+" "+patronymic;}
@@ -45,6 +43,6 @@ public class Master extends User {
 	public void setPhone(String phone)					{this.phone = phone;}
 	public void setIsAdmin(Boolean isAdmin)				{this.isAdmin = isAdmin;}
 
-	public void addService(Service service)	{this.services.add(service);}
-	public void setServices(List<Service> services)	{this.services = services;}
+	public void addService(Option option)	{this.options.add(option);}
+	public void setServices(List<Option> options)	{this.options = options;}
 }

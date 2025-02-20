@@ -18,11 +18,11 @@ import org.admin.connection.deleteRequests.DeleteService;
 import org.admin.connection.getRequests.GetService;
 import org.admin.connection.putRequests.UpdateService;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 public class ServiceInfoDialog extends Main {
     public static void show(Long id, Node node){
-        Service service = GetService.getById(token, id);
+        Option option = GetService.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -47,11 +47,11 @@ public class ServiceInfoDialog extends Main {
         Label descriptionLabel        = new Label("Описание: ");
 
 
-        Label serviceIdLabel            = new Label(service.getId().toString());
-        TextField nameTextField         = new TextField(service.getName());
-        TextField priceTextField        = new TextField(service.getPrice().toString());
-        TextField durationTextField     = new TextField(service.getDurationString());
-        TextArea descriptionTextArea    = new TextArea(service.getDescription());
+        Label serviceIdLabel            = new Label(option.getId().toString());
+        TextField nameTextField         = new TextField(option.getName());
+        TextField priceTextField        = new TextField(option.getPrice().toString());
+        TextField durationTextField     = new TextField(option.getDurationString());
+        TextArea descriptionTextArea    = new TextArea(option.getDescription());
 
         infoTable.getColumnConstraints().add(new ColumnConstraints(150));
         infoTable.getColumnConstraints().add(new ColumnConstraints(200));
@@ -102,7 +102,7 @@ public class ServiceInfoDialog extends Main {
 
         deleteButton.setOnAction(event -> {
             //TODO ALERT DELETE
-            Response response = DeleteService.deleteById(token, service.getId());
+            Response response = DeleteService.deleteById(token, option.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminInterface.loadEnterpriseWindow(node);
@@ -111,7 +111,7 @@ public class ServiceInfoDialog extends Main {
         });
 
         saveButton.setOnAction(event -> {
-            Response response = UpdateService.updateInfo(token, service);
+            Response response = UpdateService.updateInfo(token, option);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
             else{messageLabel.setText(response.getMsg());}
         });

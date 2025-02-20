@@ -2,21 +2,21 @@ package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 import org.json.simple.JSONObject;
 
 public class UpdateService extends Connection {
-    public static Response updateInfo(String token, Service service){
+    public static Response updateInfo(String token, Option option){
         try {
-            getConnection("http://localhost:8000/api/admin/option/" + service.getId());
+            getConnection("http://localhost:8000/api/admin/option/" + option.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject out = new JSONObject();
-            out.put("name", service.getName());
-            out.put("price", service.getPrice());
-            out.put("duration", service.getDurationString());
-            out.put("description", service.getDescription());
+            out.put("name", option.getName());
+            out.put("price", option.getPrice());
+            out.put("duration", option.getDurationString());
+            out.put("description", option.getDescription());
 
             sendJson(out);
 

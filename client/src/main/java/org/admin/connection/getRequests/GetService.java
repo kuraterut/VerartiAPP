@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetService extends Connection {
-    public static List<Service> getAll(String token){
+    public static List<Option> getAll(String token){
         try{
             getConnection("http://localhost:8000/api/admin/option/");
             connection.setRequestMethod("GET");
@@ -18,11 +18,11 @@ public class GetService extends Connection {
 
             JSONObject data = getJson();
 
-            List<Service> services = new ArrayList<>();
+            List<Option> options = new ArrayList<>();
             JSONArray servicesArray = (JSONArray) data.get("options");
             for (Object serviceObj : servicesArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
-                Service service = new Service();
+                Option option = new Option();
 
                 Long id = (Long) serviceJSON.get("id");
                 String name = (String) serviceJSON.get("name");
@@ -31,15 +31,15 @@ public class GetService extends Connection {
                 String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
                 LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
 
-                service.setId(id);
-                service.setName(name);
-                service.setDescription(description);
-                service.setPrice(price);
-                service.setDuration(duration);
+                option.setId(id);
+                option.setName(name);
+                option.setDescription(description);
+                option.setPrice(price);
+                option.setDuration(duration);
 
-                services.add(service);
+                options.add(option);
             }
-            return services;
+            return options;
 
         }catch (Exception e){
             System.out.println("class GetService, getAll " + e);
@@ -47,7 +47,7 @@ public class GetService extends Connection {
         }
     }
 
-    public static Service getById(String token, Long id){
+    public static Option getById(String token, Long id){
         try{
             getConnection("http://localhost:8000/api/admin/option/" + id);
             connection.setRequestMethod("GET");
@@ -56,20 +56,20 @@ public class GetService extends Connection {
             JSONObject data = getJson();
 
 
-            Service service = new Service();
+            Option option = new Option();
             String name = (String)data.get("name");
             String description = (String)data.get("description");
             Long price = (Long)data.get("price");
             String[] durationStr = ((String)data.get("duration")).split(":");
             LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
 
-            service.setId(id);
-            service.setName(name);
-            service.setDescription(description);
-            service.setPrice(price);
-            service.setDuration(duration);
+            option.setId(id);
+            option.setName(name);
+            option.setDescription(description);
+            option.setPrice(price);
+            option.setDuration(duration);
 
-            return service;
+            return option;
 
         }
         catch(Exception ex){
@@ -77,7 +77,7 @@ public class GetService extends Connection {
             return null;
         }
     }
-    public static List<Service> getListByMasterId(String token, Long masterId){
+    public static List<Option> getListByMasterId(String token, Long masterId){
         try{
             getConnection("http://localhost:8000/api/admin/option/master/" + masterId);
             connection.setRequestMethod("GET");
@@ -85,11 +85,11 @@ public class GetService extends Connection {
 
             JSONObject data = getJson();
 
-            List<Service> services = new ArrayList<>();
+            List<Option> options = new ArrayList<>();
             JSONArray servicesArray = (JSONArray) data.get("options");
             for (Object serviceObj : servicesArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
-                Service service = new Service();
+                Option option = new Option();
 
                 Long id = (Long) serviceJSON.get("id");
                 String name = (String) serviceJSON.get("name");
@@ -98,15 +98,15 @@ public class GetService extends Connection {
                 String[] durationStr = ((String)data.get("duration")).split(":");
                 LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
 
-                service.setId(id);
-                service.setName(name);
-                service.setDescription(description);
-                service.setPrice(price);
-                service.setDuration(duration);
+                option.setId(id);
+                option.setName(name);
+                option.setDescription(description);
+                option.setPrice(price);
+                option.setDuration(duration);
 
-                services.add(service);
+                options.add(option);
             }
-            return services;
+            return options;
 
         }
         catch(Exception ex){

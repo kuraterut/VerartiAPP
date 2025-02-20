@@ -6,14 +6,14 @@ import java.util.*;
 import java.time.*;
 import java.time.format.*;
 
-public class Service extends Response {
+public class Option extends Response {
 	private Long id;
 	private String name;
 	private String description;
 	private LocalTime duration;
 	private Long price;
 
-	public Boolean equals(Service other){
+	public Boolean equals(Option other){
 		return this.id == other.getId();
 	}
 

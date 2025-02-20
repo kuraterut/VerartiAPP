@@ -21,7 +21,7 @@ import org.admin.sideMenu.SideMenu;
 import org.admin.utils.entities.Admin;
 import org.admin.utils.entities.Client;
 import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class EnterpriseWindow extends Main {
 
         List<Admin> admins = GetAdmin.getAll(token);
         List<Master> masters = GetMaster.getAll(token);
-        List<Service> services = GetService.getAll(token);
+        List<Option> options = GetService.getAll(token);
         List<Client> clients = GetClient.getAll(token);
 
 
@@ -76,7 +76,7 @@ public class EnterpriseWindow extends Main {
         VBox servicesBox = new VBox();
         Label servicesLabel = new Label("Услуги");
         Button addNewServiceButton = new Button("Добавить Услугу");
-        VBox searchingStringsServices = SearchingStringServices.build(services, service-> ServiceInfoDialog.show(service.getId(), root));
+        VBox searchingStringsServices = SearchingStringServices.build(options, service-> ServiceInfoDialog.show(service.getId(), root));
         servicesBox.setAlignment(Pos.CENTER);
         servicesBox.setSpacing(20);
         servicesBox.getChildren().addAll(servicesLabel, addNewServiceButton, searchingStringsServices);

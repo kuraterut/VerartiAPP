@@ -3,7 +3,7 @@ package org.admin.connection.postRequests;
 import org.admin.connection.Connection;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -29,8 +29,8 @@ public class CreateAppointment extends Connection {
             String startTimeStr = startTime.getHour()+":"+startTime.getMinute();
 
             JSONArray servicesJSON = new JSONArray();
-            for(Service service : appointment.getServices()){
-                servicesJSON.add(service.getId());
+            for(Option option : appointment.getServices()){
+                servicesJSON.add(option.getId());
             }
 
             Long clientId = appointment.getClient().getId();

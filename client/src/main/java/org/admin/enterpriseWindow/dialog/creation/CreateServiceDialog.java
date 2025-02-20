@@ -17,7 +17,7 @@ import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.postRequests.CreateService;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.time.LocalTime;
 
@@ -116,14 +116,14 @@ public class CreateServiceDialog extends Main {
 
             String description = descriptionTextArea.getText();
 
-            Service service = new Service();
+            Option option = new Option();
 
-            service.setName(name);
-            service.setPrice(price);
-            service.setDuration(duration);
-            service.setDescription(description);
+            option.setName(name);
+            option.setPrice(price);
+            option.setDuration(duration);
+            option.setDescription(description);
 
-            Response response = CreateService.post(token, service);
+            Response response = CreateService.post(token, option);
             if(response.getCode() == 200) {
                 AdminInterface.loadEnterpriseWindow(node);
                 dialog.close();

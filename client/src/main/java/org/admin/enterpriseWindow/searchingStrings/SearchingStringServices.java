@@ -11,33 +11,33 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class SearchingStringServices extends Main {
-    public static VBox build(List<Service> startList, Consumer<Service> func){
+    public static VBox build(List<Option> startList, Consumer<Option> func){
         VBox root = new VBox();
 
         root.setPrefSize(300, 600);
         root.setMaxSize(300, 600);
         TextField searchTextField = new TextField();
 
-        ObservableList<Service> observableList = FXCollections.observableArrayList(startList);
-        ListView<Service> listView = new ListView<>(observableList);
+        ObservableList<Option> observableList = FXCollections.observableArrayList(startList);
+        ListView<Option> listView = new ListView<>(observableList);
 
-        MultipleSelectionModel<Service> selectionModel = listView.getSelectionModel();
+        MultipleSelectionModel<Option> selectionModel = listView.getSelectionModel();
 
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
                     root.getChildren().remove(listView);
-                    List<Service> filterClients = filter(startList, newValue);
+                    List<Option> filterClients = filter(startList, newValue);
 
-                    ObservableList<Service> filteredListObservable = FXCollections.observableArrayList(filterClients);
+                    ObservableList<Option> filteredListObservable = FXCollections.observableArrayList(filterClients);
                     listView.setItems(filteredListObservable);
                     if (!filterClients.isEmpty() && !newValue.isEmpty()) {
                         root.getChildren().add(listView);
@@ -47,8 +47,8 @@ public class SearchingStringServices extends Main {
         });
 
         // устанавливаем слушатель для отслеживания изменений
-        selectionModel.selectedItemProperty().addListener(new ChangeListener<Service>(){
-            public void changed(ObservableValue<? extends Service> changed, Service oldValue, Service newValue){
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<Option>(){
+            public void changed(ObservableValue<? extends Option> changed, Option oldValue, Option newValue){
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -68,11 +68,11 @@ public class SearchingStringServices extends Main {
         return root;
     }
 
-    private static List<Service> filter(List<Service> services, String start){
-        List<Service> result = new ArrayList<>();
-        for(Service service : services){
-            if(service.getName().startsWith(start)){
-                result.add(service);
+    private static List<Option> filter(List<Option> options, String start){
+        List<Option> result = new ArrayList<>();
+        for(Option option : options){
+            if(option.getName().startsWith(start)){
+                result.add(option);
             }
         }
         return result;
