@@ -40,13 +40,13 @@ type Resource interface {
 	Add(masterId, resourceId int) (int, error)
 }
 
-type Schedule interface {
+type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
-	CreateSchedule(schedule models.MasterScheduleInput) (int, error)
-	GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error)
+	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
+	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 }
 
 type Profile interface {
@@ -71,7 +71,7 @@ type Service struct {
 	Client
 	Feedback
 	Resource
-	Schedule
+	Appointment
 	User
 	Profile
 }
@@ -84,6 +84,6 @@ func NewService(repos *repository.Repository) *Service {
 		Client:        NewClientService(repos),
 		User:          NewUserService(repos),
 		Option:        NewOptionService(repos),
-		Schedule:      NewScheduleService(repos),
+		Appointment:   NewAppointmentService(repos),
 	}
 }

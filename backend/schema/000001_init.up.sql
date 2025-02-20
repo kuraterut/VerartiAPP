@@ -71,7 +71,7 @@ VALUES ('waiting'),   -- ждет подтверждения
        ('completed'), -- завершенный
        ('cancelled'); -- отмененный
 
-CREATE TABLE master_schedule
+CREATE TABLE master_appointment
 (
     id         serial                                       not null unique,
     users_id   int references users (id) on delete cascade  not null,
@@ -81,12 +81,12 @@ CREATE TABLE master_schedule
     date       date                                         not null
 );
 
-CREATE TABLE master_schedule_option
+CREATE TABLE master_appointment_option
 (
     id                 serial                                                not null unique,
     option_id     int references option (id) on delete cascade     not null,
-    master_schedule_id int references master_schedule (id) on delete cascade not null,
-    CONSTRAINT unique_option_master_schedule UNIQUE (option_id, master_schedule_id)
+    master_appointment_id int references master_appointment (id) on delete cascade not null,
+    CONSTRAINT unique_option_master_appointment UNIQUE (option_id, master_appointment_id)
 );
 
 CREATE TABLE admin_shift

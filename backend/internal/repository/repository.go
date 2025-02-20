@@ -40,13 +40,13 @@ type Resource interface {
 	Add(masterId, resourceId int) (int, error)
 }
 
-type Schedule interface {
+type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
-	CreateSchedule(schedule models.MasterScheduleInput) (int, error)
-	GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error)
+	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
+	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 }
 
 type User interface {
@@ -69,7 +69,7 @@ type Repository struct {
 	Client
 	Feedback
 	Resource
-	Schedule
+	Appointment
 	User
 	Profile
 }
@@ -82,6 +82,6 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		Client:        NewClientPostgres(db),
 		User:          NewUserPostgres(db),
 		Option:        NewOptionPostgres(db),
-		Schedule:      NewSchedulePostgres(db),
+		Appointment:   NewAppointmentPostgres(db),
 	}
 }

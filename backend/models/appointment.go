@@ -1,6 +1,6 @@
 package models
 
-type MasterSchedule struct {
+type MasterAppointment struct {
 	Id        int      `json:"id" db:"id"`
 	Client    Client   `json:"client"`
 	Master    Users    `json:"master"`
@@ -10,7 +10,7 @@ type MasterSchedule struct {
 	Date      string   `json:"date"`
 }
 
-type MasterScheduleInput struct {
+type MasterAppointmentInput struct {
 	Id        int    `json:"-"`
 	ClientId  int    `json:"client_id" binding:"required"`
 	MasterId  int    `json:"master_id" binding:"required"`

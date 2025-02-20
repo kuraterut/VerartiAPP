@@ -23,7 +23,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Schedule.PutAdminToDate(input)
+	err = h.services.Appointment.PutAdminToDate(input)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -51,7 +51,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Schedule.PutMasterToDate(input)
+	err = h.services.Appointment.PutMasterToDate(input)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -79,7 +79,7 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 		return
 	}
 
-	admin, err := h.services.Schedule.GetAdminByDate(date)
+	admin, err := h.services.Appointment.GetAdminByDate(date)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -120,7 +120,7 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid 'appointed' parameter")
 	}
 
-	masters, err := h.services.Schedule.GetAllMastersByDate(date, isAppointed)
+	masters, err := h.services.Appointment.GetAllMastersByDate(date, isAppointed)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -137,8 +137,8 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 	})
 }
 
-func (h *Handler) createSchedule(c *gin.Context) {
-	var input models.MasterScheduleInput
+func (h *Handler) createAppointment(c *gin.Context) {
+	var input models.MasterAppointmentInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
@@ -156,7 +156,7 @@ func (h *Handler) createSchedule(c *gin.Context) {
 		return
 	}
 
-	scheduleId, err := h.services.Schedule.CreateSchedule(input)
+	appointmentId, err := h.services.Appointment.CreateAppointment(input)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -169,18 +169,18 @@ func (h *Handler) createSchedule(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"schedule_id": scheduleId,
+		"appointment_id": appointmentId,
 	})
 }
 
-func (h *Handler) getScheduleByClientId(c *gin.Context) {
+func (h *Handler) getAppointmentByClientId(c *gin.Context) {
 	clientId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	schedules, err := h.services.Schedule.GetScheduleByClientId(clientId)
+	appointments, err := h.services.Appointment.GetAppointmentByClientId(clientId)
 	if err != nil {
 		var errResp *internal.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -193,12 +193,12 @@ func (h *Handler) getScheduleByClientId(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"schedules": schedules,
+		"appointments": appointments,
 	})
 }
 
-func (h *Handler) getDailySchedule(c *gin.Context) {}
+func (h *Handler) getDailyAppointment(c *gin.Context) {}
 
-func (h *Handler) getMonthlySchedule(c *gin.Context) {}
+func (h *Handler) getMonthlyAppointment(c *gin.Context) {}
 
 func (h *Handler) cancellationRequest(c *gin.Context) {}

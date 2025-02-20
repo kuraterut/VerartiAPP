@@ -1,6 +1,6 @@
-DROP TABLE master_schedule_option;
+DROP TABLE master_appointment_option;
 
-DROP TABLE master_schedule;
+DROP TABLE master_appointment;
 
 DROP TABLE admin_shift;
 
