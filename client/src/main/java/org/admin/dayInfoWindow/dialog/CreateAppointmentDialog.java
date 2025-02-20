@@ -25,6 +25,9 @@ import java.util.List;
 
 public class CreateAppointmentDialog extends Main {
     public static void show(Master master, LocalDate date, Integer startCell, List<Appointment> appointments){
+        //TODO При создании записи запрашивать номер телефона, если есть,
+        // то создавать готовые Label с инфой о клиенте и подтверждать, если нет
+        // создавать TextField для создания нового клиента
         Appointment appointment = new Appointment();
         appointment.setServices(new ArrayList<>());
 

@@ -26,7 +26,7 @@ public class AddOptionToAppoinmentDialog extends Main {
         VBox searchingStringBox = SearchingStringOptions.build(options, service->{
             if(service != null){
                 appointment.addService(service);
-                tableBox.getChildren().removeAll();
+                tableBox.getChildren().clear();
                 tableBox.getChildren().add(CreateAppointmentDialog.buildTableServices(appointment.getServices()));
                 dialog.close();
             }

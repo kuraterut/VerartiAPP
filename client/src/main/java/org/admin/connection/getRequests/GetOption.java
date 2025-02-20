@@ -95,7 +95,7 @@ public class GetOption extends Connection {
                 String name = (String) serviceJSON.get("name");
                 String description = (String) serviceJSON.get("description");
                 Long price = (Long) serviceJSON.get("price");
-                String[] durationStr = ((String)data.get("duration")).split(":");
+                String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
                 LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
 
                 option.setId(id);
