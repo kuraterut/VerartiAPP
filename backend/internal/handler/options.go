@@ -80,6 +80,30 @@ func (h *Handler) getOptionById(c *gin.Context) {
 	c.JSON(http.StatusOK, option)
 }
 
+func (h *Handler) getOptionsByMasterId(c *gin.Context) {
+	masterId, err := strconv.Atoi(c.Query("master_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is query, master_id is required")
+		return
+	}
+
+	options, err := h.services.Option.GetOptionsByMasterId(masterId)
+	if err != nil {
+		var errResp *internal.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"options": options,
+	})
+}
+
 func (h *Handler) addOptionForMaster(c *gin.Context) {
 	var input models.MasterIdInput
 	if err := c.BindJSON(&input); err != nil {

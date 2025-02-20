@@ -127,6 +127,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				option.POST("/", h.createOption)
 				option.POST("/:id", h.addOptionForMaster)
 				option.GET("/", h.getAllOptions)
+				option.GET("/master", h.getOptionsByMasterId)
 				option.GET("/:id", h.getOptionById)
 				option.PUT("/:id", h.updateOption)
 				option.DELETE("/:id", h.deleteOption)

@@ -39,13 +39,30 @@ func (r *OptionPostgres) GetAllOptions() ([]models.Option, error) {
 	return options, err
 }
 
+func (r *OptionPostgres) GetOptionsByMasterId(masterId int) ([]models.Option, error) {
+	var options []models.Option
+	query := fmt.Sprintf("SELECT op.id, op.name, op.description, op.duration, op.price "+
+		" FROM %s op INNER JOIN %s us_op on op.id = us_op.option_id"+
+		" WHERE us_op.users_id = $1", database.OptionTable, database.UsersOptionTable)
+	err := r.db.Select(&options, query, masterId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return options, err
+}
+
 func (r *OptionPostgres) GetOptionById(optionId int) (models.Option, error) {
 	var option models.Option
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", database.OptionTable)
 	err := r.db.Get(&option, query, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Option{}, internal.NewErrorResponse(404, "option not found")
+			return models.Option{}, nil
 		}
 
 		return models.Option{}, err

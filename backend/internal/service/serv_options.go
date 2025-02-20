@@ -21,6 +21,10 @@ func (s *OptionService) GetAllOptions() ([]models.Option, error) {
 	return s.repo.GetAllOptions()
 }
 
+func (s *OptionService) GetOptionsByMasterId(masterId int) ([]models.Option, error) {
+	return s.repo.GetOptionsByMasterId(masterId)
+}
+
 func (s *OptionService) GetOptionById(optionId int) (models.Option, error) {
 	return s.repo.GetOptionById(optionId)
 }
