@@ -11,15 +11,15 @@ import (
 	"verarti/pkg/database"
 )
 
-type SchedulePostgres struct {
+type AppointmentPostgres struct {
 	db *sqlx.DB
 }
 
-func NewSchedulePostgres(db *sqlx.DB) *SchedulePostgres {
-	return &SchedulePostgres{db: db}
+func NewAppointmentPostgres(db *sqlx.DB) *AppointmentPostgres {
+	return &AppointmentPostgres{db: db}
 }
 
-func (r *SchedulePostgres) PutAdminToDate(adminShift models.AdminShift) error {
+func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error {
 	var id int
 
 	queryGetAdmin := fmt.Sprintf(`
@@ -49,7 +49,7 @@ func (r *SchedulePostgres) PutAdminToDate(adminShift models.AdminShift) error {
 	return nil
 }
 
-func (r *SchedulePostgres) PutMasterToDate(masterShift models.MasterShift) error {
+func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) error {
 	var id int
 
 	queryGetMaster := fmt.Sprintf(`
@@ -79,7 +79,7 @@ func (r *SchedulePostgres) PutMasterToDate(masterShift models.MasterShift) error
 	return nil
 }
 
-func (r *SchedulePostgres) GetAdminByDate(date string) (models.Users, error) {
+func (r *AppointmentPostgres) GetAdminByDate(date string) (models.Users, error) {
 	var admins []models.Users
 
 	queryGetAdmin := fmt.Sprintf(`
@@ -121,7 +121,7 @@ func (r *SchedulePostgres) GetAdminByDate(date string) (models.Users, error) {
 	return admins[0], nil
 }
 
-func (r *SchedulePostgres) GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error) {
+func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error) {
 	var masters []models.Users
 
 	queryGetMasters := ""
@@ -187,7 +187,7 @@ func (r *SchedulePostgres) GetAllMastersByDate(date string, isAppointed bool) ([
 	return masters, nil
 }
 
-func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (int, error) {
+func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppointmentInput) (int, error) {
 	var id int
 
 	queryGetMaster := fmt.Sprintf(`
@@ -198,7 +198,7 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
 			WHERE us_rl.users_id = us.id AND rl.name = 'master'
 		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
-	err := r.db.Get(&id, queryGetMaster, schedule.MasterId)
+	err := r.db.Get(&id, queryGetMaster, appointment.MasterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return 0, internal.NewErrorResponse(404, "master with this id was not found")
@@ -208,7 +208,7 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 	}
 
 	queryGetClient := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.ClientTable)
-	err = r.db.Get(&id, queryGetClient, schedule.ClientId)
+	err = r.db.Get(&id, queryGetClient, appointment.ClientId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return 0, internal.NewErrorResponse(404, "client with this id was not found")
@@ -223,15 +223,15 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 	}
 	defer tx.Rollback()
 
-	var scheduleId int
+	var appointmentId int
 	query := fmt.Sprintf("INSERT INTO %s (users_id, client_id, start_time, date)"+
-		"VALUES ($1, $2, $3, $4) RETURNING id", database.MasterScheduleTable)
-	row := tx.QueryRow(query, schedule.MasterId, schedule.ClientId, schedule.StartTime, schedule.Date)
-	if err := row.Scan(&scheduleId); err != nil {
+		"VALUES ($1, $2, $3, $4) RETURNING id", database.MasterAppointmentTable)
+	row := tx.QueryRow(query, appointment.MasterId, appointment.ClientId, appointment.StartTime, appointment.Date)
+	if err := row.Scan(&appointmentId); err != nil {
 		return 0, err
 	}
 
-	for _, optionId := range schedule.OptionIds {
+	for _, optionId := range appointment.OptionIds {
 		queryGetOption := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.OptionTable)
 		err = r.db.Get(&id, queryGetOption, optionId)
 		if err != nil {
@@ -243,7 +243,7 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 		}
 
 		queryGetOptionAndMaster := fmt.Sprintf(`SELECT id FROM %s WHERE users_id = $1 AND option_id = $2`, database.UsersOptionTable)
-		err = r.db.Get(&id, queryGetOptionAndMaster, schedule.MasterId, optionId)
+		err = r.db.Get(&id, queryGetOptionAndMaster, appointment.MasterId, optionId)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return 0, internal.NewErrorResponse(404, fmt.Sprintf("the master does not provide a option with this id: %d", optionId))
@@ -252,22 +252,22 @@ func (r *SchedulePostgres) CreateSchedule(schedule models.MasterScheduleInput) (
 			return 0, err
 		}
 
-		query := fmt.Sprintf("INSERT INTO %s (option_id, master_schedule_id)"+
-			"VALUES ($1, $2) RETURNING id", database.MasterScheduleOptionTable)
-		row := tx.QueryRow(query, optionId, scheduleId)
+		query := fmt.Sprintf("INSERT INTO %s (option_id, master_appointment_id)"+
+			"VALUES ($1, $2) RETURNING id", database.MasterAppointmentOptionTable)
+		row := tx.QueryRow(query, optionId, appointmentId)
 		if err := row.Scan(&id); err != nil {
 			return 0, err
 		}
 	}
 
-	return scheduleId, tx.Commit()
+	return appointmentId, tx.Commit()
 }
 
-func (r *SchedulePostgres) GetScheduleByClientId(clientId int) ([]models.MasterSchedule, error) {
+func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error) {
 	//var (
 	//	id        int
-	//	schedules []models.MasterSchedule
-	//	schedule  models.MasterScheduleInput
+	//	appointments []models.MasterAppointment
+	//	appointment  models.MasterAppointmentInput
 	//	master    models.Users
 	//	client    models.Client
 	//)
@@ -297,7 +297,7 @@ func (r *SchedulePostgres) GetScheduleByClientId(clientId int) ([]models.MasterS
 	//rows, err := r.db.Query(query, clientId)
 	//if err != nil {
 	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, internal.NewErrorResponse(404, "no schedules found for this client")
+	//		return nil, internal.NewErrorResponse(404, "no appointments found for this client")
 	//	}
 	//
 	//	return nil, err
