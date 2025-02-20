@@ -3,7 +3,7 @@ package org.admin.connection.putRequests;
 import org.admin.connection.Connection;
 import org.admin.utils.entities.Master;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,8 +21,8 @@ public class UpdateMaster extends Connection {
             out.put("phone", master.getPhone());
             out.put("bio", master.getBio());
             JSONArray servicesArray = new JSONArray();
-            for(Service service: master.getServices()){
-                servicesArray.add(service.getId());
+            for(Option option : master.getServices()){
+                servicesArray.add(option.getId());
             }
             out.put("options", servicesArray);
             sendJson(out);

@@ -16,7 +16,7 @@ import org.admin.dayInfoWindow.dialog.CreateAppointmentDialog;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
 import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -87,10 +87,10 @@ public class DayInfoTable extends Main {
             for(Appointment appointment: appointments){
                 Long id = appointment.getId();
                 Client client = appointment.getClient();
-                List<Service> services = appointment.getServices();
-                Service firstService = services.get(0);
+                List<Option> options = appointment.getServices();
+                Option firstOption = options.get(0);
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
-                Integer cellNumber = calculateCellNumber(services);
+                Integer cellNumber = calculateCellNumber(options);
 
                 Rectangle rectStart = new Rectangle(150, 100, Color.AQUAMARINE);
                 rectStart.setOnMouseClicked(event -> AppointmentInfoDialog.show(id));
@@ -103,11 +103,11 @@ public class DayInfoTable extends Main {
                 Label clientLbl = new Label(client.getFio());
                 Label serviceLbl = new Label();
 
-                if(services.size() == 1){
-                    serviceLbl.setText(firstService.getName());
+                if(options.size() == 1){
+                    serviceLbl.setText(firstOption.getName());
                 }
                 else{
-                    serviceLbl.setText(firstService.getName()+"...");
+                    serviceLbl.setText(firstOption.getName()+"...");
                 }
 
                 table.add(appointmentHeadLbl, countColumn, cellStart);
@@ -158,11 +158,11 @@ public class DayInfoTable extends Main {
         int ans = (hour-8)*2 + 1 + ((minute == 30)?1:0);
         return ans;
     }
-    public static Integer calculateCellNumber(List<Service> services){
+    public static Integer calculateCellNumber(List<Option> options){
         int totalCount = 0;
-        for(Service service : services){
-            totalCount += service.getDuration().getHour()*2;
-            totalCount += service.getDuration().getMinute()==30?1:0;
+        for(Option option : options){
+            totalCount += option.getDuration().getHour()*2;
+            totalCount += option.getDuration().getMinute()==30?1:0;
         }
 
         return totalCount;

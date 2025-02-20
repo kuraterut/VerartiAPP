@@ -16,7 +16,7 @@ import org.admin.dayInfoWindow.tables.DayInfoTable;
 import org.admin.utils.*;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -38,7 +38,7 @@ public class CreateAppointmentDialog extends Main {
 
         LocalTime startTime = DayInfoTable.startCellToStartTime(startCell);
 
-        List<Service> services = GetService.getListByMasterId(token, master.getId());
+        List<Option> options = GetService.getListByMasterId(token, master.getId());
 
         Label masterFioLabel = new Label(master.getFio());
         Label dateLabel = new Label(HelpFuncs.localDateToString(date, "dd.MM.yyyy"));
@@ -61,7 +61,7 @@ public class CreateAppointmentDialog extends Main {
         Button createAppointmentButton = new Button("Создать");
 
         cancelButton.setOnAction(event -> dialog.close());
-        addServiceButton.setOnAction(event -> AddServiceToAppoinmentDialog.show(tableBox, appointment, services));
+        addServiceButton.setOnAction(event -> AddServiceToAppoinmentDialog.show(tableBox, appointment, options));
 
         buttonsBox.getChildren().addAll(cancelButton, addServiceButton, createAppointmentButton);
         root.getChildren().addAll(masterFioLabel, dateLabel, startTimeLabel, tableBox, buttonsBox);
@@ -72,7 +72,7 @@ public class CreateAppointmentDialog extends Main {
 
     }
 
-    public static ScrollPane buildTableServices(List<Service> services){
+    public static ScrollPane buildTableServices(List<Option> options){
         //TODO Кнопка удаления услуги из таблицы
         ScrollPane scrollPane = new ScrollPane();
         GridPane table = new GridPane();
@@ -103,10 +103,10 @@ public class CreateAppointmentDialog extends Main {
         GridPane.setValignment(serviceCountTableHeadLabel, VPos.CENTER);
 
         int rowNum = 1;
-        for (Service service : services) {
-            Long seriveId = service.getId();
-            String seriveName = service.getName();
-            Long serivePrice = service.getPrice();
+        for (Option option : options) {
+            Long seriveId = option.getId();
+            String seriveName = option.getName();
+            Long serivePrice = option.getPrice();
             Integer serviceCount = 1;
 
             Label serviceIdLabel = new Label(seriveId.toString());

@@ -19,7 +19,7 @@ import org.admin.connection.putRequests.UpdateClient;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +62,8 @@ public class ClientInfoDialog extends Main {
             Label appointmentDateTimeLbl = new Label(appointment.getDateTimeStr());
 
             VBox appointmentServicesVBox = new VBox();
-            for(Service service: appointment.getServices()){
-                Label serviceNameLbl = new Label(service.getName());
+            for(Option option : appointment.getServices()){
+                Label serviceNameLbl = new Label(option.getName());
                 appointmentServicesVBox.getChildren().add(serviceNameLbl);
             }
             appointmentServicesVBox.setAlignment(Pos.CENTER);

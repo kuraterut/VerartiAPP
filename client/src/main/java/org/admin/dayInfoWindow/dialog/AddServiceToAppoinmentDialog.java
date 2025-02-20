@@ -10,12 +10,12 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
 import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.util.List;
 
 public class AddServiceToAppoinmentDialog extends Main {
-    public static void show(VBox tableBox, Appointment appointment, List<Service> services){
+    public static void show(VBox tableBox, Appointment appointment, List<Option> options){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Добавить услугу");
@@ -23,7 +23,7 @@ public class AddServiceToAppoinmentDialog extends Main {
         VBox root = new VBox();
 
         Label headerLabel = new Label("Добавьте услугу");
-        VBox searchingStringBox = SearchingStringServices.build(services, service->{
+        VBox searchingStringBox = SearchingStringServices.build(options, service->{
             if(service != null){
                 appointment.addService(service);
                 tableBox.getChildren().removeAll();

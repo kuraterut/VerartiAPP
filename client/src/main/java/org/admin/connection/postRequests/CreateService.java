@@ -2,11 +2,11 @@ package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 import org.json.simple.JSONObject;
 
 public class CreateService extends Connection {
-    public static Response post(String token, Service service){
+    public static Response post(String token, Option option){
         try{
             getConnection("http://localhost:8000/api/admin/option/");
             connection.setRequestMethod("POST");
@@ -14,10 +14,10 @@ public class CreateService extends Connection {
             connection.setDoOutput(true);
 
 
-            String name = service.getName();
-            Long price = service.getPrice();
-            String duration = service.getDurationString();
-            String description = service.getDescription();
+            String name = option.getName();
+            Long price = option.getPrice();
+            String duration = option.getDurationString();
+            String description = option.getDescription();
 
 
             JSONObject outJson = new JSONObject();

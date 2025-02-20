@@ -18,7 +18,7 @@ import org.admin.connection.getRequests.GetAppointment;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
 import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +33,7 @@ public class AppointmentInfoDialog extends Main {
         Appointment appointment = GetAppointment.getById(token, appointmentId);
         Master master = appointment.getMaster();
         Client client = appointment.getClient();
-        List<Service> services = appointment.getServices();
+        List<Option> options = appointment.getServices();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -63,11 +63,11 @@ public class AppointmentInfoDialog extends Main {
         servicesTable.add(priceHeadTable, 2, 0);
 
         int numServiceRow = 0;
-        for(Service service: services){
+        for(Option option : options){
             numServiceRow++;
-            Label serviceLbl = new Label(service.getName());
-            Label durationLbl = new Label(service.getDurationString());
-            Label priceLbl = new Label(Double.toString(service.getPrice()));
+            Label serviceLbl = new Label(option.getName());
+            Label durationLbl = new Label(option.getDurationString());
+            Label priceLbl = new Label(Double.toString(option.getPrice()));
             servicesTable.add(serviceLbl, 0, numServiceRow);
             servicesTable.add(durationLbl, 1, numServiceRow);
             servicesTable.add(priceLbl, 2, numServiceRow);

@@ -4,7 +4,7 @@ import org.admin.connection.Connection;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
 import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -81,7 +81,7 @@ public class GetAppointment extends Connection {
 
             Appointment appointment = new Appointment();
 
-            List<Service> services = new ArrayList<>();
+            List<Option> options = new ArrayList<>();
 
             Long masterId 			= (Long)data.get("master_id");
             Long clientId 			= (Long)data.get("client_id");
@@ -94,8 +94,8 @@ public class GetAppointment extends Connection {
             JSONArray servicesArr = (JSONArray)data.get("options");
             for(Object serviceObj: servicesArr){
                 Long serviceId = (Long)serviceObj;
-                Service service = GetService.getById(token, serviceId);
-                services.add(service);
+                Option option = GetService.getById(token, serviceId);
+                options.add(option);
             }
 
             Master master = GetMaster.getById(token, masterId);
@@ -106,7 +106,7 @@ public class GetAppointment extends Connection {
             appointment.setClient(client);
             appointment.setMaster(master);
             appointment.setDate(date);
-            appointment.setServices(services);
+            appointment.setServices(options);
             appointment.setComment(comment);
 
             return appointment;

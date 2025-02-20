@@ -20,7 +20,7 @@ import org.admin.connection.putRequests.UpdateMaster;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
 import org.admin.utils.entities.Master;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Service;
+import org.admin.utils.entities.Option;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,15 +129,15 @@ public class MasterInfoDialog extends Main {
         });
 
         addServiceButton.setOnAction(event -> {
-            List<Service> allServices = GetService.getAll(token);
-            List<Service> masterServices = GetService.getListByMasterId(token, master.getId());
-            List<Service> notMasterServices = new ArrayList<>();
-            for(Service service : allServices){
-                if(!masterServices.contains(service)){
-                    notMasterServices.add(service);
+            List<Option> allOptions = GetService.getAll(token);
+            List<Option> masterOptions = GetService.getListByMasterId(token, master.getId());
+            List<Option> notMasterOptions = new ArrayList<>();
+            for(Option option : allOptions){
+                if(!masterOptions.contains(option)){
+                    notMasterOptions.add(option);
                 }
             }
-            showChooseServiceDialog(notMasterServices, master, servicesBox);
+            showChooseServiceDialog(notMasterOptions, master, servicesBox);
         });
 
         saveButton.setOnAction(event -> {
@@ -152,7 +152,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<Service> services, Master master, VBox servicesBox) {
+    private static void showChooseServiceDialog(List<Option> options, Master master, VBox servicesBox) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -163,7 +163,7 @@ public class MasterInfoDialog extends Main {
         Label headerLabel = new Label("Выберите услугу");
         Button cancelButton = new Button("Отмена");
 
-        VBox searchingStringServices = SearchingStringServices.build(services, service->{
+        VBox searchingStringServices = SearchingStringServices.build(options, service->{
             master.addService(service);
             Response response = AddServiceToMaster.post(token, master.getId(), service.getId());
             if(response.getCode() == 200){
@@ -209,15 +209,15 @@ public class MasterInfoDialog extends Main {
         GridPane.setValignment(servicesTableHeaders[3], VPos.CENTER);
 
         int index = 1;
-        for(Service service: master.getServices()){
-            Label serviceIdLabel = new Label(service.getId().toString());
-            Label serviceNameLabel = new Label(service.getName());
-            Label servicePriceLabel = new Label(service.getPrice().toString());
-            Label serviceDurationLabel = new Label(service.getDurationString());
+        for(Option option : master.getServices()){
+            Label serviceIdLabel = new Label(option.getId().toString());
+            Label serviceNameLabel = new Label(option.getName());
+            Label servicePriceLabel = new Label(option.getPrice().toString());
+            Label serviceDurationLabel = new Label(option.getDurationString());
             Button deleteService = new Button("Удалить");
 
             deleteService.setOnAction(event -> {
-                DeleteService.deleteByMasterId(token, service.getId(), master.getId());
+                DeleteService.deleteByMasterId(token, option.getId(), master.getId());
                 tableVBox.getChildren().clear();
                 Label servicesHeadLabel = new Label("Услуги: ");
                 tableVBox.getChildren().addAll(servicesHeadLabel, buildServiceTable(master, tableVBox));
