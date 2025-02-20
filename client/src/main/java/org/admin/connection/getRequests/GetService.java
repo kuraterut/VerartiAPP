@@ -12,14 +12,14 @@ import java.util.List;
 public class GetService extends Connection {
     public static List<Service> getAll(String token){
         try{
-            getConnection("http://localhost:8000/api/admin/appointment/");
+            getConnection("http://localhost:8000/api/admin/option/");
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
 
             List<Service> services = new ArrayList<>();
-            JSONArray servicesArray = (JSONArray) data.get("appointments");
+            JSONArray servicesArray = (JSONArray) data.get("options");
             for (Object serviceObj : servicesArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
                 Service service = new Service();
@@ -49,7 +49,7 @@ public class GetService extends Connection {
 
     public static Service getById(String token, Long id){
         try{
-            getConnection("http://localhost:8000/api/admin/appointment/" + id);
+            getConnection("http://localhost:8000/api/admin/option/" + id);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -79,14 +79,14 @@ public class GetService extends Connection {
     }
     public static List<Service> getListByMasterId(String token, Long masterId){
         try{
-            getConnection("http://localhost:8000/api/admin/appointment/master/" + masterId);
+            getConnection("http://localhost:8000/api/admin/option/master/" + masterId);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
 
             List<Service> services = new ArrayList<>();
-            JSONArray servicesArray = (JSONArray) data.get("appointments");
+            JSONArray servicesArray = (JSONArray) data.get("options");
             for (Object serviceObj : servicesArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
                 Service service = new Service();

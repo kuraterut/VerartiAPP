@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 public class AddServiceToMaster extends Connection {
     public static Response post(String token, Long masterId, Long service_id){
         try {
-            getConnection("http://localhost:8000/api/admin/appointment/"+service_id);
+            getConnection("http://localhost:8000/api/admin/option/"+service_id);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);

@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 public class UpdateService extends Connection {
     public static Response updateInfo(String token, Service service){
         try {
-            getConnection("http://localhost:8000/api/admin/appointment/" + service.getId());
+            getConnection("http://localhost:8000/api/admin/option/" + service.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

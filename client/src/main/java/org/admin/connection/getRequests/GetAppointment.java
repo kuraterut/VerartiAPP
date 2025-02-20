@@ -16,7 +16,7 @@ import java.util.List;
 public class GetAppointment extends Connection {
     public static List<Appointment> getListByClientId(String token, Long clientId){
         try{
-            getConnection("http://localhost:8000/api/admin/shedule/clients/" + clientId);
+            getConnection("http://localhost:8000/api/admin/appointment/clients/" + clientId);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -24,12 +24,14 @@ public class GetAppointment extends Connection {
 
             JSONObject data = getJson();
 
-            JSONArray jsonArr = (JSONArray)data.get("shedules");
+            JSONArray jsonArr = (JSONArray)data.get("appointments");
             for(Object elem : jsonArr){
                 JSONObject obj = (JSONObject)elem;
 
                 Long appointmentId = (Long)obj.get("id");
                 Appointment appointment = getById(token, appointmentId);
+                //TODO Решить комментарии
+
                 // String appointmentStatus = (String)obj.get("status");
                 // String[] appointmentStartTimeStr = ((String)obj.get("start_time")).split(":");
                 // LocalTime appointmentStartTime 	= LocalTime.of(Integer.valueOf(startTimeStr[0]), Integer.valueOf(startTimeStr[1]));
@@ -89,7 +91,7 @@ public class GetAppointment extends Connection {
             String[] dateStr = ((String)data.get("date")).split("-");
             LocalDate date = LocalDate.of(Integer.valueOf(dateStr[0]), Integer.valueOf(dateStr[1]), Integer.valueOf(dateStr[2]));
 
-            JSONArray servicesArr = (JSONArray)data.get("services");
+            JSONArray servicesArr = (JSONArray)data.get("options");
             for(Object serviceObj: servicesArr){
                 Long serviceId = (Long)serviceObj;
                 Service service = GetService.getById(token, serviceId);

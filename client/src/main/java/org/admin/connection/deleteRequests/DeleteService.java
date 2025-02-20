@@ -7,7 +7,7 @@ import org.json.simple.JSONObject;
 public class DeleteService extends Connection {
     public static Response deleteByMasterId(String token, Long service_id, Long master_id) {
         try {
-            getConnection("http://localhost:8000/api/admin/appointment/");
+            getConnection("http://localhost:8000/api/admin/option/");
             connection.setRequestMethod("DELETE");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -30,7 +30,7 @@ public class DeleteService extends Connection {
 
     public static Response deleteById(String token, Long id){
         try {
-            getConnection("http://localhost:8000/api/admin/appointment/" + id);
+            getConnection("http://localhost:8000/api/admin/option/" + id);
             connection.setRequestMethod("DELETE");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
