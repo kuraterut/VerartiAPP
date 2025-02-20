@@ -6,16 +6,15 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.Main;
+import org.admin.connection.getRequests.GetService;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringServices;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
 import org.admin.utils.*;
@@ -26,9 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateAppointmentDialog extends Main {
-    private static Integer rowNum = 1;
+
 
     public static void show(MasterInfo master, LocalDate date, Integer startCell, List<Appointment> appointments){
+        Appointment appointment = new Appointment();
+        appointment.setServices(new ArrayList<>());
+
+
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Создать запись");
@@ -38,15 +41,50 @@ public class CreateAppointmentDialog extends Main {
 
         LocalTime startTime = DayInfoTable.startCellToStartTime(startCell);
 
-        List<ServiceInfo> services = master.getServices();
-        if(services == null){services = new ArrayList<>();}
+        List<ServiceInfo> services = GetService.getListByMasterId(token, master.getId());
 
         Label masterFioLabel = new Label(master.getFio());
         Label dateLabel = new Label(HelpFuncs.localDateToString(date, "dd.MM.yyyy"));
         Label startTimeLabel = new Label(startTime.toString());
 
 
+
+        ScrollPane table = buildTableServices(appointment.getServices());
+
+        VBox tableBox = new VBox();
+        tableBox.setAlignment(Pos.CENTER);
+        tableBox.getChildren().add(table);
+
+        HBox buttonsBox = new HBox();
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.setSpacing(50);
+
+        Button cancelButton = new Button("Отмена");
+        Button addServiceButton = new Button("Добавить услугу");
+        Button createAppointmentButton = new Button("Создать");
+
+        cancelButton.setOnAction(event -> dialog.close());
+        addServiceButton.setOnAction(event -> AddServiceToAppoinmentDialog.show(tableBox, appointment, services));
+
+        buttonsBox.getChildren().addAll(cancelButton, addServiceButton, createAppointmentButton);
+        root.getChildren().addAll(masterFioLabel, dateLabel, startTimeLabel, tableBox, buttonsBox);
+
+        Scene dialogScene = new Scene(root, 1200, 600);
+        dialog.setScene(dialogScene);
+        dialog.showAndWait();
+
+    }
+
+    public static ScrollPane buildTableServices(List<ServiceInfo> services){
+        //TODO Кнопка удаления услуги из таблицы
+        ScrollPane scrollPane = new ScrollPane();
         GridPane table = new GridPane();
+        scrollPane.setContent(table);
+        table.setGridLinesVisible(true);
+        scrollPane.setPrefViewportHeight(300);
+        scrollPane.setPrefViewportWidth(600);
+        table.setAlignment(Pos.CENTER);
+
         Label serviceIdTableHeadLabel = new Label("ID Услуги");
         Label serviceNameTableHeadLabel = new Label("Наименование услуги");
         Label servicePriceTableHeadLabel = new Label("Стоимость");
@@ -65,43 +103,34 @@ public class CreateAppointmentDialog extends Main {
         GridPane.setHalignment(serviceCountTableHeadLabel, HPos.CENTER);
         GridPane.setValignment(serviceCountTableHeadLabel, VPos.CENTER);
 
-        VBox searchBox = SearchingStringServices.build(services, serviceInfo -> {
-            if(serviceInfo != null){
-                Long seriveId = serviceInfo.getId();
-                String seriveName = serviceInfo.getName();
-                Long serivePrice = serviceInfo.getPrice();
-                Integer serviceCount = 1;
+        int rowNum = 1;
+        for (ServiceInfo serviceInfo : services) {
+            Long seriveId = serviceInfo.getId();
+            String seriveName = serviceInfo.getName();
+            Long serivePrice = serviceInfo.getPrice();
+            Integer serviceCount = 1;
 
-                Label serviceIdLabel = new Label(seriveId.toString());
-                Label serviceNameLabel = new Label(seriveName);
-                Label servicePriceLabel = new Label(serivePrice.toString());
-                Label serviceCountLabel = new Label(serviceCount.toString());
+            Label serviceIdLabel = new Label(seriveId.toString());
+            Label serviceNameLabel = new Label(seriveName);
+            Label servicePriceLabel = new Label(serivePrice.toString());
+            Label serviceCountLabel = new Label(serviceCount.toString());
 
-                table.addRow(rowNum,
-                        serviceIdLabel,
-                        serviceNameLabel,
-                        servicePriceLabel,
-                        serviceCountLabel);
+            table.addRow(rowNum,
+                    serviceIdLabel,
+                    serviceNameLabel,
+                    servicePriceLabel,
+                    serviceCountLabel);
 
-                GridPane.setHalignment(serviceIdLabel, HPos.CENTER);
-                GridPane.setValignment(serviceIdLabel, VPos.CENTER);
-                GridPane.setHalignment(serviceNameLabel, HPos.CENTER);
-                GridPane.setValignment(serviceNameLabel, VPos.CENTER);
-                GridPane.setHalignment(servicePriceLabel, HPos.CENTER);
-                GridPane.setValignment(servicePriceLabel, VPos.CENTER);
-                GridPane.setHalignment(serviceCountLabel, HPos.CENTER);
-                GridPane.setValignment(serviceCountLabel, VPos.CENTER);
-                rowNum++;
-            }
-        });
-        table.setAlignment(Pos.CENTER);
-        table.setGridLinesVisible(true);
-
-
-        root.getChildren().addAll(masterFioLabel, dateLabel, startTimeLabel, searchBox, table);
-
-        Scene dialogScene = new Scene(root, 700, 600);
-        dialog.setScene(dialogScene);
-        dialog.showAndWait();
+            GridPane.setHalignment(serviceIdLabel, HPos.CENTER);
+            GridPane.setValignment(serviceIdLabel, VPos.CENTER);
+            GridPane.setHalignment(serviceNameLabel, HPos.CENTER);
+            GridPane.setValignment(serviceNameLabel, VPos.CENTER);
+            GridPane.setHalignment(servicePriceLabel, HPos.CENTER);
+            GridPane.setValignment(servicePriceLabel, VPos.CENTER);
+            GridPane.setHalignment(serviceCountLabel, HPos.CENTER);
+            GridPane.setValignment(serviceCountLabel, VPos.CENTER);
+            rowNum++;
+        }
+        return scrollPane;
     }
 }
