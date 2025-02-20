@@ -94,7 +94,7 @@ public class GetAppointment extends Connection {
             JSONArray servicesArr = (JSONArray)data.get("options");
             for(Object serviceObj: servicesArr){
                 Long serviceId = (Long)serviceObj;
-                Option option = GetService.getById(token, serviceId);
+                Option option = GetOption.getById(token, serviceId);
                 options.add(option);
             }
 

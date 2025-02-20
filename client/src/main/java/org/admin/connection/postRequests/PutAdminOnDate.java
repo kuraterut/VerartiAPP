@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class PutAdminOnDate extends Connection {
     public static Response post(String token, Long adminId, LocalDate date){
         try{
-            getConnection("http://localhost:8000/api/admin/schedule/admin");
+            getConnection("http://localhost:8000/api/admin/appointment/admin");
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);

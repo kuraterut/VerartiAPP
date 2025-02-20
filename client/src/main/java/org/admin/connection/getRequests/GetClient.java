@@ -51,7 +51,7 @@ public class GetClient extends Connection {
         }
         catch(Exception ex){
             System.out.println(ex);
-            return null;
+            return new ArrayList<>();
         }
     }
 

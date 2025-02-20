@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.getRequests.GetService;
+import org.admin.connection.getRequests.GetOption;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
 import org.admin.utils.*;
 import org.admin.utils.entities.Appointment;
@@ -38,7 +38,7 @@ public class CreateAppointmentDialog extends Main {
 
         LocalTime startTime = DayInfoTable.startCellToStartTime(startCell);
 
-        List<Option> options = GetService.getListByMasterId(token, master.getId());
+        List<Option> options = GetOption.getListByMasterId(token, master.getId());
 
         Label masterFioLabel = new Label(master.getFio());
         Label dateLabel = new Label(HelpFuncs.localDateToString(date, "dd.MM.yyyy"));
@@ -61,7 +61,7 @@ public class CreateAppointmentDialog extends Main {
         Button createAppointmentButton = new Button("Создать");
 
         cancelButton.setOnAction(event -> dialog.close());
-        addServiceButton.setOnAction(event -> AddServiceToAppoinmentDialog.show(tableBox, appointment, options));
+        addServiceButton.setOnAction(event -> AddOptionToAppoinmentDialog.show(tableBox, appointment, options));
 
         buttonsBox.getChildren().addAll(cancelButton, addServiceButton, createAppointmentButton);
         root.getChildren().addAll(masterFioLabel, dateLabel, startTimeLabel, tableBox, buttonsBox);

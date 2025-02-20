@@ -5,7 +5,7 @@ import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 import org.json.simple.JSONObject;
 
-public class UpdateService extends Connection {
+public class UpdateOption extends Connection {
     public static Response updateInfo(String token, Option option){
         try {
             getConnection("http://localhost:8000/api/admin/option/" + option.getId());

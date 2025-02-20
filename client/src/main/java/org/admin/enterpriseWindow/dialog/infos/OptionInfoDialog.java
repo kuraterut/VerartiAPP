@@ -14,15 +14,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.deleteRequests.DeleteService;
-import org.admin.connection.getRequests.GetService;
-import org.admin.connection.putRequests.UpdateService;
+import org.admin.connection.deleteRequests.DeleteOption;
+import org.admin.connection.getRequests.GetOption;
+import org.admin.connection.putRequests.UpdateOption;
 import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 
-public class ServiceInfoDialog extends Main {
+public class OptionInfoDialog extends Main {
     public static void show(Long id, Node node){
-        Option option = GetService.getById(token, id);
+        Option option = GetOption.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -102,7 +102,7 @@ public class ServiceInfoDialog extends Main {
 
         deleteButton.setOnAction(event -> {
             //TODO ALERT DELETE
-            Response response = DeleteService.deleteById(token, option.getId());
+            Response response = DeleteOption.deleteById(token, option.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminInterface.loadEnterpriseWindow(node);
@@ -111,7 +111,7 @@ public class ServiceInfoDialog extends Main {
         });
 
         saveButton.setOnAction(event -> {
-            Response response = UpdateService.updateInfo(token, option);
+            Response response = UpdateOption.updateInfo(token, option);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
             else{messageLabel.setText(response.getMsg());}
         });

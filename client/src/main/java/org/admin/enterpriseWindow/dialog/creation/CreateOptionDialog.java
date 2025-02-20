@@ -15,14 +15,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.postRequests.CreateService;
+import org.admin.connection.postRequests.CreateOption;
 import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 
 import java.time.LocalTime;
 
 
-public class CreateServiceDialog extends Main {
+public class CreateOptionDialog extends Main {
     public static void show(Node node){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -123,7 +123,7 @@ public class CreateServiceDialog extends Main {
             option.setDuration(duration);
             option.setDescription(description);
 
-            Response response = CreateService.post(token, option);
+            Response response = CreateOption.post(token, option);
             if(response.getCode() == 200) {
                 AdminInterface.loadEnterpriseWindow(node);
                 dialog.close();
