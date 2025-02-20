@@ -1,14 +1,14 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Master;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class UpdateMaster extends Connection {
-    public static Response updateInfo(String token, MasterInfo master){
+    public static Response updateInfo(String token, Master master){
         try {
             getConnection("http://localhost:8000/api/admin/users/master/" + master.getId());
             connection.setRequestMethod("PUT");
@@ -21,7 +21,7 @@ public class UpdateMaster extends Connection {
             out.put("phone", master.getPhone());
             out.put("bio", master.getBio());
             JSONArray servicesArray = new JSONArray();
-            for(ServiceInfo service: master.getServices()){
+            for(Service service: master.getServices()){
                 servicesArray.add(service.getId());
             }
             out.put("options", servicesArray);

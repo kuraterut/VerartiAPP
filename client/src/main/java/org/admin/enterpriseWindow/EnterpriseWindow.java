@@ -18,10 +18,10 @@ import org.admin.enterpriseWindow.dialog.infos.*;
 
 import org.admin.enterpriseWindow.searchingStrings.*;
 import org.admin.sideMenu.SideMenu;
-import org.admin.utils.AdminInfo;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.MasterInfo;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Admin;
+import org.admin.utils.entities.Client;
+import org.admin.utils.entities.Master;
+import org.admin.utils.entities.Service;
 
 import java.util.List;
 
@@ -47,10 +47,10 @@ public class EnterpriseWindow extends Main {
 
 
 
-        List<AdminInfo> admins = GetAdmin.getAll(token);
-        List<MasterInfo> masters = GetMaster.getAll(token);
-        List<ServiceInfo> services = GetService.getAll(token);
-        List<ClientInfo> clients = GetClient.getAll(token);
+        List<Admin> admins = GetAdmin.getAll(token);
+        List<Master> masters = GetMaster.getAll(token);
+        List<Service> services = GetService.getAll(token);
+        List<Client> clients = GetClient.getAll(token);
 
 
         HBox enterpriseInfoBox = new HBox();

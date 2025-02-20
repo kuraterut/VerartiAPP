@@ -14,12 +14,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetAppointment;
-import org.admin.utils.Appointment;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.MasterInfo;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Client;
+import org.admin.utils.entities.Master;
+import org.admin.utils.entities.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,9 +31,9 @@ public class AppointmentInfoDialog extends Main {
         dialog.setTitle("Информация о записи");
 
         Appointment appointment = GetAppointment.getById(token, appointmentId);
-        MasterInfo master = appointment.getMaster();
-        ClientInfo client = appointment.getClient();
-        List<ServiceInfo> services = appointment.getServices();
+        Master master = appointment.getMaster();
+        Client client = appointment.getClient();
+        List<Service> services = appointment.getServices();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -64,7 +63,7 @@ public class AppointmentInfoDialog extends Main {
         servicesTable.add(priceHeadTable, 2, 0);
 
         int numServiceRow = 0;
-        for(ServiceInfo service: services){
+        for(Service service: services){
             numServiceRow++;
             Label serviceLbl = new Label(service.getName());
             Label durationLbl = new Label(service.getDurationString());

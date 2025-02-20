@@ -1,9 +1,10 @@
-package org.admin.utils;
+package org.admin.utils.entities;
 
-import java.util.*;
+import org.admin.utils.Response;
+
 import java.time.*;
 
-public class ClientInfo extends Response{
+public class Client extends Response {
 	private Long id;
 	private String name;
 	private String surname;
@@ -12,7 +13,7 @@ public class ClientInfo extends Response{
 	private String comment;
 	private LocalDate birthday;
 
-	public Boolean equals(ClientInfo other){
+	public Boolean equals(Client other){
 		return this.id == other.getId();
 	}
 

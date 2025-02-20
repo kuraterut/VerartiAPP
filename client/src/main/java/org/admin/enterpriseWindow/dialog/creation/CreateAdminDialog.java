@@ -14,9 +14,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.postRequests.CreateUser;
+import org.admin.connection.postRequests.CreateAdmin;
 import org.admin.utils.Response;
-import org.admin.utils.User;
+import org.admin.utils.entities.Admin;
 
 public class CreateAdminDialog extends Main {
     public static void show(Node node){
@@ -112,17 +112,16 @@ public class CreateAdminDialog extends Main {
             String phone = phoneTextField.getText();
             String password = passwordTextField.getText();
 
-            User user = new User();
+            Admin admin = new Admin();
 
-            user.setName(name);
-            user.setSurname(surname);
-            user.setPatronymic(patronymic);
-            user.setEmail(email);
-            user.setPhone(phone);
-            user.setPassword(password);
-            user.addRole("admin");
+            admin.setName(name);
+            admin.setSurname(surname);
+            admin.setPatronymic(patronymic);
+            admin.setEmail(email);
+            admin.setPhone(phone);
+            admin.setPassword(password);
 
-            Response checkInfo = user.checkInfo();
+            Response checkInfo = admin.checkInfo();
 
             if(checkInfo.getCode() == -1){
                 errorMsg.setText(checkInfo.getMsg());
@@ -130,12 +129,12 @@ public class CreateAdminDialog extends Main {
             }
 
 
-            Response addingClientResponse = CreateUser.post(token, user);
-            if(addingClientResponse.getCode() == 200) {
+            Response response = CreateAdmin.post(token, admin);
+            if(response.getCode() == 200) {
                 AdminInterface.loadEnterpriseWindow(node);
                 dialog.close();
             }
-            else{errorMsg.setText(addingClientResponse.getMsg());}
+            else{errorMsg.setText(response.getMsg());}
         });
 
 

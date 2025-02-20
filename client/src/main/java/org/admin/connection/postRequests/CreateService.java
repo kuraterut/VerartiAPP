@@ -1,17 +1,12 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.HelpFuncs;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 import org.json.simple.JSONObject;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 public class CreateService extends Connection {
-    public static Response post(String token, ServiceInfo service){
+    public static Response post(String token, Service service){
         try{
             getConnection("http://localhost:8000/api/admin/appointment/");
             connection.setRequestMethod("POST");

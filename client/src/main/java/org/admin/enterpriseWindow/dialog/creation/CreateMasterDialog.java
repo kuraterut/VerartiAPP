@@ -14,9 +14,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.postRequests.CreateUser;
+import org.admin.connection.postRequests.CreateMaster;
 import org.admin.utils.Response;
-import org.admin.utils.User;
+import org.admin.utils.entities.Master;
 
 public class CreateMasterDialog extends Main {
     public static void show(Node node){
@@ -112,25 +112,24 @@ public class CreateMasterDialog extends Main {
             String phone = phoneTextField.getText();
             String password = passwordTextField.getText();
 
-            User user = new User();
+            Master master = new Master();
 
-            user.setName(name);
-            user.setSurname(surname);
-            user.setPatronymic(patronymic);
-            user.setEmail(email);
-            user.setPhone(phone);
-            user.setPassword(password);
-            user.addRole("master");
+            master.setName(name);
+            master.setSurname(surname);
+            master.setPatronymic(patronymic);
+            master.setEmail(email);
+            master.setPhone(phone);
+            master.setPassword(password);
 
-            Response checkInfo = user.checkInfo();
+
+            Response checkInfo = master.checkInfo();
 
             if(checkInfo.getCode() == -1){
                 errorMsg.setText(checkInfo.getMsg());
                 return;
             }
 
-
-            Response response = CreateUser.post(token, user);
+            Response response = CreateMaster.post(token, master);
             if(response.getCode() == 200) {
                 AdminInterface.loadEnterpriseWindow(node);
                 dialog.close();

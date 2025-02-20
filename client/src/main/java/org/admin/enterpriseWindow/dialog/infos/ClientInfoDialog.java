@@ -13,15 +13,13 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.deleteRequests.DeleteClient;
-import org.admin.connection.deleteRequests.DeleteService;
 import org.admin.connection.getRequests.GetAppointment;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.putRequests.UpdateClient;
-import org.admin.connection.putRequests.UpdateService;
-import org.admin.utils.Appointment;
-import org.admin.utils.ClientInfo;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Client;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +30,7 @@ public class ClientInfoDialog extends Main {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Информация о Клиенте");
 
-        ClientInfo client = GetClient.getById(token, clientId);
+        Client client = GetClient.getById(token, clientId);
 
         List<Appointment> clientAppointments = GetAppointment.getListByClientId(token, clientId);
 
@@ -64,7 +62,7 @@ public class ClientInfoDialog extends Main {
             Label appointmentDateTimeLbl = new Label(appointment.getDateTimeStr());
 
             VBox appointmentServicesVBox = new VBox();
-            for(ServiceInfo service: appointment.getServices()){
+            for(Service service: appointment.getServices()){
                 Label serviceNameLbl = new Label(service.getName());
                 appointmentServicesVBox.getChildren().add(serviceNameLbl);
             }

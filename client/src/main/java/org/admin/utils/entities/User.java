@@ -1,31 +1,19 @@
-package org.admin.utils;
+package org.admin.utils.entities;
+
+import org.admin.utils.Response;
 
 import java.util.ArrayList;
 
-public class User extends Response{
+public class User extends Response {
     private String name;
     private String surname;
     private String patronymic;
     private String email;
     private String phone;
     private String password;
-    private ArrayList<String> roles;
 
-    public User() {
-        this.roles = new ArrayList<>();
-    }
-    public User(String name, String surname, String patronymic, String email, String phone, String password, ArrayList<String> roles) {
-        this.name = name;
-        this.surname = surname;
-        this.patronymic = patronymic;
-        this.email = email;
-        this.phone = phone;
-        this.password = password;
-        this.roles = roles;
-    }
-    public String getName() {
-        return name;
-    }
+
+    public String getName()             {return name;}
     public void setName(String name) {
         this.name = name;
     }
@@ -58,15 +46,6 @@ public class User extends Response{
     }
     public void setPassword(String password) {
         this.password = password;
-    }
-    public ArrayList<String> getRoles() {
-        return roles;
-    }
-    public void setRoles(ArrayList<String> roles) {
-        this.roles = roles;
-    }
-    public void addRole(String role) {
-        this.roles.add(role);
     }
     public Response checkInfo(){
         if (this.name.equals("")){

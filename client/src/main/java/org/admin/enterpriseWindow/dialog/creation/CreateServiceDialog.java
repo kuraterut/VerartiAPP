@@ -16,9 +16,8 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.postRequests.CreateService;
-import org.admin.connection.postRequests.CreateUser;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 
 import java.time.LocalTime;
 
@@ -117,7 +116,7 @@ public class CreateServiceDialog extends Main {
 
             String description = descriptionTextArea.getText();
 
-            ServiceInfo service = new ServiceInfo();
+            Service service = new Service();
 
             service.setName(name);
             service.setPrice(price);

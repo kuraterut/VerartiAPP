@@ -10,14 +10,13 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.Main;
-import org.admin.connection.Connection;
 import org.admin.connection.getRequests.GetMaster;
 import org.admin.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.dayInfoWindow.dialog.CreateAppointmentDialog;
-import org.admin.utils.Appointment;
-import org.admin.utils.ClientInfo;
-import org.admin.utils.MasterInfo;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Appointment;
+import org.admin.utils.entities.Client;
+import org.admin.utils.entities.Master;
+import org.admin.utils.entities.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -57,10 +56,10 @@ public class DayInfoTable extends Main {
         table.getColumnConstraints().add(new ColumnConstraints(100));
 
 //        Map<Long, List<Appointment>> dayInfo = Connection.getMastersSheduleByDate(token, date);
-        List<MasterInfo> masters = GetMaster.getListByDate(token, date, true);
+        List<Master> masters = GetMaster.getListByDate(token, date, true);
 
         Map<Long, List<Appointment>> dayInfo = new HashMap<>();
-        for(MasterInfo master : masters){
+        for(Master master : masters){
             dayInfo.put(master.getId(), new ArrayList<>());
         }
 
@@ -69,7 +68,7 @@ public class DayInfoTable extends Main {
             Set<Integer> usedCells = new HashSet<>();
             countColumn++;
             table.getColumnConstraints().add(new ColumnConstraints(200));
-            MasterInfo master = GetMaster.getById(token, masterId);
+            Master master = GetMaster.getById(token, masterId);
 
 
             Label masterSurnameLbl = new Label(master.getSurname());
@@ -87,9 +86,9 @@ public class DayInfoTable extends Main {
 
             for(Appointment appointment: appointments){
                 Long id = appointment.getId();
-                ClientInfo client = appointment.getClient();
-                List<ServiceInfo> services = appointment.getServices();
-                ServiceInfo firstService = services.get(0);
+                Client client = appointment.getClient();
+                List<Service> services = appointment.getServices();
+                Service firstService = services.get(0);
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
                 Integer cellNumber = calculateCellNumber(services);
 
@@ -159,9 +158,9 @@ public class DayInfoTable extends Main {
         int ans = (hour-8)*2 + 1 + ((minute == 30)?1:0);
         return ans;
     }
-    public static Integer calculateCellNumber(List<ServiceInfo> services){
+    public static Integer calculateCellNumber(List<Service> services){
         int totalCount = 0;
-        for(ServiceInfo service : services){
+        for(Service service : services){
             totalCount += service.getDuration().getHour()*2;
             totalCount += service.getDuration().getMinute()==30?1:0;
         }

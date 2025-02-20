@@ -2,36 +2,26 @@ package org.admin.resourceWindow;
 
 import org.Main;
 
-import org.admin.AdminInterface;
-import org.admin.connection.*;
 import org.admin.connection.resources.ConnectionResources;
 import org.admin.sideMenu.SideMenu;
 import org.admin.utils.*;
 
-import javafx.application.*;
 import javafx.stage.*;
 
 import javafx.scene.*;
 
 
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.image.*;
-import javafx.scene.shape.*;
-import javafx.scene.paint.*;
 import javafx.geometry.*;
-import javafx.event.*;
-import javafx.animation.*;
-import javafx.collections.*;
-import javafx.util.*;
+import org.admin.utils.entities.Resource;
+import org.admin.utils.entities.ResourceRequest;
 
 import java.util.*;
 
 public class ResourceWindow extends Main{
     public static BorderPane loadResourcesListWindow(){
-        ArrayList<ResourceInfo> resourceList = ConnectionResources.getResourcesList(token);
+        ArrayList<Resource> resourceList = ConnectionResources.getResourcesList(token);
         
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = SideMenu.buildSideMenu(1);
@@ -57,7 +47,7 @@ public class ResourceWindow extends Main{
         GridPane.setValignment(descriptionHead, VPos.CENTER);
 
         if(resourceList == null){
-            ResourceInfo resource = new ResourceInfo();
+            Resource resource = new Resource();
             resource.setId(Long.valueOf(-1));
             resource.setName("Ошибка");
             resource.setDescription("Ошибка");
@@ -65,7 +55,7 @@ public class ResourceWindow extends Main{
         }
 
         for (int i = 0; i < resourceList.size(); i++){
-            ResourceInfo resource = resourceList.get(i);
+            Resource resource = resourceList.get(i);
 
             Label id = new Label(resource.getId()+"");
             Label name = new Label(resource.getName());
@@ -121,7 +111,7 @@ public class ResourceWindow extends Main{
 
 
     public static void loadResourceOrderDialog(Long id) {    
-        ResourceInfo resource = (ResourceInfo)ConnectionResources.getResourceById(token, id);
+        Resource resource = (Resource)ConnectionResources.getResourceById(token, id);
         if(resource.getCode() != 200){
             resource.setName(resource.getMsg());
             resource.setDescription(resource.getMsg());
@@ -174,7 +164,7 @@ public class ResourceWindow extends Main{
     }
 
     public static BorderPane loadResourcesRequestsWindow(){
-        ArrayList<ResourceRequestInfo> resourceRequestsList = ConnectionResources.getResourcesRequestsList(token);
+        ArrayList<ResourceRequest> resourceRequestsList = ConnectionResources.getResourcesRequestsList(token);
         
         BorderPane root             = new BorderPane();
         StackPane sideMenuStack     = SideMenu.buildSideMenu(1);
@@ -210,7 +200,7 @@ public class ResourceWindow extends Main{
             HBox statusBox = new HBox();
             statusBox.setSpacing(20);
 
-            ResourceRequestInfo request = resourceRequestsList.get(i);
+            ResourceRequest request = resourceRequestsList.get(i);
             Label id = new Label(request.getId()+"");
             Label name = new Label(request.getResource().getName());
             Label count = new Label(request.getCount()+"");

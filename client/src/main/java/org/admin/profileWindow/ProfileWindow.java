@@ -2,31 +2,21 @@ package org.admin.profileWindow;
 
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.*;
 import org.admin.connection.profile.*;
 import org.admin.sideMenu.SideMenu;
 import org.admin.utils.*;
 
-import javafx.application.*;
 import javafx.stage.*;
 
-import javafx.scene.*;
-
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.image.*;
 import javafx.scene.shape.*;
-import javafx.scene.paint.*;
 import javafx.geometry.*;
 import javafx.event.*;
-import javafx.animation.*;
-import javafx.collections.*;
-import javafx.util.*;
+import org.admin.utils.entities.Admin;
 
 import java.io.*;
-import java.util.*;
 
 public class ProfileWindow extends Main{
 	public static BorderPane loadChangeProfileWindow(){
@@ -73,7 +63,7 @@ public class ProfileWindow extends Main{
 
         rightBox.setPrefWidth(MENU_WIDTH);
 
-        AdminInfo admin = (AdminInfo) ConnectionProfile.getProfileInfo(token);
+        Admin admin = (Admin) ConnectionProfile.getProfileInfo(token);
         if(admin.getCode() == 200){
             nameField.setText(admin.getName());
             surnameField.setText(admin.getSurname());
@@ -150,7 +140,7 @@ public class ProfileWindow extends Main{
                 String newPhone         = phoneField.getText();
                 String newBio           = bioField.getText();
 
-                AdminInfo newAdmin = new AdminInfo();
+                Admin newAdmin = new Admin();
                 newAdmin.setName(newName);
                 newAdmin.setSurname(newSurname);
                 newAdmin.setPatronymic(newPatronymic);
@@ -303,28 +293,28 @@ public class ProfileWindow extends Main{
         bioLbl.setText("Биография");
         roleLbl.setText("Роль");
 
-        AdminInfo adminInfo = (AdminInfo)ConnectionProfile.getProfileInfo(token);
+        Admin admin = (Admin)ConnectionProfile.getProfileInfo(token);
         
         Image avatarImage = null;
         
-        if(adminInfo.getCode() != 200) {
+        if(admin.getCode() != 200) {
             avatarImage = ConnectionProfile.getProfilePhoto(null);
-            name.setText(adminInfo.getMsg());
-            surname.setText(adminInfo.getMsg());
-            patronymic.setText(adminInfo.getMsg());
-            phone.setText(adminInfo.getMsg());
-            email.setText(adminInfo.getMsg());
-            bio.setText(adminInfo.getMsg());
-            role.setText(adminInfo.getMsg());
+            name.setText(admin.getMsg());
+            surname.setText(admin.getMsg());
+            patronymic.setText(admin.getMsg());
+            phone.setText(admin.getMsg());
+            email.setText(admin.getMsg());
+            bio.setText(admin.getMsg());
+            role.setText(admin.getMsg());
         }
         else{
-            avatarImage = ConnectionProfile.getProfilePhoto(adminInfo.getPhotoURL());
-            name.setText(adminInfo.getName());
-            surname.setText(adminInfo.getSurname());
-            patronymic.setText(adminInfo.getPatronymic());
-            phone.setText(adminInfo.getPhone());
-            email.setText(adminInfo.getEmail());
-            bio.setText(adminInfo.getBio());
+            avatarImage = ConnectionProfile.getProfilePhoto(admin.getPhotoURL());
+            name.setText(admin.getName());
+            surname.setText(admin.getSurname());
+            patronymic.setText(admin.getPatronymic());
+            phone.setText(admin.getPhone());
+            email.setText(admin.getEmail());
+            bio.setText(admin.getBio());
             role.setText("Администратор");
         }
         

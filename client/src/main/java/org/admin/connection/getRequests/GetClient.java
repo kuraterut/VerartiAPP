@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.ClientInfo;
+import org.admin.utils.entities.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetClient extends Connection {
-    public static List<ClientInfo> getAll(String token){
+    public static List<Client> getAll(String token){
         try{
             getConnection("http://localhost:8000/api/admin/clients/");
 
@@ -18,14 +18,14 @@ public class GetClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
 
-            List<ClientInfo> clients = new ArrayList<>();
+            List<Client> clients = new ArrayList<>();
 
             JSONObject data = getJson();
             JSONArray jsonArr = (JSONArray) data.get("clients");
 
             for(Object elemObj : jsonArr) {
                 JSONObject elem = (JSONObject)elemObj;
-                ClientInfo client = new ClientInfo();
+                Client client = new Client();
 
                 Long id = (Long)elem.get("id");
                 String name = (String)elem.get("name");
@@ -55,7 +55,7 @@ public class GetClient extends Connection {
         }
     }
 
-    public static ClientInfo getById(String token, Long id){
+    public static Client getById(String token, Long id){
         try{
             getConnection("http://localhost:8000/api/admin/clients/" + id);
             connection.setRequestMethod("GET");
@@ -63,7 +63,7 @@ public class GetClient extends Connection {
 
             JSONObject data = getJson();
 
-            ClientInfo client = new ClientInfo();
+            Client client = new Client();
 
             String name = (String)data.get("name");
             String surname = (String)data.get("surname");
@@ -91,7 +91,7 @@ public class GetClient extends Connection {
         }
     }
 
-    public static ClientInfo getByPhone(String token, String phone){
+    public static Client getByPhone(String token, String phone){
         try{
             getConnection("http://localhost:8000/api/admin/clients/phone");
             connection.setRequestMethod("GET");
@@ -103,7 +103,7 @@ public class GetClient extends Connection {
 
             JSONObject data = getJson();
 
-            ClientInfo client = new ClientInfo();
+            Client client = new Client();
 
             Long id = (Long)data.get("id");
             String name = (String)data.get("name");

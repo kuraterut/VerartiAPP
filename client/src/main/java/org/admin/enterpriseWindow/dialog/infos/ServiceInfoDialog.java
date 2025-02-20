@@ -1,6 +1,5 @@
 package org.admin.enterpriseWindow.dialog.infos;
 
-import com.almasb.fxgl.app.services.UpdaterService;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -15,19 +14,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.deleteRequests.DeleteAdmin;
 import org.admin.connection.deleteRequests.DeleteService;
-import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetService;
-import org.admin.connection.putRequests.UpdateAdmin;
 import org.admin.connection.putRequests.UpdateService;
-import org.admin.utils.AdminInfo;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
+import org.admin.utils.entities.Service;
 
 public class ServiceInfoDialog extends Main {
     public static void show(Long id, Node node){
-        ServiceInfo service = GetService.getById(token, id);
+        Service service = GetService.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);

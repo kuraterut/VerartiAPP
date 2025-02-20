@@ -1,8 +1,10 @@
-package org.admin.utils;
+package org.admin.utils.entities;
+
+import org.admin.utils.Response;
 
 import java.time.*;
 
-public class DayTransactions extends Response{
+public class DayTransactions extends Response {
 	private LocalDate date;
 	private Double cash;
 	private Double card;

@@ -15,23 +15,14 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.deleteRequests.DeleteAdmin;
-import org.admin.connection.deleteRequests.DeleteMaster;
 import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetMaster;
-import org.admin.connection.getRequests.GetService;
 import org.admin.connection.putRequests.UpdateAdmin;
-import org.admin.connection.putRequests.UpdateMaster;
-import org.admin.utils.AdminInfo;
-import org.admin.utils.MasterInfo;
+import org.admin.utils.entities.Admin;
 import org.admin.utils.Response;
-import org.admin.utils.ServiceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AdminInfoDialog extends Main {
     public static void show(Long id, Node node){
-        AdminInfo admin = GetAdmin.getById(token, id);
+        Admin admin = GetAdmin.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
