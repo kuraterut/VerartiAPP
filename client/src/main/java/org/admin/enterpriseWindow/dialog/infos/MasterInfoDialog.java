@@ -141,7 +141,14 @@ public class MasterInfoDialog extends Main {
         });
 
         saveButton.setOnAction(event -> {
-            Response response = UpdateMaster.updateInfo(token, master);
+            Master newMaster = new Master();
+            newMaster.setName(nameTextField.getText());
+            newMaster.setSurname(surnameTextField.getText());
+            newMaster.setPatronymic(patronymicTextField.getText());
+            newMaster.setPhone(phoneTextField.getText());
+            newMaster.setBio(bioTextArea.getText());
+
+            Response response = UpdateMaster.updateInfo(token, newMaster);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
             else{messageLabel.setText(response.getMsg());}
         });

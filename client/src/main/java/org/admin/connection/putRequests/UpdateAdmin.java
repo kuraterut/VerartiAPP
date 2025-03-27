@@ -11,6 +11,7 @@ public class UpdateAdmin extends Connection {
             getConnection("http://localhost:8000/api/admin/users/admin/" + admin.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
 
             JSONObject out = new JSONObject();
             out.put("name", admin.getName());

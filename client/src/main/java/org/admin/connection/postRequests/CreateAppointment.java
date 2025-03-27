@@ -1,6 +1,7 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
+import org.admin.utils.HelpFuncs;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
@@ -13,24 +14,23 @@ import java.time.LocalTime;
 public class CreateAppointment extends Connection {
     public static Response post(String token, Appointment appointment){
         try{
+            //TODO Комментарий к записи
             getConnection("http://localhost:8000/api/admin/appointment/");
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
 
             JSONObject outJson = new JSONObject();
 
-
             LocalDate date = appointment.getDate();
-            String dateStr = date.getYear()+"-";
-            dateStr += date.getMonthValue()+"-";
-            dateStr += date.getDayOfMonth();
+            String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
 
             LocalTime startTime = appointment.getStartTime();
-            String startTimeStr = startTime.getHour()+":"+startTime.getMinute();
+            String startTimeStr = HelpFuncs.localTimeToString(startTime, "HH:mm");
 
-            JSONArray servicesJSON = new JSONArray();
-            for(Option option : appointment.getServices()){
-                servicesJSON.add(option.getId());
+            JSONArray optionsJSON = new JSONArray();
+            for(Option option : appointment.getOptions()){
+                optionsJSON.add(option.getId());
             }
 
             Long clientId = appointment.getClient().getId();
@@ -39,10 +39,10 @@ public class CreateAppointment extends Connection {
 
             outJson.put("date", dateStr);
             outJson.put("start_time", startTimeStr);
-            outJson.put("services", servicesJSON);
+            outJson.put("option_ids", optionsJSON);
             outJson.put("client_id", clientId);
             outJson.put("master_id", masterId);
-            outJson.put("comment", comment);
+//            outJson.put("comment", comment);
 
             sendJson(outJson);
 

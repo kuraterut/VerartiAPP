@@ -47,6 +47,7 @@ public class ResourceWindow extends Main{
         GridPane.setValignment(descriptionHead, VPos.CENTER);
 
         if(resourceList == null){
+            resourceList = new ArrayList<>();
             Resource resource = new Resource();
             resource.setId(Long.valueOf(-1));
             resource.setName("Ошибка");

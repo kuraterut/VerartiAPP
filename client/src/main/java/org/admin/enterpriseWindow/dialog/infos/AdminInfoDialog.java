@@ -126,7 +126,15 @@ public class AdminInfoDialog extends Main {
         });
 
         saveButton.setOnAction(event -> {
-            Response response = UpdateAdmin.updateInfo(token, admin);
+            Admin newAdmin = new Admin();
+            newAdmin.setName(nameTextField.getText());
+            newAdmin.setSurname(surnameTextField.getText());
+            newAdmin.setPatronymic(patronymicTextField.getText());
+            newAdmin.setEmail(emailTextField.getText());
+            newAdmin.setPhone(phoneTextField.getText());
+            newAdmin.setBio(bioTextArea.getText());
+
+            Response response = UpdateAdmin.updateInfo(token, newAdmin);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
             else{messageLabel.setText(response.getMsg());}
         });
