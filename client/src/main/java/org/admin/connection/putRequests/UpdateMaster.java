@@ -13,6 +13,7 @@ public class UpdateMaster extends Connection {
             getConnection("http://localhost:8000/api/admin/users/master/" + master.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
 
             JSONObject out = new JSONObject();
             out.put("name", master.getName());

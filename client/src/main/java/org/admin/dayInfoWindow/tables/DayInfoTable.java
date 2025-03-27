@@ -1,16 +1,21 @@
 package org.admin.dayInfoWindow.tables;
 
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.Main;
+import org.admin.connection.getRequests.GetAppointment;
+import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.getRequests.GetMaster;
+import org.admin.connection.getRequests.GetOption;
 import org.admin.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.dayInfoWindow.dialog.CreateAppointmentDialog;
 import org.admin.utils.entities.Appointment;
@@ -59,8 +64,25 @@ public class DayInfoTable extends Main {
         List<Master> masters = GetMaster.getListByDate(token, date, true);
 
         Map<Long, List<Appointment>> dayInfo = new HashMap<>();
+        List<Appointment> dailyAppointments = GetAppointment.getAllByDate(token, date);
+
+//        Appointment testAppointment = new Appointment();
+//        testAppointment.setDate(date);
+//        testAppointment.setMaster(masters.get(0));
+//        testAppointment.setClient(GetClient.getByPhone(token, "+79092762463"));
+//        testAppointment.setStartTime(LocalTime.of(12, 0));
+//        testAppointment.setId(1L);
+//        testAppointment.setOptions(new ArrayList<>());
+//        testAppointment.addOption(GetOption.getAll(token).get(0));
+//
+//        dailyAppointments.add(testAppointment);
+
+
         for(Master master : masters){
             dayInfo.put(master.getId(), new ArrayList<>());
+        }
+        for(Appointment appointment : dailyAppointments){
+            dayInfo.getOrDefault(appointment.getMaster().getId(), new ArrayList<>()).add(appointment);
         }
 
         int countColumn = 0;
@@ -87,19 +109,21 @@ public class DayInfoTable extends Main {
             for(Appointment appointment: appointments){
                 Long id = appointment.getId();
                 Client client = appointment.getClient();
-                List<Option> options = appointment.getServices();
+                List<Option> options = appointment.getOptions();
                 Option firstOption = options.get(0);
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
                 Integer cellNumber = calculateCellNumber(options);
 
-                Rectangle rectStart = new Rectangle(150, 100, Color.AQUAMARINE);
-                rectStart.setOnMouseClicked(event -> AppointmentInfoDialog.show(id));
-                rectStart.setOnMouseEntered(event -> {
-                    rectStart.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
+                Rectangle rectStart = new Rectangle(200, 40, Color.AQUAMARINE);
+                Rectangle clickRect = new Rectangle(200, 40, Color.TRANSPARENT);
+                clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id));
+                clickRect.setOnMouseEntered(event -> {
+                    clickRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
                 });
-                rectStart.setOnMouseExited(event -> rectStart.setStyle("-fx-fill: aquamarine"));
+                clickRect.setOnMouseExited(event -> clickRect.setStyle("-fx-fill: transparent;"));
 
                 Label appointmentHeadLbl = new Label("Запись №"+id);
+
                 Label clientLbl = new Label(client.getFio());
                 Label serviceLbl = new Label();
 
@@ -109,11 +133,14 @@ public class DayInfoTable extends Main {
                 else{
                     serviceLbl.setText(firstOption.getName()+"...");
                 }
-
-                table.add(appointmentHeadLbl, countColumn, cellStart);
-                table.add(clientLbl, countColumn, cellStart);
-                table.add(serviceLbl, countColumn, cellStart);
+                VBox appointmentBox = new VBox(appointmentHeadLbl, clientLbl);
+                appointmentBox.setAlignment(Pos.CENTER);
                 table.add(rectStart, countColumn, cellStart);
+                table.add(appointmentBox, countColumn, cellStart);
+                table.add(clickRect, countColumn, cellStart);
+//                table.add(appointmentHeadLbl, countColumn, cellStart);
+//                table.add(clientLbl, countColumn, cellStart);
+//                table.add(serviceLbl, countColumn, cellStart);
 
                 usedCells.add(cellStart);
 

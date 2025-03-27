@@ -33,7 +33,7 @@ public class AppointmentInfoDialog extends Main {
         Appointment appointment = GetAppointment.getById(token, appointmentId);
         Master master = appointment.getMaster();
         Client client = appointment.getClient();
-        List<Option> options = appointment.getServices();
+        List<Option> options = appointment.getOptions();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

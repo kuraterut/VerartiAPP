@@ -4,11 +4,11 @@ import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.dayInfoWindow.dialog.AddNewClientDialog;
-import org.admin.dayInfoWindow.dialog.ClientInfoDialog;
 import org.admin.dayInfoWindow.dialog.PutAdminOnDateDialog;
 import org.admin.dayInfoWindow.dialog.PutMasterOnDateDialog;
-import org.admin.dayInfoWindow.searchingStrings.SearchingStringClients;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
+import org.admin.enterpriseWindow.dialog.infos.ClientInfoDialog;
+import org.admin.enterpriseWindow.searchingStrings.SearchingStringClients;
 import org.admin.sideMenu.SideMenu;
 import org.admin.utils.*;
 
@@ -17,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.geometry.*;
 import javafx.collections.*;
+import org.admin.utils.entities.Client;
 
 import java.util.*;
 import java.time.*;
@@ -99,7 +100,8 @@ public class DayInfoWindow extends Main{
 
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        VBox searchStringClients = SearchingStringClients.build();
+        List<Client> clients = GetClient.getAll(token);
+        VBox searchStringClients = SearchingStringClients.build(clients, client-> ClientInfoDialog.show(client.getId(), root));
         ScrollPane scrollTable = DayInfoTable.create(date);
 
         TextArea textArea = new TextArea();

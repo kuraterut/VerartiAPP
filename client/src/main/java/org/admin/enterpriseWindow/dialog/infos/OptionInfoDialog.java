@@ -20,6 +20,8 @@ import org.admin.connection.putRequests.UpdateOption;
 import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 
+import java.time.LocalTime;
+
 public class OptionInfoDialog extends Main {
     public static void show(Long id, Node node){
         Option option = GetOption.getById(token, id);
@@ -111,9 +113,18 @@ public class OptionInfoDialog extends Main {
         });
 
         saveButton.setOnAction(event -> {
-            Response response = UpdateOption.updateInfo(token, option);
-            if(response.getCode() == 200){messageLabel.setText("Сохранено");}
-            else{messageLabel.setText(response.getMsg());}
+            Option newOption = new Option();
+            try {
+                newOption.setName(nameTextField.getText());
+                newOption.setPrice(Long.parseLong(priceTextField.getText()));
+                newOption.setDuration(LocalTime.parse(durationTextField.getText()));
+                newOption.setDescription(descriptionTextArea.getText());
+
+                Response response = UpdateOption.updateInfo(token, newOption);
+                if(response.getCode() == 200){messageLabel.setText("Сохранено");}
+                else{messageLabel.setText(response.getMsg());}
+            } catch (NumberFormatException e) {messageLabel.setText("Введите число в прайс");}
+            catch (Exception e) {messageLabel.setText(e.getMessage());}
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);

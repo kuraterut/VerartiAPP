@@ -25,9 +25,9 @@ public class AddOptionToAppoinmentDialog extends Main {
         Label headerLabel = new Label("Добавьте услугу");
         VBox searchingStringBox = SearchingStringOptions.build(options, service->{
             if(service != null){
-                appointment.addService(service);
+                appointment.addOption(service);
                 tableBox.getChildren().clear();
-                tableBox.getChildren().add(CreateAppointmentDialog.buildTableServices(appointment.getServices()));
+                tableBox.getChildren().add(CreateAppointmentDialog.buildTableServices(appointment.getOptions()));
                 dialog.close();
             }
         });
