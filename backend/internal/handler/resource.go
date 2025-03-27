@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 )
 
@@ -18,7 +18,7 @@ func (h *Handler) createResource(c *gin.Context) {
 
 	resourceId, err := h.services.Resource.Create(input)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -40,7 +40,7 @@ type getAllResourcesResponse struct {
 func (h *Handler) getAllResources(c *gin.Context) {
 	resources, err := h.services.Resource.GetAll()
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -64,7 +64,7 @@ func (h *Handler) getResourceById(c *gin.Context) {
 
 	resource, err := h.services.GetById(resourceId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -85,7 +85,7 @@ func (h *Handler) getResourcesByMasterId(c *gin.Context) {
 
 	resources, err := h.services.Resource.GetByMasterId(masterId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -114,7 +114,7 @@ func (h *Handler) addResource(c *gin.Context) {
 
 	_, err = h.services.Resource.Add(masterId, resourceId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

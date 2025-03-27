@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"verarti/internal"
+	"verarti/internal/domain"
 )
 
 type responseModel struct {
@@ -21,7 +21,7 @@ type errorModel struct {
 func newErrorResponse(c *gin.Context, statusCode int, message string) {
 	logrus.Error(message)
 	c.AbortWithStatusJSON(statusCode, errorModel{
-		internal.ErrorResponse{
+		domain.ErrorResponse{
 			Code: statusCode,
 			Text: message,
 		},

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"strings"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -77,7 +77,7 @@ func (r *OptionPostgres) UpdateOption(option models.OptionUpdate, optionId int) 
 	err := r.db.Get(&id, queryGetOption, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return internal.NewErrorResponse(404, "option with this id was not found")
+			return domain.NewErrorResponse(404, "option with this id was not found")
 		}
 
 		return err
@@ -114,7 +114,7 @@ func (r *OptionPostgres) UpdateOption(option models.OptionUpdate, optionId int) 
 	setQuery := strings.Join(setValues, ", ")
 
 	if setQuery == "" {
-		return internal.NewErrorResponse(400, "invalid input body: it is empty")
+		return domain.NewErrorResponse(400, "invalid input body: it is empty")
 	}
 
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d",
@@ -131,7 +131,7 @@ func (r *OptionPostgres) DeleteOption(optionId int) error {
 	err := r.db.Get(&id, queryGetOption, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return internal.NewErrorResponse(404, "option with this id was not found")
+			return domain.NewErrorResponse(404, "option with this id was not found")
 		}
 
 		return err
@@ -141,7 +141,7 @@ func (r *OptionPostgres) DeleteOption(optionId int) error {
 	_, err = r.db.Exec(query, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return internal.NewErrorResponse(404, "option not found")
+			return domain.NewErrorResponse(404, "option not found")
 		}
 
 		return err
@@ -164,7 +164,7 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 	err := r.db.Get(&id, queryGetUser, masterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, internal.NewErrorResponse(404, "master with this id was not found")
+			return 0, domain.NewErrorResponse(404, "master with this id was not found")
 		}
 
 		return 0, err
@@ -174,7 +174,7 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 	err = r.db.Get(&id, queryGetOption, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, internal.NewErrorResponse(404, "option with this id was not found")
+			return 0, domain.NewErrorResponse(404, "option with this id was not found")
 		}
 
 		return 0, err
