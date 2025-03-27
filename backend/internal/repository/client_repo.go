@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"strings"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -47,7 +47,7 @@ func (r *ClientPostgres) GetClientByPhone(phone string) (models.Client, error) {
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return models.Client{}, internal.NewErrorResponse(404, "client with this phone number not found")
+		return models.Client{}, domain.NewErrorResponse(404, "client with this phone number not found")
 	}
 
 	return client, err
@@ -63,7 +63,7 @@ func (r *ClientPostgres) GetClientById(clientId int) (models.Client, error) {
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return models.Client{}, internal.NewErrorResponse(404, "client with this id not found")
+		return models.Client{}, domain.NewErrorResponse(404, "client with this id not found")
 	}
 
 	return client, err
@@ -79,7 +79,7 @@ func (r *ClientPostgres) GetAllClients() ([]models.Client, error) {
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, internal.NewErrorResponse(404, "no clients found")
+		return nil, domain.NewErrorResponse(404, "no clients found")
 	}
 
 	return clients, err
@@ -135,7 +135,7 @@ func (r *ClientPostgres) UpdateClient(clientId int, input models.Client) error {
 	setQuery := strings.Join(setValues, ", ")
 
 	if setQuery == "" {
-		return internal.NewErrorResponse(400, "invalid input body: it is empty")
+		return domain.NewErrorResponse(400, "invalid input body: it is empty")
 	}
 
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d",

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -36,14 +36,14 @@ func (r *ProfilePostgres) GetUserInfo(userId int) (models.Users, error) {
 	err := row.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Users{}, internal.NewErrorResponse(404, "user not found")
+			return models.Users{}, domain.NewErrorResponse(404, "user not found")
 		}
 
 		return models.Users{}, err
 	}
 
 	if user.Roles == nil {
-		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+		return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
 	}
 
 	return user, err

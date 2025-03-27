@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -59,7 +59,7 @@ func (r *UserPostgres) GetAllMasters() ([]models.Users, error) {
 	}
 
 	if len(masters) == 0 {
-		return nil, internal.NewErrorResponse(404, "masters not found")
+		return nil, domain.NewErrorResponse(404, "masters not found")
 	}
 
 	return masters, nil
@@ -83,14 +83,14 @@ func (r *UserPostgres) GetMasterById(masterId int) (models.Users, error) {
 	err := row.Scan(&master.Id, &master.Name, &master.Surname, &master.Patronymic, &master.Email, &master.Phone, &master.Bio, &master.Photo, &master.CurSalary, pq.Array(&master.Roles))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Users{}, internal.NewErrorResponse(404, "user not found")
+			return models.Users{}, domain.NewErrorResponse(404, "user not found")
 		}
 
 		return models.Users{}, err
 	}
 
 	if master.Roles == nil {
-		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+		return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
 	} else {
 		for _, role := range master.Roles {
 			if role == "master" {
@@ -99,7 +99,7 @@ func (r *UserPostgres) GetMasterById(masterId int) (models.Users, error) {
 		}
 	}
 
-	return models.Users{}, internal.NewErrorResponse(400, "this user does not have the master role")
+	return models.Users{}, domain.NewErrorResponse(400, "this user does not have the master role")
 }
 
 func (r *UserPostgres) GetAllAdmins() ([]models.Users, error) {
@@ -142,7 +142,7 @@ func (r *UserPostgres) GetAllAdmins() ([]models.Users, error) {
 	}
 
 	if len(admins) == 0 {
-		return nil, internal.NewErrorResponse(404, "admins not found")
+		return nil, domain.NewErrorResponse(404, "admins not found")
 	}
 
 	return admins, nil
@@ -166,14 +166,14 @@ func (r *UserPostgres) GetAdminById(masterId int) (models.Users, error) {
 	err := row.Scan(&admin.Id, &admin.Name, &admin.Surname, &admin.Patronymic, &admin.Email, &admin.Phone, &admin.Bio, &admin.Photo, &admin.CurSalary, pq.Array(&admin.Roles))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Users{}, internal.NewErrorResponse(404, "user not found")
+			return models.Users{}, domain.NewErrorResponse(404, "user not found")
 		}
 
 		return models.Users{}, err
 	}
 
 	if admin.Roles == nil {
-		return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+		return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
 	} else {
 		for _, role := range admin.Roles {
 			if role == "admin" {
@@ -182,7 +182,7 @@ func (r *UserPostgres) GetAdminById(masterId int) (models.Users, error) {
 		}
 	}
 
-	return models.Users{}, internal.NewErrorResponse(400, "this user does not have the admin role")
+	return models.Users{}, domain.NewErrorResponse(400, "this user does not have the admin role")
 }
 
 func (r *UserPostgres) GetDirector() (models.Users, error) {
@@ -225,11 +225,11 @@ func (r *UserPostgres) GetDirector() (models.Users, error) {
 	}
 
 	if len(directors) == 0 {
-		return models.Users{}, internal.NewErrorResponse(404, "director not found")
+		return models.Users{}, domain.NewErrorResponse(404, "director not found")
 	}
 
 	if len(directors) > 1 {
-		return models.Users{}, internal.NewErrorResponse(404, "several directors found, not just one")
+		return models.Users{}, domain.NewErrorResponse(404, "several directors found, not just one")
 	}
 
 	return directors[0], nil
@@ -240,7 +240,7 @@ func (r *UserPostgres) DeleteUser(userId int) error {
 	_, err := r.db.Exec(query, userId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return internal.NewErrorResponse(404, "user not found")
+			return domain.NewErrorResponse(404, "user not found")
 		}
 
 		return err

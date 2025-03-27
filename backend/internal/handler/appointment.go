@@ -5,7 +5,6 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
-	"verarti/internal"
 	"verarti/internal/domain"
 	"verarti/models"
 )
@@ -25,7 +24,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 
 	err = h.services.Appointment.PutAdminToDate(input)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -53,7 +52,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 
 	err = h.services.Appointment.PutMasterToDate(input)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -81,7 +80,7 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 
 	admin, err := h.services.Appointment.GetAdminByDate(date)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -122,7 +121,7 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 
 	masters, err := h.services.Appointment.GetAllMastersByDate(date, isAppointed)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -158,7 +157,7 @@ func (h *Handler) createAppointment(c *gin.Context) {
 
 	appointmentId, err := h.services.Appointment.CreateAppointment(input)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -182,7 +181,7 @@ func (h *Handler) getAppointmentByClientId(c *gin.Context) {
 
 	appointments, err := h.services.Appointment.GetAppointmentByClientId(clientId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

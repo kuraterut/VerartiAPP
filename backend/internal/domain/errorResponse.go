@@ -1,4 +1,4 @@
-package internal
+package domain
 
 type ErrorResponse struct {
 	Code int    `json:"code"`

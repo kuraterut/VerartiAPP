@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"verarti/internal"
 	"verarti/internal/domain"
 	"verarti/models"
 )
@@ -25,7 +24,7 @@ func (h *Handler) createOption(c *gin.Context) {
 
 	optionId, err := h.services.Option.CreateOption(input)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -43,7 +42,7 @@ func (h *Handler) createOption(c *gin.Context) {
 func (h *Handler) getAllOptions(c *gin.Context) {
 	options, err := h.services.Option.GetAllOptions()
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -67,7 +66,7 @@ func (h *Handler) getOptionById(c *gin.Context) {
 
 	option, err := h.services.Option.GetOptionById(optionId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -89,7 +88,7 @@ func (h *Handler) getOptionsByMasterId(c *gin.Context) {
 
 	options, err := h.services.Option.GetOptionsByMasterId(masterId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -119,7 +118,7 @@ func (h *Handler) addOptionForMaster(c *gin.Context) {
 
 	_, err = h.services.Option.AddOptionForMaster(input.MasterId, optionId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -153,7 +152,7 @@ func (h *Handler) updateOption(c *gin.Context) {
 
 	err = h.services.Option.UpdateOption(input, optionId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -175,7 +174,7 @@ func (h *Handler) deleteOption(c *gin.Context) {
 
 	err = h.services.Option.DeleteOption(optionId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -33,7 +33,7 @@ func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error
 	err := r.db.Get(&id, queryGetAdmin, adminShift.AdminId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return internal.NewErrorResponse(404, "admin with this id was not found")
+			return domain.NewErrorResponse(404, "admin with this id was not found")
 		}
 
 		return err
@@ -63,7 +63,7 @@ func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) er
 	err := r.db.Get(&id, queryGetMaster, masterShift.MasterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return internal.NewErrorResponse(404, "master with this id was not found")
+			return domain.NewErrorResponse(404, "master with this id was not found")
 		}
 
 		return err
@@ -115,7 +115,7 @@ func (r *AppointmentPostgres) GetAdminByDate(date string) (models.Users, error) 
 	}
 
 	if len(admins) == 0 {
-		return models.Users{}, internal.NewErrorResponse(404, "there is no appointed admin for this date")
+		return models.Users{}, domain.NewErrorResponse(404, "there is no appointed admin for this date")
 	}
 
 	return admins[0], nil
@@ -178,10 +178,10 @@ func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool)
 
 	if len(masters) == 0 {
 		if isAppointed {
-			return nil, internal.NewErrorResponse(404, "there are no appointed masters for this date")
+			return nil, domain.NewErrorResponse(404, "there are no appointed masters for this date")
 		}
 
-		return nil, internal.NewErrorResponse(404, "no free masters. Everything is booked for this date")
+		return nil, domain.NewErrorResponse(404, "no free masters. Everything is booked for this date")
 	}
 
 	return masters, nil
@@ -201,7 +201,7 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 	err := r.db.Get(&id, queryGetMaster, appointment.MasterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, internal.NewErrorResponse(404, "master with this id was not found")
+			return 0, domain.NewErrorResponse(404, "master with this id was not found")
 		}
 
 		return 0, err
@@ -211,7 +211,7 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 	err = r.db.Get(&id, queryGetClient, appointment.ClientId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, internal.NewErrorResponse(404, "client with this id was not found")
+			return 0, domain.NewErrorResponse(404, "client with this id was not found")
 		}
 
 		return 0, err
@@ -236,7 +236,7 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 		err = r.db.Get(&id, queryGetOption, optionId)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return 0, internal.NewErrorResponse(404, fmt.Sprintf("option with this id: %d was not found", optionId))
+				return 0, domain.NewErrorResponse(404, fmt.Sprintf("option with this id: %d was not found", optionId))
 			}
 
 			return 0, err
@@ -246,7 +246,7 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 		err = r.db.Get(&id, queryGetOptionAndMaster, appointment.MasterId, optionId)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				return 0, internal.NewErrorResponse(404, fmt.Sprintf("the master does not provide a option with this id: %d", optionId))
+				return 0, domain.NewErrorResponse(404, fmt.Sprintf("the master does not provide a option with this id: %d", optionId))
 			}
 
 			return 0, err
@@ -277,7 +277,7 @@ func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.M
 	//err := r.db.Get(&id, queryGetClient, clientId)
 	//if err != nil {
 	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, internal.NewErrorResponse(404, "client with this id was not found")
+	//		return nil, domain.NewErrorResponse(404, "client with this id was not found")
 	//	}
 	//
 	//	return nil, err
@@ -297,7 +297,7 @@ func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.M
 	//rows, err := r.db.Query(query, clientId)
 	//if err != nil {
 	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, internal.NewErrorResponse(404, "no appointments found for this client")
+	//		return nil, domain.NewErrorResponse(404, "no appointments found for this client")
 	//	}
 	//
 	//	return nil, err
@@ -318,7 +318,7 @@ func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.M
 	//}
 	//
 	//if user.Roles == nil {
-	//	return models.Users{}, internal.NewErrorResponse(500, "the user does not have any roles")
+	//	return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
 	//}
 
 	return nil, nil
