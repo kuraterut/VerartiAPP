@@ -16,7 +16,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidateDateOnly(input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -44,7 +44,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidateDateOnly(input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -72,7 +72,7 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", date)
+	err := domain.ValidateDateOnly(date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -100,7 +100,7 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", date)
+	err := domain.ValidateDateOnly(date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -143,13 +143,13 @@ func (h *Handler) createAppointment(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidateDateOnly(input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err = domain.ValidatorDateAndTimeFormat("15:04", input.StartTime)
+	err = domain.ValidateTimeOnly(input.StartTime)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
