@@ -2,6 +2,7 @@ package org.admin.dayInfoWindow;
 
 import org.Main;
 import org.admin.AdminInterface;
+import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.dayInfoWindow.dialog.AddNewClientDialog;
 import org.admin.dayInfoWindow.dialog.PutAdminOnDateDialog;
@@ -17,6 +18,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.geometry.*;
 import javafx.collections.*;
+import org.admin.utils.entities.Admin;
 import org.admin.utils.entities.Client;
 
 import java.util.*;
@@ -24,8 +26,8 @@ import java.time.*;
 
 public class DayInfoWindow extends Main{
 	public static StackPane loadWindow(LocalDate date){
-            //TODO Сделать заголовок с ФИО Админа
-        StackPane stackPane = new StackPane();
+            //TODO Добавить транзакции
+        StackPane stackPane         = new StackPane();
         BorderPane root             = new BorderPane();
 
         StackPane sideMenuStack     = SideMenu.buildSideMenu(0);
@@ -41,15 +43,20 @@ public class DayInfoWindow extends Main{
         HBox centerInfo				= new HBox();
         HBox searchStringBox        = new HBox();
 
+        Label adminLabel            = new Label("");
+
         Button totalSumBtn			= new Button();
-        Button cashBtn 				= new Button();
         Button putMasterOnDayBtn    = new Button();
         Button putAdminOnDayBtn     = new Button();
         Button addNewClientBtn      = new Button();
 
         Region spacer               = new Region();
 
-
+        Admin todayAdmin = GetAdmin.getByDate(token, date);
+        if(todayAdmin == null){adminLabel.setText("Админ не назначен");}
+        else {
+                adminLabel.setText("Админ: " + todayAdmin);
+        }
         addNewClientBtn.setMinHeight(30);
         addNewClientBtn.setMinWidth(120);
         addNewClientBtn.setPrefHeight(30);
@@ -60,8 +67,6 @@ public class DayInfoWindow extends Main{
         rightBox.setMinWidth(MENU_WIDTH);
         totalSumBtn.setMinHeight(40);
         totalSumBtn.setMinWidth(150);
-        cashBtn.setMinHeight(40);
-        cashBtn.setMinWidth(150);
         putAdminOnDayBtn.setMinHeight(40);
         putAdminOnDayBtn.setMinWidth(150);
         putMasterOnDayBtn.setMinHeight(40);
@@ -76,18 +81,15 @@ public class DayInfoWindow extends Main{
 
 
         totalSumBtn.setText("Общее: " + totalSum);
-        cashBtn.setText("Касса: " + cash);
         putMasterOnDayBtn.setText("Назначить мастера");
         putAdminOnDayBtn.setText("Назначить администратора");
         addNewClientBtn.setText("Добавить клиента");
 
-        cashBtn.setWrapText(true);
         totalSumBtn.setWrapText(true);
         putAdminOnDayBtn.setWrapText(true);
         putMasterOnDayBtn.setWrapText(true);
         addNewClientBtn.setWrapText(true);
 
-        cashBtn.setTextAlignment(TextAlignment.CENTER);
         totalSumBtn.setTextAlignment(TextAlignment.CENTER);
         putAdminOnDayBtn.setTextAlignment(TextAlignment.CENTER);
         putMasterOnDayBtn.setTextAlignment(TextAlignment.CENTER);
@@ -104,9 +106,9 @@ public class DayInfoWindow extends Main{
         VBox searchStringClients = SearchingStringClients.build(clients, client-> ClientInfoDialog.show(client.getId(), root));
         ScrollPane scrollTable = DayInfoTable.create(date);
 
-        TextArea textArea = new TextArea();
-        textArea.setWrapText(true);
-        textArea.setScrollLeft(Double.MAX_VALUE);
+//        TextArea textArea = new TextArea();
+//        textArea.setWrapText(true);
+//        textArea.setScrollLeft(Double.MAX_VALUE);
 
         searchStringBox.setSpacing(25);
         searchStringBox.setAlignment(Pos.TOP_CENTER);
@@ -127,12 +129,13 @@ public class DayInfoWindow extends Main{
         stackPane.setAlignment(Pos.CENTER);
         StackPane.setAlignment(searchStringBox, Pos.TOP_CENTER);
         StackPane.setAlignment(root, Pos.CENTER);
+        adminLabel.setWrapText(true);
 
-        searchStringBox.getChildren().addAll(searchStringClients, addNewClientBtn);
-        rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, cashBtn, totalSumBtn);
+        searchStringBox.getChildren().addAll(searchStringClients, addNewClientBtn, adminLabel);
+        rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, totalSumBtn);
         leftSheduleHeaders.getChildren().addAll(miniCalendar);
         sheduleHeaders.getChildren().addAll(leftSheduleHeaders, spacer, rightSheduleHeaders);
-        centerInfo.getChildren().addAll(scrollTable, textArea);
+        centerInfo.getChildren().addAll(scrollTable);
         centerBox.getChildren().addAll(sheduleHeaders, centerInfo);
         root.setLeft(sideMenuStack);
         root.setCenter(centerBox);

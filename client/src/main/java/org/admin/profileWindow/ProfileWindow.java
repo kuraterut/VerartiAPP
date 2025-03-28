@@ -15,13 +15,14 @@ import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.event.*;
 import org.admin.utils.entities.Admin;
+import org.admin.utils.entities.User;
 
 import java.io.*;
 
 public class ProfileWindow extends Main{
 	public static BorderPane loadChangeProfileWindow(){
         BorderPane root                 = new BorderPane();
-        StackPane sideMenuStack         = SideMenu.buildSideMenu(2);
+        StackPane sideMenuStack         = SideMenu.buildSideMenu(3);
         GridPane table                  = new GridPane();
 
         VBox rightBox                   = new VBox();
@@ -293,10 +294,14 @@ public class ProfileWindow extends Main{
         bioLbl.setText("Биография");
         roleLbl.setText("Роль");
 
-        Admin admin = (Admin)ConnectionProfile.getProfileInfo(token);
-        
+        Response response = ConnectionProfile.getProfileInfo(token);
+        Admin admin = new Admin();
         Image avatarImage = null;
-        
+        if(response.getCode() != 200){
+
+        }
+
+
         if(admin.getCode() != 200) {
             avatarImage = ConnectionProfile.getProfilePhoto(null);
             name.setText(admin.getMsg());
