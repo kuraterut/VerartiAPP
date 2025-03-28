@@ -1,6 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
+import org.admin.utils.HelpFuncs;
 import org.admin.utils.entities.Master;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -89,8 +90,7 @@ public class GetMaster extends Connection {
 
     public static List<Master> getListByDate(String token, LocalDate date, boolean appointed){
         try{
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String dateStr = formatter.format(date);
+            String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
             String url = "http://localhost:8000/api/admin/appointment/master?";
             url += "date=" + encodedDate + "&appointed=" + appointed;
