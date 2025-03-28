@@ -104,7 +104,7 @@ CREATE TABLE master_shift
     CONSTRAINT unique_user_date UNIQUE (users_id, date)
 );
 
-CREATE TABLE product
+CREATE TABLE resource
 (
     id          serial       not null unique,
     name        varchar(255) not null unique,
@@ -115,7 +115,7 @@ CREATE TABLE users_resource
 (
     id          serial                                         not null unique,
     users_id    int references users (id) on delete cascade    not null,
-    resource_id int references product (id) on delete cascade not null,
+    resource_id int references resource (id) on delete cascade not null,
     CONSTRAINT unique_user_resource UNIQUE (users_id, resource_id)
 );
 
