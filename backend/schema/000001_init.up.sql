@@ -53,8 +53,8 @@ CREATE TABLE option
 
 CREATE TABLE users_option
 (
-    id             serial                                            not null unique,
-    users_id       int references users (id) on delete cascade       not null,
+    id        serial                                       not null unique,
+    users_id  int references users (id) on delete cascade  not null,
     option_id int references option (id) on delete cascade not null,
     CONSTRAINT unique_user_option UNIQUE (users_id, option_id)
 );
@@ -78,13 +78,14 @@ CREATE TABLE master_appointment
     client_id  int references client (id) on delete cascade not null,
     status_id  int references status (id)                   not null default 1,
     start_time VARCHAR(5)                                   not null,
-    date       date                                         not null
+    date       date                                         not null,
+    comment    VARCHAR(511)                                          default ''
 );
 
 CREATE TABLE master_appointment_option
 (
-    id                 serial                                                not null unique,
-    option_id     int references option (id) on delete cascade     not null,
+    id                    serial                                                   not null unique,
+    option_id             int references option (id) on delete cascade             not null,
     master_appointment_id int references master_appointment (id) on delete cascade not null,
     CONSTRAINT unique_option_master_appointment UNIQUE (option_id, master_appointment_id)
 );

@@ -47,6 +47,7 @@ type Appointment interface {
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
 	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
+	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
 }
 
 type Profile interface {

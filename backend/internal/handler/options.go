@@ -16,7 +16,7 @@ func (h *Handler) createOption(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("15:04", input.Duration)
+	err := domain.ValidateTimeOnly(input.Duration)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -144,7 +144,7 @@ func (h *Handler) updateOption(c *gin.Context) {
 		return
 	}
 
-	err = domain.ValidatorDateAndTimeFormat("15:04", input.Duration)
+	err = domain.ValidateTimeOnly(input.Duration)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

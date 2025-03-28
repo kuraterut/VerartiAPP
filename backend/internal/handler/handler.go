@@ -136,6 +136,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			appointment := admin.Group("/appointment")
 			{
 				appointment.POST("/", h.createAppointment)
+				appointment.GET("/", h.getAllAppointmentsByDate)
 				appointment.GET("/client/:id", h.getAppointmentByClientId)
 
 				appointment.POST("/admin", h.putAdminToDate)
