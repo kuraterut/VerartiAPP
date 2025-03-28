@@ -10,7 +10,7 @@ DROP TABLE users_role;
 
 DROP TABLE users_resource;
 
-DROP TABLE product;
+DROP TABLE resource;
 
 DROP TABLE feedback;
 
