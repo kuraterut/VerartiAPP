@@ -4,28 +4,10 @@ import org.admin.calendarOfEmployeesWindow.CalendarOfEmployeesWindow;
 import org.admin.enterpriseWindow.EnterpriseWindow;
 import org.admin.helpWindow.HelpWindow;
 import org.admin.profileWindow.ProfileWindow;
-import org.admin.resourceWindow.ResourceWindow;
-import org.admin.sideMenu.SideMenu;
+import org.admin.productWindow.ProductWindow;
 import org.admin.dayInfoWindow.DayInfoWindow;
-import org.AuthorizationWindow;
-
-import javafx.application.*;
-import javafx.stage.*;
 
 import javafx.scene.*;
-
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.image.*;
-import javafx.scene.shape.*;
-import javafx.scene.paint.*;
-import javafx.geometry.*;
-import javafx.event.*;
-import javafx.animation.*;
-import javafx.collections.*;
-import javafx.util.*;
 
 import java.time.*;
 
@@ -39,12 +21,8 @@ public class AdminInterface{
 		return dayOW.getValue();
 	}
 
-	public static void loadResourcesListWindow(Node node){
-		node.getScene().setRoot(ResourceWindow.loadResourcesListWindow());	
-	}
-
-	public static void loadResourcesRequestsWindow(Node node){
-		node.getScene().setRoot(ResourceWindow.loadResourcesRequestsWindow());	
+	public static void loadProductsWindow(Node node){
+		node.getScene().setRoot(ProductWindow.loadProductsWindow());
 	}
 
 	public static void loadProfileWindow(Node node){
