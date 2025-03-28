@@ -18,6 +18,7 @@ const (
 	MasterShiftTable             = "master_shift"
 	MasterAppointmentTable       = "master_appointment"
 	MasterAppointmentOptionTable = "master_appointment_option"
+	StatusTable                  = "status"
 )
 
 type Config struct {

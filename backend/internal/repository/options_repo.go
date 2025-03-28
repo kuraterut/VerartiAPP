@@ -62,7 +62,7 @@ func (r *OptionPostgres) GetOptionById(optionId int) (models.Option, error) {
 	err := r.db.Get(&option, query, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Option{}, nil
+			return models.Option{}, nil // todo выводить ошибку 404
 		}
 
 		return models.Option{}, err

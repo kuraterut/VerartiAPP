@@ -5,10 +5,10 @@ type MasterAppointment struct {
 	Client    Client   `json:"client"`
 	Master    Users    `json:"master"`
 	Options   []Option `json:"options"`
-	Status    string   `json:"status"`
-	StartTime string   `json:"start_time"`
-	Date      string   `json:"date"`
-	Comment   string   `json:"comment"`
+	Status    string   `json:"status" db:"status"`
+	StartTime string   `json:"start_time" db:"start_time"`
+	Date      string   `json:"date" db:"date"`
+	Comment   string   `json:"comment" db:"comment"`
 }
 
 type MasterAppointmentInput struct {

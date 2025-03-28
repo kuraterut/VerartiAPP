@@ -196,6 +196,36 @@ func (h *Handler) getAppointmentByClientId(c *gin.Context) {
 	})
 }
 
+func (h *Handler) getAllAppointmentsByDate(c *gin.Context) {
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
+		return
+	}
+
+	err := domain.ValidateDateOnly(date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	appointments, err := h.services.Appointment.GetAllAppointmentsByDate(date)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"appointments": appointments,
+	})
+}
+
 func (h *Handler) getDailyAppointment(c *gin.Context) {}
 
 func (h *Handler) getMonthlyAppointment(c *gin.Context) {}
