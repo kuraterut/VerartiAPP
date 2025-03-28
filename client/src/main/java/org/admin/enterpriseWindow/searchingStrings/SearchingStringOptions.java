@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SearchingStringServices extends Main {
+public class SearchingStringOptions extends Main {
     public static VBox build(List<Option> startList, Consumer<Option> func){
         VBox root = new VBox();
 

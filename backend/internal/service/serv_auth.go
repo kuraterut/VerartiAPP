@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/internal/repository"
 	"verarti/models"
 )
@@ -58,7 +58,7 @@ func (s *AuthService) GenerateToken(phone, password, role string) (string, error
 		}
 	}
 	if !exist {
-		return "", internal.NewErrorResponse(403, "this user does not have such a role")
+		return "", domain.NewErrorResponse(403, "this user does not have such a role")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{

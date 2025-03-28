@@ -11,7 +11,7 @@ import org.Main;
 import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.getRequests.GetMaster;
-import org.admin.connection.getRequests.GetService;
+import org.admin.connection.getRequests.GetOption;
 import org.admin.enterpriseWindow.dialog.creation.*;
 
 import org.admin.enterpriseWindow.dialog.infos.*;
@@ -49,7 +49,7 @@ public class EnterpriseWindow extends Main {
 
         List<Admin> admins = GetAdmin.getAll(token);
         List<Master> masters = GetMaster.getAll(token);
-        List<Option> options = GetService.getAll(token);
+        List<Option> options = GetOption.getAll(token);
         List<Client> clients = GetClient.getAll(token);
 
 
@@ -76,7 +76,7 @@ public class EnterpriseWindow extends Main {
         VBox servicesBox = new VBox();
         Label servicesLabel = new Label("Услуги");
         Button addNewServiceButton = new Button("Добавить Услугу");
-        VBox searchingStringsServices = SearchingStringServices.build(options, service-> ServiceInfoDialog.show(service.getId(), root));
+        VBox searchingStringsServices = SearchingStringOptions.build(options, service-> OptionInfoDialog.show(service.getId(), root));
         servicesBox.setAlignment(Pos.CENTER);
         servicesBox.setSpacing(20);
         servicesBox.getChildren().addAll(servicesLabel, addNewServiceButton, searchingStringsServices);
@@ -92,7 +92,7 @@ public class EnterpriseWindow extends Main {
 
         addNewAdminButton.setOnAction(event -> CreateAdminDialog.show(addNewAdminButton));
         addNewMasterButton.setOnAction(event -> CreateMasterDialog.show(addNewMasterButton));
-        addNewServiceButton.setOnAction(event -> CreateServiceDialog.show(addNewServiceButton));
+        addNewServiceButton.setOnAction(event -> CreateOptionDialog.show(addNewServiceButton));
         addNewClientButton.setOnAction(event -> CreateClientDialog.show(addNewClientButton));
 
         enterpriseInfoBox.getChildren().addAll(adminsBox, mastersBox, servicesBox, clientsBox);

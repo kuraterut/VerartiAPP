@@ -1,4 +1,4 @@
-package org.admin.enterpriseWindow.dialog.creation;
+package org.admin.productWindow.dialog;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -15,18 +15,17 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.postRequests.CreateService;
+import org.admin.connection.postRequests.CreateAdmin;
+import org.admin.connection.postRequests.CreateProduct;
 import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.utils.entities.Admin;
+import org.admin.utils.entities.Product;
 
-import java.time.LocalTime;
-
-
-public class CreateServiceDialog extends Main {
+public class CreateProductDialog extends Main {
     public static void show(Node node){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("Создать Услугу");
+        dialog.setTitle("Создать Продукт");
 
         GridPane table = new GridPane();
 
@@ -36,20 +35,22 @@ public class CreateServiceDialog extends Main {
         Button cancelBtn = new Button();
         Button addBtn = new Button();
 
-        Label errorMsg = new Label("");
+        Label errorMsg = new Label();
         Label nameHeadLbl = new Label("Название: ");
         Label priceHeadLbl = new Label("Прайс: ");
-        Label durationHeadLbl = new Label("Время (hh:mm): ");
+        Label countHeadLbl = new Label("Количество: ");
         Label descriptionHeadLbl = new Label("Описание: ");
 
         TextField nameTextField = new TextField();
         TextField priceTextField = new TextField();
-        TextField durationTextField = new TextField();
+        TextField countTextField = new TextField();
         TextArea descriptionTextArea = new TextArea();
+
+        errorMsg.setText("");
 
         table.setAlignment(Pos.CENTER);
 
-        addBtn.setText("Создать Услугу");
+        addBtn.setText("Создать");
         addBtn.setWrapText(true);
         addBtn.setTextAlignment(TextAlignment.CENTER);
 
@@ -63,75 +64,62 @@ public class CreateServiceDialog extends Main {
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
-        table.addColumn(0, nameHeadLbl, priceHeadLbl, durationHeadLbl, descriptionHeadLbl);
-        table.addColumn(1, nameTextField, priceTextField, durationTextField, descriptionTextArea);
+        table.addColumn(0, nameHeadLbl, priceHeadLbl, countHeadLbl, descriptionHeadLbl);
+        table.addColumn(1, nameTextField, priceTextField, countTextField, descriptionTextArea);
 
         GridPane.setHalignment(nameHeadLbl, HPos.CENTER);
         GridPane.setValignment(nameHeadLbl, VPos.CENTER);
         GridPane.setHalignment(priceHeadLbl, HPos.CENTER);
         GridPane.setValignment(priceHeadLbl, VPos.CENTER);
-        GridPane.setHalignment(durationHeadLbl, HPos.CENTER);
-        GridPane.setValignment(durationHeadLbl, VPos.CENTER);
+        GridPane.setHalignment(countHeadLbl, HPos.CENTER);
+        GridPane.setValignment(countHeadLbl, VPos.CENTER);
         GridPane.setHalignment(descriptionHeadLbl, HPos.CENTER);
         GridPane.setValignment(descriptionHeadLbl, VPos.CENTER);
-
 
         GridPane.setHalignment(nameTextField, HPos.CENTER);
         GridPane.setValignment(nameTextField, VPos.CENTER);
         GridPane.setHalignment(priceTextField, HPos.CENTER);
         GridPane.setValignment(priceTextField, VPos.CENTER);
-        GridPane.setHalignment(durationTextField, HPos.CENTER);
-        GridPane.setValignment(durationTextField, VPos.CENTER);
+        GridPane.setHalignment(countTextField, HPos.CENTER);
+        GridPane.setValignment(countTextField, VPos.CENTER);
         GridPane.setHalignment(descriptionTextArea, HPos.CENTER);
         GridPane.setValignment(descriptionTextArea, VPos.CENTER);
 
         table.getColumnConstraints().add(new ColumnConstraints(150));
-        table.getColumnConstraints().add(new ColumnConstraints(200));
+        table.getColumnConstraints().add(new ColumnConstraints(250));
         table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
-        table.getRowConstraints().add(new RowConstraints(50));
-        table.getRowConstraints().add(new RowConstraints(100));
+        table.getRowConstraints().add(new RowConstraints(150));
 
         cancelBtn.setOnAction(event -> dialog.close());
         addBtn.setOnAction(event -> {
             String name = nameTextField.getText();
-            //TODO Сделать нормальную проверку
-            Long price = 0L;
-            try{price = Long.parseLong(priceTextField.getText());}
-            catch (Exception e){errorMsg.setText("Неверно указана цена"); return;}
-
-            LocalTime duration = null;
-            try{
-                String durationHoursStr = durationTextField.getText().split(":")[0];
-                String durationMinutesStr = durationTextField.getText().split(":")[1];
-                Integer durationHours = Integer.parseInt(durationHoursStr);
-                Integer durationMinutes = Integer.parseInt(durationMinutesStr);
-                if(durationMinutes % 30 != 0){errorMsg.setText("Неверный формат времени(ячейки по 30 минут)"); return;}
-                duration = LocalTime.of(durationHours, durationMinutes);
-            }catch (Exception e){
-                errorMsg.setText("Неверный формат времени(ячейки по 30 минут)");
-                return;
-            }
-
             String description = descriptionTextArea.getText();
 
-            Option option = new Option();
+            Long price = 0L;
+            try{price = Long.parseLong(priceTextField.getText());}
+            catch (NumberFormatException e){errorMsg.setText("Неправильный формат прайса, должно быть целое число");}
 
-            option.setName(name);
-            option.setPrice(price);
-            option.setDuration(duration);
-            option.setDescription(description);
+            Integer count = 0;
+            try{count = Integer.parseInt(countTextField.getText());}
+            catch (NumberFormatException e){errorMsg.setText("Неправильный формат количества, должно быть целое число");}
 
-            Response response = CreateService.post(token, option);
+
+            Product product = new Product();
+
+            product.setName(name);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setCount(count);
+
+            Response response = CreateProduct.post(token, product);
             if(response.getCode() == 200) {
-                AdminInterface.loadEnterpriseWindow(node);
+                AdminInterface.loadProductsWindow(node);
                 dialog.close();
             }
             else{errorMsg.setText(response.getMsg());}
         });
-
-
         btnsBox.getChildren().addAll(cancelBtn, addBtn);
         root.getChildren().addAll(table, errorMsg, btnsBox);
 
@@ -141,4 +129,3 @@ public class CreateServiceDialog extends Main {
         dialog.showAndWait();
     }
 }
-

@@ -3,6 +3,7 @@ package org.admin.dayInfoWindow.dialog;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -10,8 +11,12 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.AdminInterface;
+import org.admin.connection.deleteRequests.DeleteClient;
 import org.admin.connection.getRequests.GetAppointment;
 import org.admin.connection.getRequests.GetClient;
+import org.admin.connection.putRequests.UpdateClient;
+import org.admin.utils.Response;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
 import org.admin.utils.entities.Option;
@@ -20,10 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientInfoDialog extends Main {
-    public static void show(Long clientId){
+    public static void show(Long clientId, Node node){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("Информация о клиенте");
+        dialog.setTitle("Информация о Клиенте");
 
         Client client = GetClient.getById(token, clientId);
 
@@ -57,7 +62,7 @@ public class ClientInfoDialog extends Main {
             Label appointmentDateTimeLbl = new Label(appointment.getDateTimeStr());
 
             VBox appointmentServicesVBox = new VBox();
-            for(Option option : appointment.getServices()){
+            for(Option option : appointment.getOptions()){
                 Label serviceNameLbl = new Label(option.getName());
                 appointmentServicesVBox.getChildren().add(serviceNameLbl);
             }
@@ -99,8 +104,9 @@ public class ClientInfoDialog extends Main {
         VBox root = new VBox();
         HBox btnsBox = new HBox();
 
-        Button cancelBtn = new Button();
-        Button saveBtn = new Button();
+        Button cancelBtn = new Button("Отмена");
+        Button deleteButton = new Button("Удалить");
+        Button saveBtn = new Button("Сохранить");
 
         Label errorMsg = new Label();
         Label nameHeadLbl = new Label("Имя: ");
@@ -128,18 +134,20 @@ public class ClientInfoDialog extends Main {
 
         table.setAlignment(Pos.CENTER);
 
-        saveBtn.setText("Сохранить");
+
         saveBtn.setWrapText(true);
         saveBtn.setTextAlignment(TextAlignment.CENTER);
 
-        cancelBtn.setText("Отмена");
         cancelBtn.setWrapText(true);
         cancelBtn.setTextAlignment(TextAlignment.CENTER);
+
+        deleteButton.setWrapText(true);
+        deleteButton.setTextAlignment(TextAlignment.CENTER);
 
         btnsBox.setSpacing(200);
         btnsBox.setAlignment(Pos.CENTER);
 
-        root.setSpacing(50);
+        root.setSpacing(20);
         root.setAlignment(Pos.CENTER);
 
         table.add(nameHeadLbl, 0, 0);
@@ -185,15 +193,36 @@ public class ClientInfoDialog extends Main {
         table.getRowConstraints().add(new RowConstraints(50));
 
         cancelBtn.setOnAction(event -> dialog.close());
+        saveBtn.setOnAction(event -> {
+            Client newClient = new Client();
+            newClient.setName(nameTextField.getText());
+            newClient.setSurname(surnameTextField.getText());
+            newClient.setPatronymic(patronymicTextField.getText());
+            newClient.setPhone(phoneTextField.getText());
+            newClient.setBirthday(birthdayDatePicker.getValue());
+            newClient.setComment(commentsArea.getText());
+            Response response = UpdateClient.updateInfo(token, newClient);
+            if(response.getCode() == 200){errorMsg.setText("Сохранено");}
+            else{errorMsg.setText(response.getMsg());}
+        });
+        deleteButton.setOnAction(event -> {
+            //TODO ALERT DELETE
+            Response response = DeleteClient.deleteById(token, client.getId());
+            if(response.getCode() == 200){
+                dialog.close();
+                AdminInterface.loadEnterpriseWindow(node);
+            }
+            else{errorMsg.setText(response.getMsg());}
+        });
 
         appointmentsTable.setAlignment(Pos.CENTER);
         appointmentsScrollPane.setFitToWidth(true);
         appointmentsScrollPane.setFitToHeight(true);
 
 
-        btnsBox.getChildren().addAll(cancelBtn, saveBtn);
+        btnsBox.getChildren().addAll(cancelBtn, deleteButton, saveBtn);
         root.getChildren().addAll(headLbl, table, appointmentsScrollPane, commentsArea, errorMsg, btnsBox);
-        Scene dialogScene = new Scene(root, 1500, 800);
+        Scene dialogScene = new Scene(root, 1200, 700);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();

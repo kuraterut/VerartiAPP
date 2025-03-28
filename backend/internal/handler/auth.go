@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 )
 
@@ -41,7 +41,7 @@ func (h *Handler) signUp(c *gin.Context) {
 
 	id, err := h.services.Authorization.CreateUser(input, roleIds)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -72,7 +72,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	token, err := h.services.Authorization.GenerateToken(input.Phone, input.Password, input.Role)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

@@ -37,7 +37,7 @@ import org.json.simple.parser.*;
 public class HelpWindow extends Main{
 	public static BorderPane loadHelpWindow(){
         BorderPane root             = new BorderPane();
-        StackPane sideMenuStack     = SideMenu.buildSideMenu(3);
+        StackPane sideMenuStack     = SideMenu.buildSideMenu(4);
         
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();

@@ -5,12 +5,13 @@ import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 import org.json.simple.JSONObject;
 
-public class UpdateService extends Connection {
+public class UpdateOption extends Connection {
     public static Response updateInfo(String token, Option option){
         try {
             getConnection("http://localhost:8000/api/admin/option/" + option.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
 
             JSONObject out = new JSONObject();
             out.put("name", option.getName());

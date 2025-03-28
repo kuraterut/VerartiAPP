@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"verarti/internal"
 	"verarti/internal/domain"
 	"verarti/models"
 )
@@ -28,7 +27,7 @@ func (h *Handler) createClient(c *gin.Context) {
 
 	id, err := h.services.Client.CreateClient(input)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -46,7 +45,7 @@ func (h *Handler) createClient(c *gin.Context) {
 func (h *Handler) getAllClients(c *gin.Context) {
 	clients, err := h.services.Client.GetAllClients()
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -70,7 +69,7 @@ func (h *Handler) getClientById(c *gin.Context) {
 
 	client, err := h.services.Client.GetClientById(clientId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -92,7 +91,7 @@ func (h *Handler) getClientByPhone(c *gin.Context) {
 
 	client, err := h.services.Client.GetClientByPhone(phone)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -138,7 +137,7 @@ func (h *Handler) updateClient(c *gin.Context) {
 
 	err = h.services.Client.UpdateClient(clientId, client)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

@@ -1,5 +1,6 @@
 package org.admin.dayInfoWindow.searchingStrings;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -10,41 +11,59 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.connection.getRequests.GetClient;
 import org.admin.utils.entities.Client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class SearchingStringClients extends Main {
-    public static VBox build(){
+    public static VBox build(List<Client> clients, Consumer<Client> func){
         VBox root = new VBox();
 
-        List<Client> clients = GetClient.getAll(token);
+
+        root.setPrefSize(300, 600);
+        root.setMaxSize(300, 600);
+
         TextField searchTextField = new TextField();
 
         ObservableList<Client> clientsObservable = FXCollections.observableArrayList(clients);
         ListView<Client> clientsListView = new ListView<>(clientsObservable);
 
+        MultipleSelectionModel<Client> selectionModel = clientsListView.getSelectionModel();
+
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            root.getChildren().remove(clientsListView);
-            List<Client> filterClients = filter(clients, newValue);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    selectionModel.clearSelection();
+                    root.getChildren().remove(clientsListView);
+                    List<Client> filterClients = filter(clients, newValue);
 
-            ObservableList<Client> filterClientsObservable = FXCollections.observableArrayList(filterClients);
-            clientsListView.setItems(filterClientsObservable);
-            if(!filterClients.isEmpty() && !newValue.isEmpty()){
-                root.getChildren().add(clientsListView);
-            }
+                    ObservableList<Client> filterClientsObservable = FXCollections.observableArrayList(filterClients);
+                    clientsListView.setItems(filterClientsObservable);
+                    if (!filterClients.isEmpty() && !newValue.isEmpty()) {
+                        root.getChildren().add(clientsListView);
+                    }
+                }
+            });
         });
 
-        MultipleSelectionModel<Client> clientsSelectionModel = clientsListView.getSelectionModel();
         // устанавливаем слушатель для отслеживания изменений
-        clientsSelectionModel.selectedItemProperty().addListener(new ChangeListener<Client>(){
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<Client>(){
             public void changed(ObservableValue<? extends Client> changed, Client oldValue, Client newValue){
-                System.out.println(newValue);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(newValue != null){
+                            selectionModel.clearSelection();
+                            func.accept(newValue);
+                        }
+                    }
+                });
             }
         });
-        clientsListView.setPrefSize(300, 250);
+        clientsListView.setPrefSize(300, 600);
         searchTextField.setPrefSize(300, 30);
 
         root.getChildren().addAll(searchTextField);

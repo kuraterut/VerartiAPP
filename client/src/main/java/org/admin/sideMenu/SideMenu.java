@@ -69,7 +69,7 @@ public class SideMenu extends Main{
 
         ButtonBase[] mainSideMenuBtn = new ButtonBase[6];
         mainSideMenuBtn[0] = new Button();
-        mainSideMenuBtn[1] = new ToggleButton();
+        mainSideMenuBtn[1] = new Button();
         mainSideMenuBtn[2] = new Button();
         mainSideMenuBtn[3] = new Button();
         mainSideMenuBtn[4] = new Button();
@@ -83,7 +83,7 @@ public class SideMenu extends Main{
             mainSideMenuBtn[i].setPrefHeight(SIDEMENU_BTN_HEIGHT);
         }
         mainSideMenuBtn[0].setText("Главная");
-        mainSideMenuBtn[1].setText("Ресурсы");
+        mainSideMenuBtn[1].setText("Товары");
         mainSideMenuBtn[2].setText("Календарь сотрудников");
         mainSideMenuBtn[3].setText("Профиль");
         mainSideMenuBtn[4].setText("Помощь");
@@ -108,40 +108,13 @@ public class SideMenu extends Main{
         menuIcon.setFitHeight(60);
 
         mainSideMenuBtn[0].setOnAction(event -> AdminInterface.loadDayInfoWindow(mainSideMenuBtn[0], LocalDate.now()));
+        mainSideMenuBtn[1].setOnAction(event -> AdminInterface.loadProductsWindow(mainSideMenuBtn[1]));
         mainSideMenuBtn[2].setOnAction(event -> AdminInterface.loadCalendarOfEmployeesWindow(mainSideMenuBtn[2]));
         mainSideMenuBtn[3].setOnAction(event -> AdminInterface.loadProfileWindow(mainSideMenuBtn[3]));
         mainSideMenuBtn[4].setOnAction(event -> AdminInterface.loadHelpWindow(mainSideMenuBtn[4]));
         mainSideMenuBtn[5].setOnAction(event -> AdminInterface.loadEnterpriseWindow(mainSideMenuBtn[5]));
 
-        ToggleButton resourcesBtn = (ToggleButton)mainSideMenuBtn[1];
-        resourcesBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (resourcesBtn.isSelected()){
-                    Button listBtn = new Button("Список");
-                    Button requestsBtn = new Button("Запросы");
 
-                    listBtn.setOnAction(e -> AdminInterface.loadResourcesListWindow(listBtn));
-                    requestsBtn.setOnAction(e -> AdminInterface.loadResourcesRequestsWindow(requestsBtn));
-
-                    listBtn.setPrefWidth(MENU_WIDTH-30);
-                    requestsBtn.setPrefWidth(MENU_WIDTH-30);
-                    listBtn.setPrefHeight(SIDEMENU_BTN_HEIGHT-30);
-                    requestsBtn.setPrefHeight(SIDEMENU_BTN_HEIGHT-30);
-
-                    sideMenuBtnsList.add(sideMenuBtnsList.indexOf(resourcesBtn)+1, requestsBtn);
-                    sideMenuBtnsList.add(sideMenuBtnsList.indexOf(resourcesBtn)+1, listBtn);
-                    sideMenuBox.getChildren().clear();
-                    for(int i = 0; i < sideMenuBtnsList.size(); i++){sideMenuBox.getChildren().add(sideMenuBtnsList.get(i));}
-                }
-                else{
-                    sideMenuBtnsList.remove(sideMenuBtnsList.indexOf(resourcesBtn)+1);
-                    sideMenuBtnsList.remove(sideMenuBtnsList.indexOf(resourcesBtn)+1);
-                    sideMenuBox.getChildren().clear();
-                    for(int i = 0; i < sideMenuBtnsList.size(); i++){sideMenuBox.getChildren().add(sideMenuBtnsList.get(i));}
-                }
-            }
-        });
 
 
         for(int i = 0; i < sideMenuBtnsList.size(); i++){sideMenuBox.getChildren().add(sideMenuBtnsList.get(i));}

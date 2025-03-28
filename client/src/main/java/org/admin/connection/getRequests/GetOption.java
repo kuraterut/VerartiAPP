@@ -9,7 +9,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetService extends Connection {
+public class GetOption extends Connection {
     public static List<Option> getAll(String token){
         try{
             getConnection("http://localhost:8000/api/admin/option/");
@@ -79,15 +79,15 @@ public class GetService extends Connection {
     }
     public static List<Option> getListByMasterId(String token, Long masterId){
         try{
-            getConnection("http://localhost:8000/api/admin/option/master/" + masterId);
+            getConnection("http://localhost:8000/api/admin/option/master?master_id=" + masterId);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-
+            System.out.println(data);
             List<Option> options = new ArrayList<>();
-            JSONArray servicesArray = (JSONArray) data.get("options");
-            for (Object serviceObj : servicesArray) {
+            JSONArray optionsArray = (JSONArray) data.get("options");
+            for (Object serviceObj : optionsArray) {
                 JSONObject serviceJSON = (JSONObject) serviceObj;
                 Option option = new Option();
 
@@ -95,7 +95,7 @@ public class GetService extends Connection {
                 String name = (String) serviceJSON.get("name");
                 String description = (String) serviceJSON.get("description");
                 Long price = (Long) serviceJSON.get("price");
-                String[] durationStr = ((String)data.get("duration")).split(":");
+                String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
                 LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
 
                 option.setId(id);
@@ -110,7 +110,7 @@ public class GetService extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println("class GetService, getListByMasterId " + ex);
+            System.out.println("class GetOption, getListByMasterId " + ex);
             return new ArrayList<>();
         }
     }

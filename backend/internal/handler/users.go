@@ -5,13 +5,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"verarti/internal"
+	"verarti/internal/domain"
 )
 
 func (h *Handler) getAllMasters(c *gin.Context) {
 	masters, err := h.services.User.GetAllMasters()
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -35,7 +35,7 @@ func (h *Handler) getMasterById(c *gin.Context) {
 
 	master, err := h.services.User.GetMasterById(masterId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -51,7 +51,7 @@ func (h *Handler) getMasterById(c *gin.Context) {
 func (h *Handler) getAllAdmins(c *gin.Context) {
 	admins, err := h.services.User.GetAllAdmins()
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -75,7 +75,7 @@ func (h *Handler) getAdminById(c *gin.Context) {
 
 	admin, err := h.services.User.GetAdminById(adminId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return
@@ -97,7 +97,7 @@ func (h *Handler) deleteUser(c *gin.Context) {
 
 	err = h.services.User.DeleteUser(userId)
 	if err != nil {
-		var errResp *internal.ErrorResponse
+		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
 			newErrorResponse(c, errResp.Code, errResp.Text)
 			return

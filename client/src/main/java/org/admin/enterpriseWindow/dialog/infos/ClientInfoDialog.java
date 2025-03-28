@@ -16,9 +16,9 @@ import org.admin.connection.deleteRequests.DeleteClient;
 import org.admin.connection.getRequests.GetAppointment;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.putRequests.UpdateClient;
+import org.admin.utils.Response;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
-import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class ClientInfoDialog extends Main {
             Label appointmentDateTimeLbl = new Label(appointment.getDateTimeStr());
 
             VBox appointmentServicesVBox = new VBox();
-            for(Option option : appointment.getServices()){
+            for(Option option : appointment.getOptions()){
                 Label serviceNameLbl = new Label(option.getName());
                 appointmentServicesVBox.getChildren().add(serviceNameLbl);
             }
@@ -147,7 +147,7 @@ public class ClientInfoDialog extends Main {
         btnsBox.setSpacing(200);
         btnsBox.setAlignment(Pos.CENTER);
 
-        root.setSpacing(50);
+        root.setSpacing(20);
         root.setAlignment(Pos.CENTER);
 
         table.add(nameHeadLbl, 0, 0);
@@ -194,7 +194,14 @@ public class ClientInfoDialog extends Main {
 
         cancelBtn.setOnAction(event -> dialog.close());
         saveBtn.setOnAction(event -> {
-            Response response = UpdateClient.updateInfo(token, client);
+            Client newClient = new Client();
+            newClient.setName(nameTextField.getText());
+            newClient.setSurname(surnameTextField.getText());
+            newClient.setPatronymic(patronymicTextField.getText());
+            newClient.setPhone(phoneTextField.getText());
+            newClient.setBirthday(birthdayDatePicker.getValue());
+            newClient.setComment(commentsArea.getText());
+            Response response = UpdateClient.updateInfo(token, newClient);
             if(response.getCode() == 200){errorMsg.setText("Сохранено");}
             else{errorMsg.setText(response.getMsg());}
         });
@@ -215,7 +222,7 @@ public class ClientInfoDialog extends Main {
 
         btnsBox.getChildren().addAll(cancelBtn, deleteButton, saveBtn);
         root.getChildren().addAll(headLbl, table, appointmentsScrollPane, commentsArea, errorMsg, btnsBox);
-        Scene dialogScene = new Scene(root, 1200, 600);
+        Scene dialogScene = new Scene(root, 1200, 700);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();

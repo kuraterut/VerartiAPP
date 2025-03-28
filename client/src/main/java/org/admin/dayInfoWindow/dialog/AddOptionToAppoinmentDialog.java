@@ -8,13 +8,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
+import org.admin.enterpriseWindow.searchingStrings.SearchingStringOptions;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Option;
 
 import java.util.List;
 
-public class AddServiceToAppoinmentDialog extends Main {
+public class AddOptionToAppoinmentDialog extends Main {
     public static void show(VBox tableBox, Appointment appointment, List<Option> options){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -23,11 +23,11 @@ public class AddServiceToAppoinmentDialog extends Main {
         VBox root = new VBox();
 
         Label headerLabel = new Label("Добавьте услугу");
-        VBox searchingStringBox = SearchingStringServices.build(options, service->{
+        VBox searchingStringBox = SearchingStringOptions.build(options, service->{
             if(service != null){
-                appointment.addService(service);
-                tableBox.getChildren().removeAll();
-                tableBox.getChildren().add(CreateAppointmentDialog.buildTableServices(appointment.getServices()));
+                appointment.addOption(service);
+                tableBox.getChildren().clear();
+                tableBox.getChildren().add(CreateAppointmentDialog.buildTableServices(appointment.getOptions()));
                 dialog.close();
             }
         });

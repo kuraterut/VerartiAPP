@@ -1,6 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
+import org.admin.utils.HelpFuncs;
 import org.admin.utils.entities.Appointment;
 import org.admin.utils.entities.Client;
 import org.admin.utils.entities.Master;
@@ -94,7 +95,7 @@ public class GetAppointment extends Connection {
             JSONArray servicesArr = (JSONArray)data.get("options");
             for(Object serviceObj: servicesArr){
                 Long serviceId = (Long)serviceObj;
-                Option option = GetService.getById(token, serviceId);
+                Option option = GetOption.getById(token, serviceId);
                 options.add(option);
             }
 
@@ -106,7 +107,7 @@ public class GetAppointment extends Connection {
             appointment.setClient(client);
             appointment.setMaster(master);
             appointment.setDate(date);
-            appointment.setServices(options);
+            appointment.setOptions(options);
             appointment.setComment(comment);
 
             return appointment;
@@ -115,6 +116,42 @@ public class GetAppointment extends Connection {
         catch(Exception ex){
             System.out.println(ex);
             return null;
+        }
+    }
+
+    public static List<Appointment> getAllByDate(String token, LocalDate date){
+        try{
+            getConnection("http://localhost:8000/api/admin/appointment/day?date=" + HelpFuncs.localDateToString(date, "yyyy-MM-dd"));
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+
+            JSONObject data = getJson();
+
+            List<Appointment> appointments = new ArrayList<>();
+
+            JSONArray jsonArr = (JSONArray)data.get("appointments");
+            for(Object elem : jsonArr){
+                JSONObject obj = (JSONObject)elem;
+                Appointment appointment = new Appointment();
+                Long appointmentId = (Long)obj.get("id");
+                Long masterId 			= (Long)data.get("master_id");
+                Long clientId 			= (Long)data.get("client_id");
+                String comment 			= (String)data.get("comment");
+                LocalTime startTime 	= LocalTime.parse((String)obj.get("start_time"));
+
+                appointment.setId(appointmentId);
+                appointment.setStartTime(startTime);
+                appointment.setDate(date);
+                appointment.setMaster(GetMaster.getById(token, masterId));
+                appointment.setClient(GetClient.getById(token, clientId));
+                appointment.setComment(comment);
+                appointments.add(appointment);
+            }
+            return appointments;
+        }
+        catch(Exception ex){
+            System.out.println(ex);
+            return new ArrayList<>();
         }
     }
 }

@@ -12,6 +12,7 @@ public class UpdateClient extends Connection {
             getConnection("http://localhost:8000/api/admin/clients/" + client.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
 
             JSONObject out = new JSONObject();
             out.put("name", client.getName());

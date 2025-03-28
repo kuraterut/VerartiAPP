@@ -13,6 +13,7 @@ public class UpdateMaster extends Connection {
             getConnection("http://localhost:8000/api/admin/users/master/" + master.getId());
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
 
             JSONObject out = new JSONObject();
             out.put("name", master.getName());
@@ -20,11 +21,6 @@ public class UpdateMaster extends Connection {
             out.put("patronymic", master.getPatronymic());
             out.put("phone", master.getPhone());
             out.put("bio", master.getBio());
-            JSONArray servicesArray = new JSONArray();
-            for(Option option : master.getServices()){
-                servicesArray.add(option.getId());
-            }
-            out.put("options", servicesArray);
             sendJson(out);
 
             int status = connection.getResponseCode();

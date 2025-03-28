@@ -1,11 +1,10 @@
 package org.admin.connection.postRequests;
 
-import org.Main;
 import org.admin.connection.Connection;
 import org.admin.utils.Response;
 import org.json.simple.JSONObject;
 
-public class AddServiceToMaster extends Connection {
+public class AddOptionToMaster extends Connection {
     public static Response post(String token, Long masterId, Long service_id){
         try {
             getConnection("http://localhost:8000/api/admin/option/"+service_id);

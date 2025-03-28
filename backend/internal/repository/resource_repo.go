@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"verarti/internal"
+	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
 )
@@ -43,7 +43,7 @@ func (r *ResourcePostgres) GetById(resourceId int) (models.Resource, error) {
 	query := fmt.Sprintf("Select * from %s WHERE id = $1", database.ResourceTable)
 	err := r.db.Get(&resource, query, resourceId)
 	if errors.Is(err, sql.ErrNoRows) {
-		return models.Resource{}, internal.NewErrorResponse(404, "resource not found")
+		return models.Resource{}, domain.NewErrorResponse(404, "resource not found")
 	}
 
 	return resource, err
@@ -68,7 +68,7 @@ func (r *ResourcePostgres) Add(masterId, resourceId int) (int, error) {
 	err := r.db.Get(&resource, query, resourceId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, internal.NewErrorResponse(400, "adding a non-existent resource")
+			return 0, domain.NewErrorResponse(400, "adding a non-existent resource")
 		}
 
 		return 0, err

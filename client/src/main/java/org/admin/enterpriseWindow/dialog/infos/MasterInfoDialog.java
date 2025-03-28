@@ -12,12 +12,12 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.deleteRequests.DeleteMaster;
-import org.admin.connection.deleteRequests.DeleteService;
+import org.admin.connection.deleteRequests.DeleteOption;
 import org.admin.connection.getRequests.GetMaster;
-import org.admin.connection.getRequests.GetService;
-import org.admin.connection.postRequests.AddServiceToMaster;
+import org.admin.connection.getRequests.GetOption;
+import org.admin.connection.postRequests.AddOptionToMaster;
 import org.admin.connection.putRequests.UpdateMaster;
-import org.admin.enterpriseWindow.searchingStrings.SearchingStringServices;
+import org.admin.enterpriseWindow.searchingStrings.SearchingStringOptions;
 import org.admin.utils.entities.Master;
 import org.admin.utils.Response;
 import org.admin.utils.entities.Option;
@@ -129,8 +129,8 @@ public class MasterInfoDialog extends Main {
         });
 
         addServiceButton.setOnAction(event -> {
-            List<Option> allOptions = GetService.getAll(token);
-            List<Option> masterOptions = GetService.getListByMasterId(token, master.getId());
+            List<Option> allOptions = GetOption.getAll(token);
+            List<Option> masterOptions = GetOption.getListByMasterId(token, master.getId());
             List<Option> notMasterOptions = new ArrayList<>();
             for(Option option : allOptions){
                 if(!masterOptions.contains(option)){
@@ -141,7 +141,14 @@ public class MasterInfoDialog extends Main {
         });
 
         saveButton.setOnAction(event -> {
-            Response response = UpdateMaster.updateInfo(token, master);
+            Master newMaster = new Master();
+            newMaster.setName(nameTextField.getText());
+            newMaster.setSurname(surnameTextField.getText());
+            newMaster.setPatronymic(patronymicTextField.getText());
+            newMaster.setPhone(phoneTextField.getText());
+            newMaster.setBio(bioTextArea.getText());
+
+            Response response = UpdateMaster.updateInfo(token, newMaster);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
             else{messageLabel.setText(response.getMsg());}
         });
@@ -163,9 +170,8 @@ public class MasterInfoDialog extends Main {
         Label headerLabel = new Label("Выберите услугу");
         Button cancelButton = new Button("Отмена");
 
-        VBox searchingStringServices = SearchingStringServices.build(options, service->{
-            master.addService(service);
-            Response response = AddServiceToMaster.post(token, master.getId(), service.getId());
+        VBox searchingStringServices = SearchingStringOptions.build(options, service->{
+            Response response = AddOptionToMaster.post(token, master.getId(), service.getId());
             if(response.getCode() == 200){
                 Label servicesBoxLabel = new Label("Услуги");
                 servicesBox.getChildren().clear();
@@ -208,8 +214,9 @@ public class MasterInfoDialog extends Main {
         GridPane.setHalignment(servicesTableHeaders[3], HPos.CENTER);
         GridPane.setValignment(servicesTableHeaders[3], VPos.CENTER);
 
+        List<Option> masterOptions = GetOption.getListByMasterId(token, master.getId());
         int index = 1;
-        for(Option option : master.getServices()){
+        for(Option option : masterOptions){
             Label serviceIdLabel = new Label(option.getId().toString());
             Label serviceNameLabel = new Label(option.getName());
             Label servicePriceLabel = new Label(option.getPrice().toString());
@@ -217,7 +224,7 @@ public class MasterInfoDialog extends Main {
             Button deleteService = new Button("Удалить");
 
             deleteService.setOnAction(event -> {
-                DeleteService.deleteByMasterId(token, option.getId(), master.getId());
+                DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
                 tableVBox.getChildren().clear();
                 Label servicesHeadLabel = new Label("Услуги: ");
                 tableVBox.getChildren().addAll(servicesHeadLabel, buildServiceTable(master, tableVBox));
