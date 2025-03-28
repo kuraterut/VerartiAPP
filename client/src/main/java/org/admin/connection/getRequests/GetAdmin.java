@@ -54,7 +54,7 @@ public class GetAdmin extends Connection {
         try{
             String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/shedule/admin?date=" + encodedDate);
+            getConnection("http://localhost:8000/api/admin/appointment/admin?date=" + encodedDate);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

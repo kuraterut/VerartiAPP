@@ -109,29 +109,37 @@ public class DayInfoWindow extends Main{
 //        TextArea textArea = new TextArea();
 //        textArea.setWrapText(true);
 //        textArea.setScrollLeft(Double.MAX_VALUE);
+        VBox headBox = new VBox();
 
         searchStringBox.setSpacing(25);
         searchStringBox.setAlignment(Pos.TOP_CENTER);
-        searchStringBox.setMaxSize(500, 100);
-        searchStringBox.setPadding(new Insets(10, 0, 0, 0));
+        searchStringBox.setMaxWidth(700);
+
+        headBox.setSpacing(10);
+        headBox.setAlignment(Pos.TOP_CENTER);
+        headBox.setMaxSize(700, 100);
+        headBox.setPadding(new Insets(10, 0, 0, 0));
 
         miniCalendar.valueProperty().addListener((observable, oldValue, newValue) -> {
             AdminInterface.loadDayInfoWindow(miniCalendar, newValue);
         });
 
 
-        putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date, putMasterOnDayBtn));
-        putAdminOnDayBtn.setOnAction(event -> PutAdminOnDateDialog.show(date, putAdminOnDayBtn));
-        // сash.setOnAction(event -> showCashDialog());
-        // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
-        addNewClientBtn.setOnAction(event -> AddNewClientDialog.show(addNewClientBtn, date));
+            putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date, putMasterOnDayBtn));
+            putAdminOnDayBtn.setOnAction(event -> PutAdminOnDateDialog.show(date, putAdminOnDayBtn));
+            // сash.setOnAction(event -> showCashDialog());
+            // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
+            addNewClientBtn.setOnAction(event -> AddNewClientDialog.show(addNewClientBtn, date));
 
         stackPane.setAlignment(Pos.CENTER);
-        StackPane.setAlignment(searchStringBox, Pos.TOP_CENTER);
+        StackPane.setAlignment(headBox, Pos.TOP_CENTER);
         StackPane.setAlignment(root, Pos.CENTER);
         adminLabel.setWrapText(true);
 
-        searchStringBox.getChildren().addAll(searchStringClients, addNewClientBtn, adminLabel);
+
+
+        searchStringBox.getChildren().addAll(searchStringClients, addNewClientBtn);
+        headBox.getChildren().addAll(searchStringBox, adminLabel);
         rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, totalSumBtn);
         leftSheduleHeaders.getChildren().addAll(miniCalendar);
         sheduleHeaders.getChildren().addAll(leftSheduleHeaders, spacer, rightSheduleHeaders);
@@ -141,7 +149,7 @@ public class DayInfoWindow extends Main{
         root.setCenter(centerBox);
         root.setRight(rightBox);
 
-        stackPane.getChildren().addAll(root, searchStringBox);
+        stackPane.getChildren().addAll(root, headBox);
 
         return stackPane;
     }

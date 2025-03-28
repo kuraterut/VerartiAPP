@@ -1,6 +1,7 @@
 package org.admin.utils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -15,6 +16,10 @@ public class HelpFuncs {
     public static String localTimeToString(LocalTime time, String format) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return time.format(formatter);
+    }
+    public static String localDateTimeToString(LocalDateTime dateTime, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        return dateTime.format(formatter);
     }
 
     public static boolean checkPhone(String phone) {

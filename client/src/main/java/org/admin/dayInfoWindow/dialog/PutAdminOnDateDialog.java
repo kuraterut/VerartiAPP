@@ -30,7 +30,7 @@ public class PutAdminOnDateDialog extends Main {
 
         Stage dialog            = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("Назначить мастера");
+        dialog.setTitle("Назначить Админа");
 
         Label errorMsg          = new Label("");
         Label dateLbl           = new Label(dateStr);
