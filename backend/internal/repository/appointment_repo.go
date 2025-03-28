@@ -177,11 +177,7 @@ func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool)
 	}
 
 	if len(masters) == 0 {
-		if isAppointed {
-			return nil, domain.NewErrorResponse(404, "there are no appointed masters for this date")
-		}
-
-		return nil, domain.NewErrorResponse(404, "no free masters. Everything is booked for this date")
+		return nil, nil
 	}
 
 	return masters, nil
@@ -224,9 +220,9 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 	defer tx.Rollback()
 
 	var appointmentId int
-	query := fmt.Sprintf("INSERT INTO %s (users_id, client_id, start_time, date)"+
+	query := fmt.Sprintf("INSERT INTO %s (users_id, client_id, start_time, date, comment)"+
 		"VALUES ($1, $2, $3, $4) RETURNING id", database.MasterAppointmentTable)
-	row := tx.QueryRow(query, appointment.MasterId, appointment.ClientId, appointment.StartTime, appointment.Date)
+	row := tx.QueryRow(query, appointment.MasterId, appointment.ClientId, appointment.StartTime, appointment.Date, appointment.Comment)
 	if err := row.Scan(&appointmentId); err != nil {
 		return 0, err
 	}

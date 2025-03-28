@@ -8,6 +8,7 @@ type MasterAppointment struct {
 	Status    string   `json:"status"`
 	StartTime string   `json:"start_time"`
 	Date      string   `json:"date"`
+	Comment   string   `json:"comment"`
 }
 
 type MasterAppointmentInput struct {
@@ -17,6 +18,7 @@ type MasterAppointmentInput struct {
 	OptionIds []int  `json:"option_ids" binding:"required"`
 	StartTime string `json:"start_time" binding:"required"`
 	Date      string `json:"date" binding:"required"`
+	Comment   string `json:"comment"`
 }
 
 type MasterShift struct {
