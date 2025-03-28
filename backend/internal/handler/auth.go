@@ -13,9 +13,9 @@ func checkRoles(roles []string) ([]int, error) {
 	roleIds := make([]int, len(roles))
 
 	for i, role := range roles {
-		if role == "master" {
+		if role == domain.MasterRole {
 			roleIds[i] = 1
-		} else if role == "admin" {
+		} else if role == domain.AdminRole {
 			roleIds[i] = 2
 		} else {
 			return nil, errors.New(fmt.Sprintf("invalid role: %s", role))

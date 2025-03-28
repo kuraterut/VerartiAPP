@@ -336,7 +336,6 @@ func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.Ma
 	rows, err := r.db.Query(query, date)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			fmt.Println(111111)
 			return nil, nil
 		}
 
@@ -360,13 +359,11 @@ func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.Ma
 
 		master, err = r.userPostgres.GetMasterById(masterId)
 		if err != nil {
-			fmt.Println(22222)
 			continue // todo возможно стоит по-другому обрабатывать эти ошибки. Например логировать их в какой-то файл
 		}
 
 		client, err = r.clientPostgres.GetClientById(clientId)
 		if err != nil {
-			fmt.Println(333333)
 			continue
 		}
 
@@ -376,8 +373,6 @@ func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.Ma
 			" WHERE app_opt.master_appointment_id = $1", database.OptionTable, database.MasterAppointmentOptionTable)
 		err = r.db.Select(&options, queryGetOptions, appointment.Id)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println(444444)
 			continue
 		}
 

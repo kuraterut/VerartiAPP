@@ -5,8 +5,8 @@ CREATE TABLE role
 );
 
 INSERT INTO role (name)
-VALUES ('master'),
-       ('admin');
+VALUES ('MASTER'),
+       ('ADMIN');
 
 CREATE TABLE users
 (
@@ -66,10 +66,10 @@ CREATE TABLE status
 );
 
 INSERT INTO status (name)
-VALUES ('waiting'),   -- ждет подтверждения
-       ('confirmed'), -- подтвержденный
-       ('completed'), -- завершенный
-       ('cancelled'); -- отмененный
+VALUES ('WAITING'),   -- ждет подтверждения
+       ('CONFIRMED'), -- подтвержденный
+       ('COMPLETED'), -- завершенный
+       ('CANCELLED'); -- отмененный
 
 CREATE TABLE master_appointment
 (
