@@ -23,6 +23,9 @@ import java.util.*;
 import java.time.*;
 
 public class CalendarOfEmployeesWindow extends Main{
+    private static final int CALENDAR_ROW_CONSTRAINT = 85;
+    private static final int CALENDAR_COLUMN_CONSTRAINT = 120;
+
     public static GridPane buildCalendarByYM(int year, int month){
         GridPane calendar           = new GridPane();
 
@@ -43,7 +46,7 @@ public class CalendarOfEmployeesWindow extends Main{
             GridPane.setHalignment(daysOfWeekArr[i], HPos.CENTER);
             GridPane.setValignment(daysOfWeekArr[i], VPos.CENTER);
             calendar.add(daysOfWeekArr[i], i, 0);
-            calendar.getColumnConstraints().add(new ColumnConstraints(150));
+            calendar.getColumnConstraints().add(new ColumnConstraints(CALENDAR_COLUMN_CONSTRAINT));
         }
 
         int row = 1;
@@ -51,7 +54,7 @@ public class CalendarOfEmployeesWindow extends Main{
         // int day = 1;
 
         for(int day = 1; day <= monthLen; day++){
-            Rectangle rect = new Rectangle(150, 100, Color.TRANSPARENT); // Прозрачный
+            Rectangle rect = new Rectangle(CALENDAR_COLUMN_CONSTRAINT, CALENDAR_ROW_CONSTRAINT, Color.TRANSPARENT); // Прозрачный
             Label dayLbl = new Label(String.valueOf(day));
             
             LocalDate date = LocalDate.of(year, month, day);
@@ -88,7 +91,7 @@ public class CalendarOfEmployeesWindow extends Main{
             if(column == 7) {
                 row++;
                 column = 0;
-                calendar.getRowConstraints().add(new RowConstraints(100));
+                calendar.getRowConstraints().add(new RowConstraints(CALENDAR_ROW_CONSTRAINT));
             }
         }
         return calendar;
