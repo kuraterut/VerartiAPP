@@ -78,8 +78,8 @@ func (r *ClientPostgres) GetAllClients() ([]models.Client, error) {
 		return nil, err
 	}
 
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, domain.NewErrorResponse(404, "no clients found")
+	if len(clients) == 0 {
+		return []models.Client{}, nil
 	}
 
 	return clients, err

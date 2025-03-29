@@ -36,6 +36,10 @@ func (r *OptionPostgres) GetAllOptions() ([]models.Option, error) {
 	query := fmt.Sprintf("SELECT * FROM %s", database.OptionTable)
 	err := r.db.Select(&options, query)
 
+	if len(options) == 0 {
+		return []models.Option{}, err
+	}
+
 	return options, err
 }
 
@@ -53,6 +57,10 @@ func (r *OptionPostgres) GetOptionsByMasterId(masterId int) ([]models.Option, er
 		return nil, err
 	}
 
+	if len(options) == 0 {
+		return []models.Option{}, err
+	}
+
 	return options, err
 }
 
@@ -62,7 +70,7 @@ func (r *OptionPostgres) GetOptionById(optionId int) (models.Option, error) {
 	err := r.db.Get(&option, query, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return models.Option{}, nil // todo выводить ошибку 404
+			return models.Option{}, domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d not found", optionId))
 		}
 
 		return models.Option{}, err
@@ -77,7 +85,7 @@ func (r *OptionPostgres) UpdateOption(option models.OptionUpdate, optionId int) 
 	err := r.db.Get(&id, queryGetOption, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.NewErrorResponse(404, "option with this id was not found")
+			return domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d not found", optionId))
 		}
 
 		return err
@@ -131,7 +139,7 @@ func (r *OptionPostgres) DeleteOption(optionId int) error {
 	err := r.db.Get(&id, queryGetOption, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.NewErrorResponse(404, "option with this id was not found")
+			return domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d not found", optionId))
 		}
 
 		return err
@@ -164,7 +172,7 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 	err := r.db.Get(&id, queryGetUser, masterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, domain.NewErrorResponse(404, "master with this id was not found")
+			return 0, domain.NewErrorResponse(404, fmt.Sprintf("master with this id = %d not found", masterId))
 		}
 
 		return 0, err
@@ -174,7 +182,7 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 	err = r.db.Get(&id, queryGetOption, optionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, domain.NewErrorResponse(404, "option with this id was not found")
+			return 0, domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d not found", optionId))
 		}
 
 		return 0, err
