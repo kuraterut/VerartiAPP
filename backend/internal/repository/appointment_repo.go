@@ -41,14 +41,27 @@ func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error
 		return err
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
-		"VALUES ($1, $2) RETURNING id", database.AdminShiftTable)
-	row := r.db.QueryRow(query, adminShift.AdminId, adminShift.Date)
-	if err := row.Scan(&id); err != nil {
+	queryGetAdminByDate := fmt.Sprintf("SELECT ad_sh.id FROM %s ad_sh "+
+		" WHERE ad_sh.date = $1", database.AdminShiftTable)
+	err = r.db.Get(&id, queryGetAdminByDate, adminShift.Date)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
 
-	return nil
+	if errors.Is(err, sql.ErrNoRows) {
+		query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
+			"VALUES ($1, $2) RETURNING id", database.AdminShiftTable)
+		row := r.db.QueryRow(query, adminShift.AdminId, adminShift.Date)
+		if err := row.Scan(&id); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET users_id = $1 WHERE id = $2", database.AdminShiftTable)
+	_, err = r.db.Exec(query, adminShift.AdminId, id)
+	return err
 }
 
 func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) error {
