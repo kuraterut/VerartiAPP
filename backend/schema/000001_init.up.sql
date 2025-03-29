@@ -90,6 +90,25 @@ CREATE TABLE master_appointment_option
     CONSTRAINT unique_option_master_appointment UNIQUE (option_id, master_appointment_id)
 );
 
+CREATE OR REPLACE FUNCTION clean_orphaned_appointments()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM master_appointment
+        WHERE id IN (
+            SELECT OLD.master_appointment_id
+            WHERE NOT EXISTS (
+                SELECT 1 FROM master_appointment_option mao
+                WHERE mao.master_appointment_id = OLD.master_appointment_id
+            )
+        );
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_clean_orphaned_appointments
+AFTER DELETE ON master_appointment_option
+FOR EACH ROW EXECUTE FUNCTION clean_orphaned_appointments();
+
 CREATE TABLE admin_shift
 (
     id       serial                                      not null unique,
