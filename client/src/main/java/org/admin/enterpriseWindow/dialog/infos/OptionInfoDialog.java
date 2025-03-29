@@ -19,6 +19,7 @@ import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.putRequests.UpdateOption;
 import org.admin.model.Response;
 import org.admin.model.Option;
+import org.admin.utils.HelpFuncs;
 
 import java.time.LocalTime;
 
@@ -52,7 +53,7 @@ public class OptionInfoDialog extends Main {
         Label serviceIdLabel            = new Label(option.getId().toString());
         TextField nameTextField         = new TextField(option.getName());
         TextField priceTextField        = new TextField(option.getPrice().toString());
-        TextField durationTextField     = new TextField(option.getDurationString());
+        TextField durationTextField     = new TextField(HelpFuncs.localTimeToString(option.getDuration(), "HH:mm"));
         TextArea descriptionTextArea    = new TextArea(option.getDescription());
 
         infoTable.getColumnConstraints().add(new ColumnConstraints(150));

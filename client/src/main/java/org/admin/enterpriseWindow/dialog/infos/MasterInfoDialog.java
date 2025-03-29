@@ -21,6 +21,7 @@ import org.admin.enterpriseWindow.searchingStrings.SearchingStringOptions;
 import org.admin.model.Master;
 import org.admin.model.Response;
 import org.admin.model.Option;
+import org.admin.utils.HelpFuncs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -220,7 +221,7 @@ public class MasterInfoDialog extends Main {
             Label serviceIdLabel = new Label(option.getId().toString());
             Label serviceNameLabel = new Label(option.getName());
             Label servicePriceLabel = new Label(option.getPrice().toString());
-            Label serviceDurationLabel = new Label(option.getDurationString());
+            Label serviceDurationLabel = new Label(HelpFuncs.localTimeToString(option.getDuration(), "HH:mm"));
             Button deleteService = new Button("Удалить");
 
             deleteService.setOnAction(event -> {

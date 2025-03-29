@@ -1,11 +1,15 @@
 package org.admin.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.admin.utils.TransactionType;
 import org.json.simple.JSONObject;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class Transaction extends Response {
     private Long id;
     private TransactionType type;
@@ -13,21 +17,6 @@ public class Transaction extends Response {
     private Integer count;
     private LocalDateTime timestamp;
     private Long unitId;
-
-    public Long getId()                 {return this.id;}
-    public TransactionType getType()    {return this.type;}
-    public Long getAmount()             {return this.amount;}
-    public Integer getCount()           {return this.count;}
-    public LocalDateTime getTimestamp() {return this.timestamp;}
-    public Long getUnitId()             {return this.unitId;}
-
-
-    public void setId(Long id)                          { this.id = id;}
-    public void setType(TransactionType type)           { this.type = type;}
-    public void setAmount(Long amount)                  { this.amount = amount;}
-    public void setCount(Integer count)                 { this.count = count;}
-    public void setTimestamp(LocalDateTime timestamp)   { this.timestamp = timestamp;}
-    public void setUnitId(Long unitId)                  { this.unitId = unitId;}
 
     public JSONObject toJson(){
         JSONObject obj = new JSONObject();

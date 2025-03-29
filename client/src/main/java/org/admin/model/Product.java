@@ -1,30 +1,27 @@
 package org.admin.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONObject;
 
+import java.util.Objects;
+
+@Getter
+@Setter
 public class Product extends Response {
 	private Long id;
 	private String name;
 	private String description;
 	private Long price;
 	private Integer count;
-	
-	public Boolean equals(Product other){
-		return this.id == other.getId();
+
+	@Override
+	public boolean equals(Object other){
+		if(other == null) return false;
+		if(other == this) return true;
+		if(!(other instanceof Product product)) return false;
+        return Objects.equals(this.id, product.getId());
 	}
-
-	public Long getId()				{return this.id;}
-	public String getName()			{return this.name;}
-	public String getDescription()	{return this.description;}
-	public Long getPrice()		{return this.price;}
-	public Integer getCount()		{return this.count;}
-	
-	public void setId(Long id)						{this.id = id;}
-	public void setName(String name)				{this.name = name;}
-	public void setDescription(String description)	{this.description = description;}
-	public void setPrice(Long price)				{this.price = price;}
-	public void setCount(Integer count)				{this.count = count;}
-
 
 	public JSONObject toJson(){
 		JSONObject obj = new JSONObject();

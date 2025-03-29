@@ -1,15 +1,16 @@
 package org.admin.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.*;
 
+@Getter
+@Setter
 public class Master extends User {
 	private Boolean isAdmin;
-
-	public Boolean getIsAdmin()				{return this.isAdmin;}
-	public void setIsAdmin(Boolean isAdmin)	{this.isAdmin = isAdmin;}
 
 	public static Master fromJson(JSONObject obj){
 		Master master = new Master();
@@ -21,7 +22,7 @@ public class Master extends User {
 		String bio = (String) obj.get("bio");
 		String photoURL = (String) obj.get("photo");
 
-		Boolean isAdmin = false;
+		boolean isAdmin = false;
 		ArrayList<String> roles = new ArrayList<>((JSONArray) obj.get("roles"));
 		if(roles.contains("ADMIN")) isAdmin = true;
 
