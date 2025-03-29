@@ -40,3 +40,7 @@ func (s *AppointmentService) GetAppointmentByClientId(clientId int) ([]models.Ma
 func (s *AppointmentService) GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error) {
 	return s.repo.GetAllAppointmentsByDate(date)
 }
+
+func (s *AppointmentService) GetAppointmentById(appointmentId int) (models.MasterAppointment, error) {
+	return s.repo.GetAppointmentById(appointmentId)
+}

@@ -159,8 +159,8 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 			SELECT 1
 			FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'master'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
 	err := r.db.Get(&id, queryGetUser, masterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

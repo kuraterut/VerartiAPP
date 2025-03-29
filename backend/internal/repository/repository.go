@@ -48,6 +48,7 @@ type Appointment interface {
 	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
+	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 }
 
 type User interface {
@@ -55,7 +56,6 @@ type User interface {
 	GetMasterById(masterId int) (models.Users, error)
 	GetAllAdmins() ([]models.Users, error)
 	GetAdminById(masterId int) (models.Users, error)
-	GetDirector() (models.Users, error)
 	DeleteUser(userId int) error
 }
 
