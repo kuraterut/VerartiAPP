@@ -19,7 +19,7 @@ public class Master extends User {
 		String patronymic = (String) obj.get("patronymic");
 		String phone = (String) obj.get("phone");
 		String bio = (String) obj.get("bio");
-		String photoURL = (String) obj.get("photo_url");
+		String photoURL = (String) obj.get("photo");
 
 		Boolean isAdmin = false;
 		ArrayList<String> roles = new ArrayList<>((JSONArray) obj.get("roles"));

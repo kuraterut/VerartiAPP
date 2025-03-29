@@ -23,27 +23,11 @@ public class GetMaster extends Connection {
             List<Master> masters = new ArrayList<>();
 
             JSONObject data = getJson();
-            System.out.println(data);
             JSONArray jsonArr = (JSONArray) data.get("masters");
 
             for(Object elem: jsonArr){
                 JSONObject masterJSON = (JSONObject) elem;
-                Master master = new Master();
-
-                Long id = (Long) masterJSON.get("id");
-                String name = (String) masterJSON.get("name");
-                String surname = (String) masterJSON.get("surname");
-                String patronymic = (String) masterJSON.get("patronymic");
-                String phone = (String) masterJSON.get("phone");
-                String bio = (String) masterJSON.get("bio");
-
-                master.setId(id);
-                master.setName(name);
-                master.setSurname(surname);
-                master.setPatronymic(patronymic);
-                master.setPhone(phone);
-                master.setBio(bio);
-
+                Master master = Master.fromJson(masterJSON);
                 masters.add(master);
             }
             return masters;
@@ -62,22 +46,7 @@ public class GetMaster extends Connection {
 
             JSONObject data = getJson();
 
-            Master master = new Master();
-
-            String name = (String)data.get("name");
-            String surname = (String)data.get("surname");
-            String patronymic = (String)data.get("patronymic");
-            String bio = (String)data.get("bio");
-            String phone = (String)data.get("phone");
-
-            master.setId(id);
-            master.setName(name);
-            master.setSurname(surname);
-            master.setPatronymic(patronymic);
-            master.setBio(bio);
-            master.setPhone(phone);
-
-            return master;
+            return Master.fromJson(data);
 
         }
         catch(Exception ex){
@@ -103,21 +72,7 @@ public class GetMaster extends Connection {
             JSONArray mastersArr = (JSONArray)data.get("masters");
             for(Object elem: mastersArr){
                 JSONObject masterJSON = (JSONObject)elem;
-                Master master = new Master();
-                Long id = (Long)masterJSON.get("id");
-                String name = (String)masterJSON.get("name");
-                String surname = (String)masterJSON.get("surname");
-                String patronymic = (String)masterJSON.get("patronymic");
-                String phone = (String)masterJSON.get("phone");
-                String bio = (String)masterJSON.get("bio");
-
-                master.setId(id);
-                master.setName(name);
-                master.setSurname(surname);
-                master.setPatronymic(patronymic);
-                master.setPhone(phone);
-                master.setBio(bio);
-
+                Master master = Master.fromJson(masterJSON);
                 masters.add(master);
             }
 

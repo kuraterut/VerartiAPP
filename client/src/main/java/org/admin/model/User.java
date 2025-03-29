@@ -66,7 +66,6 @@ public abstract class User extends Response {
         obj.put("patronymic", patronymic);
         obj.put("phone", phone);
         obj.put("bio", bio);
-        obj.put("photoURL", photoURL);
         obj.put("password", password);
 
         return obj;

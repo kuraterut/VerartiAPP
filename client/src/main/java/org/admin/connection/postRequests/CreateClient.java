@@ -16,21 +16,7 @@ public class CreateClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-
-            String name = client.getName();
-            String surname = client.getSurname();
-            String patronymic = client.getPatronymic();
-            String phone = client.getPhone();
-            LocalDate birthday = client.getBirthday();
-
-            String birthdayStr = HelpFuncs.localDateToString(birthday, "yyyy-MM-dd");
-            JSONObject outJson = new JSONObject();
-			outJson.put("birthday", birthdayStr);
-            outJson.put("name", name);
-            outJson.put("surname", surname);
-            outJson.put("patronymic", patronymic);
-            outJson.put("phone", phone);
-
+            JSONObject outJson = client.toJson();
             sendJson(outJson);
 
             int status = connection.getResponseCode();

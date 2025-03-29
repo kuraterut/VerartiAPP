@@ -13,12 +13,7 @@ public class UpdateOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", option.getName());
-            out.put("price", option.getPrice());
-            out.put("duration", option.getDurationString());
-            out.put("description", option.getDescription());
-
+            JSONObject out = option.toJson();
             sendJson(out);
 
             int status = connection.getResponseCode();

@@ -13,18 +13,7 @@ public class CreateProduct extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-
-            String name = product.getName();
-            String description = product.getDescription();
-            Long price = product.getPrice();
-            Integer count = product.getCount();
-
-            JSONObject outJson = new JSONObject();
-            outJson.put("name", name);
-            outJson.put("description", description);
-            outJson.put("price", price);
-            outJson.put("count", count);
-
+            JSONObject outJson = product.toJson();
             sendJson(outJson);
 
             int status = connection.getResponseCode();

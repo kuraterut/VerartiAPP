@@ -25,22 +25,7 @@ public class GetAdmin extends Connection {
             System.out.println(data);
             for(Object adminObj : adminsJSON){
                 JSONObject adminJSON = (JSONObject) adminObj;
-                Admin admin = new Admin();
-
-                Long id = (Long) adminJSON.get("id");
-                String name = (String)adminJSON.get("name");
-                String surname = (String)adminJSON.get("surname");
-                String patronymic = (String)adminJSON.get("patronymic");
-                String phone = (String)adminJSON.get("phone");
-                String bio = (String)adminJSON.get("bio");
-
-                admin.setId(id);
-                admin.setName(name);
-                admin.setSurname(surname);
-                admin.setPatronymic(patronymic);
-                admin.setPhone(phone);
-                admin.setBio(bio);
-
+                Admin admin = Admin.fromJson(adminJSON);
                 admins.add(admin);
             }
             return admins;
@@ -61,25 +46,10 @@ public class GetAdmin extends Connection {
 
             JSONObject data = getJson();
 
-            Admin admin = null;
+            int code = connection.getResponseCode();
+            if(code != 200) return null;
 
-            Long adminId = (Long) data.get("id");
-            if(adminId != -1){
-                admin = new Admin();
-                String name = (String)data.get("name");
-                String surname = (String)data.get("surname");
-                String patronymic = (String)data.get("patronymic");
-                String phone = (String)data.get("phone");
-                String bio = (String)data.get("bio");
-
-                admin.setId(adminId);
-                admin.setName(name);
-                admin.setSurname(surname);
-                admin.setPatronymic(patronymic);
-                admin.setPhone(phone);
-                admin.setBio(bio);
-            }
-            return admin;
+            return Admin.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetAdmin, method: getByDate, exception: " + ex.getMessage());
@@ -95,22 +65,7 @@ public class GetAdmin extends Connection {
 
             JSONObject data = getJson();
 
-            Admin admin = new Admin();
-
-            String name = (String)data.get("name");
-            String surname = (String)data.get("surname");
-            String patronymic = (String)data.get("patronymic");
-            String phone = (String)data.get("phone");
-            String bio = (String)data.get("bio");
-
-            admin.setId(id);
-            admin.setName(name);
-            admin.setSurname(surname);
-            admin.setPatronymic(patronymic);
-            admin.setPhone(phone);
-            admin.setBio(bio);
-
-            return admin;
+            return Admin.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetAdmin, method: getById, exception: " + ex.getMessage());

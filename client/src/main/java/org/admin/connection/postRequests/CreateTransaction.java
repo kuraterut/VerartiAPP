@@ -21,19 +21,7 @@ public class CreateTransaction extends Connection {
             JSONObject transactionsJSONObject = new JSONObject();
             JSONArray transactionsJSONArray = new JSONArray();
             for(Transaction transaction : transactions){
-                TransactionType type = transaction.getType();
-                Long amount = transaction.getAmount();
-                Integer count = transaction.getCount();
-                String timestamp = HelpFuncs.localDateTimeToString(transaction.getTimestamp(), "yyyy-MM-dd HH:mm:ss");
-                Long unitId = transaction.getUnitId();
-
-                JSONObject transactionJSONObject = new JSONObject();
-                transactionJSONObject.put("type", type.toString());
-                transactionJSONObject.put("amount", amount);
-                transactionJSONObject.put("count", count);
-                transactionJSONObject.put("timestamp", timestamp);
-                transactionJSONObject.put("unit_id", unitId);
-
+                JSONObject transactionJSONObject = transaction.toJson();
                 transactionsJSONArray.add(transactionJSONObject);
             }
             transactionsJSONObject.put("transactions", transactionsJSONArray);
