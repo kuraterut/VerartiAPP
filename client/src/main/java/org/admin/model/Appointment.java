@@ -1,6 +1,8 @@
 package org.admin.model;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.admin.utils.AppointmentStatus;
 import org.json.simple.JSONArray;
@@ -8,7 +10,9 @@ import org.json.simple.JSONObject;
 
 import java.util.*;
 import java.time.*;
-//TODO Добавить Lombok
+
+@Getter
+@Setter
 public class Appointment extends Response {
 	private Long id;
 	private AppointmentStatus status;
@@ -19,34 +23,12 @@ public class Appointment extends Response {
 	private Master master;
 	private String comment;
 
-	public Long getId()						{return this.id;}
-	public LocalDate getDate()				{return this.date;}
-	public LocalTime getStartTime()			{return this.startTime;}
-	public Client getClient()			{return this.client;}
-	public Master getMaster()			{return this.master;}
-	public List<Option> getOptions()	{return this.options;}
-	public String getComment()				{return this.comment;}
-	public AppointmentStatus getStatus()				{return this.status;}
-	public String getDateTimeStr()			{
-		String dateTime = date.getDayOfMonth()+".";
-		dateTime += date.getMonthValue()+".";
-		dateTime += date.getYear()+" ";
-		dateTime += startTime.getHour();
-		dateTime += startTime.getMinute();
-		return dateTime;
+	public void addOption(Option option){this.options.add(option);}
+
+	public String getDateTimeStr(){
+		LocalDateTime dateTime = LocalDateTime.of(date, startTime);
+		return HelpFuncs.localDateTimeToString(dateTime, "yyyy-MM-dd HH:mm");
 	}
-
-	
-	public void setId(Long id)							{this.id = id;}
-	public void setDate(LocalDate date)					{this.date = date;}
-	public void setStartTime(LocalTime startTime)		{this.startTime = startTime;} 	
-	public void setOptions(List<Option> options)	{this.options = options;}
-	public void setClient(Client client)			{this.client = client;}
-	public void setMaster(Master master)			{this.master = master;}
-	public void setComment(String comment)				{this.comment = comment;}
-	public void setStatus(AppointmentStatus status)				{this.status = status;}
-	public void addOption(Option option)			{this.options.add(option);}
-
 
 	public JSONObject toJson(){
 		JSONObject obj = new JSONObject();

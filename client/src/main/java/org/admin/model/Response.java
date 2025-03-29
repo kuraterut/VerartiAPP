@@ -1,5 +1,10 @@
 package org.admin.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Response{
 	private Integer code;
 	private String msg;
@@ -13,11 +18,4 @@ public class Response{
 		this.code = code;
 		this.msg = msg;
 	}
-
-	public Integer getCode()			{return this.code;}
-	public String getMsg()			{return this.msg;}
-	
-	public void setCode(Integer code)	{this.code = code;}
-	public void setMsg(String msg)	{this.msg = msg;}
-	
 }

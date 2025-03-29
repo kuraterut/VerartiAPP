@@ -1,10 +1,15 @@
 package org.admin.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONObject;
 
 import java.time.*;
+import java.util.Objects;
 
+@Getter
+@Setter
 public class Client extends Response {
 	private Long id;
 	private String name;
@@ -14,8 +19,12 @@ public class Client extends Response {
 	private String comment;
 	private LocalDate birthday;
 
-	public Boolean equals(Client other){
-		return this.id == other.getId();
+	@Override
+	public boolean equals(Object other){
+		if (other == null) return false;
+		if (other == this) return true;
+		if (!(other instanceof Client otherClient)) return false;
+        return Objects.equals(this.id, otherClient.getId());
 	}
 
 	@Override
@@ -29,10 +38,10 @@ public class Client extends Response {
     }
 
     public Response checkInfo(){
-    	if (this.name.equals("")){
+    	if (this.name.isEmpty()){
     		return new Response(-1, "Введите имя");
     	}
-    	if (this.surname.equals("")){
+    	if (this.surname.isEmpty()){
     		return new Response(-1, "Введите фамилию");
     	}
     	//+79092762462
@@ -48,23 +57,7 @@ public class Client extends Response {
     	return new Response(200, "");
     }
 
-	public Long getId()				{return this.id;}
-	public String getName()			{return this.name;}
-	public String getSurname()		{return this.surname;}
-	public String getPatronymic()	{return this.patronymic;}
-	public String getPhone()		{return this.phone;}
-	public String getComment()		{return this.comment;}
-	public LocalDate getBirthday()	{return this.birthday;}
 	public String getFio(){return surname+" "+name+" "+patronymic;}
-
-	public void setId(Long id)					{this.id = id;}
-	public void setName(String name)			{this.name = name;}
-	public void setSurname(String surname)		{this.surname = surname;}
-	public void setPatronymic(String patronymic){this.patronymic = patronymic;}
-	public void setPhone(String phone)			{this.phone = phone;}
-	public void setComment(String comment)		{this.comment = comment;}
-	public void setBirthday(LocalDate birthday)	{this.birthday = birthday;}
-
 
 	public JSONObject toJson(){
 		JSONObject obj = new JSONObject();

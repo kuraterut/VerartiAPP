@@ -20,6 +20,7 @@ import org.admin.model.Appointment;
 import org.admin.model.Client;
 import org.admin.model.Master;
 import org.admin.model.Option;
+import org.admin.utils.HelpFuncs;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,8 +38,7 @@ public class AppointmentInfoDialog extends Main {
         List<Option> options = appointment.getOptions();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String dateTimeStr = dateTime.format(formatter); // "1986-04-08 12:30"
+        String dateTimeStr = HelpFuncs.localDateTimeToString(dateTime, "yyyy-MM-dd HH:mm");
 
         Label dateTimeLbl = new Label(dateTimeStr);
         Label appointmentHeadLbl = new Label("Запись №"+appointmentId);
@@ -49,9 +49,12 @@ public class AppointmentInfoDialog extends Main {
         ScrollPane servicesScrollPane = new ScrollPane();
         servicesScrollPane.setPrefViewportHeight(300);
         servicesScrollPane.setPrefViewportWidth(400);
+        servicesScrollPane.setFitToHeight(true);
+        servicesScrollPane.setFitToWidth(true);
 
         GridPane servicesTable = new GridPane();
         servicesTable.setGridLinesVisible(true);
+        servicesTable.setAlignment(Pos.CENTER);
 
         servicesScrollPane.setContent(servicesTable);
 
@@ -67,7 +70,7 @@ public class AppointmentInfoDialog extends Main {
         for(Option option : options){
             numServiceRow++;
             Label serviceLbl = new Label(option.getName());
-            Label durationLbl = new Label(option.getDurationString());
+            Label durationLbl = new Label(HelpFuncs.localTimeToString(option.getDuration(), "HH:mm"));
             Label priceLbl = new Label(Double.toString(option.getPrice()));
             servicesTable.add(serviceLbl, 0, numServiceRow);
             servicesTable.add(durationLbl, 1, numServiceRow);
@@ -87,19 +90,25 @@ public class AppointmentInfoDialog extends Main {
         commentsArea.setText(appointment.getComment());
         commentsArea.setMinWidth(400);
         commentsArea.setMinHeight(200);
+        commentsArea.setMaxWidth(400);
+        commentsArea.setMaxHeight(200);
 
         //TODO Отмена услуги
         //TODO Оплата услуги
+        //TODO Обновить инфу о записи
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
-        Button cancelServiceBtn = new Button("Отмена услуги");
+        Button cancelOptionBtn = new Button("Отмена Записи");
+        Button saveAppointmentBtn = new Button("Сохранить");
         Button paymentBtn = new Button("Оплата");
+        closeBtn.setOnAction(event -> dialog.close());
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, cancelServiceBtn, paymentBtn);
+        bottomBtnsBox.getChildren().addAll(closeBtn, cancelOptionBtn, addServiceBtn, saveAppointmentBtn, paymentBtn);
         bottomBtnsBox.setSpacing(100);
         bottomBtnsBox.setAlignment(Pos.CENTER);
 
-        VBox root = new VBox();
+        VBox root = new VBox(15);
+        root.setMaxWidth(800);
 
         dateTimeLbl.setAlignment(Pos.TOP_RIGHT);
         appointmentHeadLbl.setAlignment(Pos.TOP_CENTER);
@@ -107,11 +116,9 @@ public class AppointmentInfoDialog extends Main {
 
         root.getChildren().addAll(dateTimeLbl, appointmentHeadLbl);
         root.getChildren().addAll(masterLbl, clientLbl);
-        root.getChildren().addAll(servicesLbl, servicesScrollPane);
-        root.getChildren().addAll(addServiceBtn, commentsArea);
-        root.getChildren().addAll(bottomBtnsBox);
+        root.getChildren().addAll(servicesLbl, servicesScrollPane, commentsArea, bottomBtnsBox);
 
-        Scene dialogScene = new Scene(root, 500, 500);
+        Scene dialogScene = new Scene(root, 1000, 800);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();

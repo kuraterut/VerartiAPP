@@ -1,8 +1,12 @@
 package org.admin.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONObject;
 
+@Getter
+@Setter
 public abstract class User extends Response {
     protected Long id;
     protected String name;
@@ -12,24 +16,6 @@ public abstract class User extends Response {
     protected String bio;
     protected String photoURL;
     protected String password;
-
-    public Long getId()                 {return id;}
-    public String getName()             {return name;}
-    public String getSurname()          {return surname;}
-    public String getPatronymic()       {return patronymic;}
-    public String getPhone()            {return phone;}
-    public String getBio()              {return bio;}
-    public String getPhotoURL()         {return photoURL;}
-    public String getPassword()         {return password;}
-
-    public void setId(Long id)                      {this.id = id;}
-    public void setName(String name)                {this.name = name;}
-    public void setSurname(String surname)          {this.surname = surname;}
-    public void setPatronymic(String patronymic)    {this.patronymic = patronymic;}
-    public void setPhone(String phone)              {this.phone = phone;}
-    public void setBio(String bio)                  {this.bio = bio;}
-    public void setPhotoURL(String photoURL)        {this.photoURL = photoURL;}
-    public void setPassword(String password)        {this.password = password;}
 
     public Response checkInfo(){
         if (this.name.equals("")) return new Response(-1, "Введите имя");

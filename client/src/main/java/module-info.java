@@ -12,6 +12,7 @@ module org {
     requires com.almasb.fxgl.all;
     requires json.simple;
     requires java.sql;
+    requires static lombok;
 
     opens org to javafx.fxml;
     exports org;
