@@ -66,7 +66,7 @@ func (h *Handler) updatePhoto(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK") // todo в репозитории убрать заглушку и написать нормальное решение
+	c.JSON(http.StatusOK, domain.StatusOK) // todo в репозитории убрать заглушку и написать нормальное решение
 }
 
 func (h *Handler) updateInfo(c *gin.Context) {}

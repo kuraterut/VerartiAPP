@@ -128,7 +128,7 @@ func (h *Handler) addOptionForMaster(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) updateOption(c *gin.Context) {
@@ -162,7 +162,7 @@ func (h *Handler) updateOption(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) deleteOption(c *gin.Context) {
@@ -184,5 +184,5 @@ func (h *Handler) deleteOption(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
