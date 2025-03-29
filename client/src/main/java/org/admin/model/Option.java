@@ -1,6 +1,7 @@
-package org.admin.utils.entities;
+package org.admin.model;
 
-import org.admin.utils.Response;
+import org.admin.utils.HelpFuncs;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 import java.time.*;
@@ -29,7 +30,6 @@ public class Option extends Response {
 	@Override
 	public String toString() {
 		return id + " " + name;
-
 	}
 
 	public void setId(Long id)						{this.id = id;}
@@ -37,4 +37,32 @@ public class Option extends Response {
 	public void setDuration(LocalTime duration)		{this.duration = duration;}
 	public void setPrice(Long price)				{this.price = price;}
 	public void setDescription(String description)	{this.description = description;}
+
+	public JSONObject toJson(){
+		JSONObject obj = new JSONObject();
+		obj.put("name", this.name);
+		obj.put("description", this.description);
+		obj.put("duration", HelpFuncs.localTimeToString(this.duration, "HH:mm"));
+		obj.put("price", this.price);
+
+		return obj;
+	}
+
+	public static Option fromJson(JSONObject obj){
+		Option option = new Option();
+
+		Long id = (Long) obj.get("id");
+		String name = (String) obj.get("name");
+		String description = (String) obj.get("description");
+		LocalTime duration = LocalTime.parse((String) obj.get("duration"));
+		Long price = (Long) obj.get("price");
+
+		option.setId(id);
+		option.setName(name);
+		option.setDescription(description);
+		option.setDuration(duration);
+		option.setPrice(price);
+
+		return option;
+	}
 }

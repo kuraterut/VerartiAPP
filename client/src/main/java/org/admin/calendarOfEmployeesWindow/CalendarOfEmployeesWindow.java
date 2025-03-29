@@ -15,8 +15,8 @@ import javafx.scene.paint.*;
 import javafx.geometry.*;
 import javafx.event.*;
 import javafx.collections.*;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.Master;
+import org.admin.model.Admin;
+import org.admin.model.Master;
 
 import java.io.*;
 import java.util.*;

@@ -17,8 +17,8 @@ import org.admin.AdminInterface;
 import org.admin.connection.deleteRequests.DeleteOption;
 import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.putRequests.UpdateOption;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Response;
+import org.admin.model.Option;
 
 import java.time.LocalTime;
 

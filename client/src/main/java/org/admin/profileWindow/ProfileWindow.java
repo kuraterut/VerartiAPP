@@ -3,8 +3,8 @@ package org.admin.profileWindow;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.profile.*;
+import org.admin.model.Response;
 import org.admin.sideMenu.SideMenu;
-import org.admin.utils.*;
 
 import javafx.stage.*;
 
@@ -14,8 +14,7 @@ import javafx.scene.image.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.event.*;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.User;
+import org.admin.model.Admin;
 
 import java.io.*;
 
@@ -69,7 +68,6 @@ public class ProfileWindow extends Main{
             nameField.setText(admin.getName());
             surnameField.setText(admin.getSurname());
             patronymicField.setText(admin.getPatronymic());
-            emailField.setText(admin.getEmail());
             phoneField.setText(admin.getPhone());
             bioField.setText(admin.getBio());
         }
@@ -145,7 +143,6 @@ public class ProfileWindow extends Main{
                 newAdmin.setName(newName);
                 newAdmin.setSurname(newSurname);
                 newAdmin.setPatronymic(newPatronymic);
-                newAdmin.setEmail(newEmail);
                 newAdmin.setPhone(newPhone);
                 newAdmin.setBio(newBio);
 
@@ -318,7 +315,6 @@ public class ProfileWindow extends Main{
             surname.setText(admin.getSurname());
             patronymic.setText(admin.getPatronymic());
             phone.setText(admin.getPhone());
-            email.setText(admin.getEmail());
             bio.setText(admin.getBio());
             role.setText("Администратор");
         }

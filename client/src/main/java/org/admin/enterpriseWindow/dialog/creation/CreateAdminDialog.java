@@ -15,8 +15,8 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.postRequests.CreateAdmin;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Admin;
+import org.admin.model.Response;
+import org.admin.model.Admin;
 
 public class CreateAdminDialog extends Main {
     public static void show(Node node){
@@ -117,7 +117,6 @@ public class CreateAdminDialog extends Main {
             admin.setName(name);
             admin.setSurname(surname);
             admin.setPatronymic(patronymic);
-            admin.setEmail(email);
             admin.setPhone(phone);
             admin.setPassword(password);
 

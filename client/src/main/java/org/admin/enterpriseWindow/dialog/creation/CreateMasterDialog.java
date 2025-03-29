@@ -15,8 +15,8 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.postRequests.CreateMaster;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Master;
+import org.admin.model.Response;
+import org.admin.model.Master;
 
 public class CreateMasterDialog extends Main {
     public static void show(Node node){
@@ -117,7 +117,6 @@ public class CreateMasterDialog extends Main {
             master.setName(name);
             master.setSurname(surname);
             master.setPatronymic(patronymic);
-            master.setEmail(email);
             master.setPhone(phone);
             master.setPassword(password);
 

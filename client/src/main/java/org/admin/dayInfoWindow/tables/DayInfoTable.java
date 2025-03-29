@@ -13,15 +13,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.Main;
 import org.admin.connection.getRequests.GetAppointment;
-import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.getRequests.GetMaster;
-import org.admin.connection.getRequests.GetOption;
 import org.admin.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.dayInfoWindow.dialog.CreateAppointmentDialog;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Client;
-import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Option;
+import org.admin.model.Appointment;
+import org.admin.model.Client;
+import org.admin.model.Master;
+import org.admin.model.Option;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -64,7 +62,7 @@ public class DayInfoTable extends Main {
         List<Master> masters = GetMaster.getListByDate(token, date, true);
 
         Map<Long, List<Appointment>> dayInfo = new HashMap<>();
-        List<Appointment> dailyAppointments = GetAppointment.getAllByDate(token, date);
+        List<Appointment> dailyAppointments = GetAppointment.getListByDate(token, date);
 
 //        Appointment testAppointment = new Appointment();
 //        testAppointment.setDate(date);
@@ -116,7 +114,7 @@ public class DayInfoTable extends Main {
 
                 Rectangle rectStart = new Rectangle(200, 40, Color.AQUAMARINE);
                 Rectangle clickRect = new Rectangle(200, 40, Color.TRANSPARENT);
-                clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id));
+                clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id, clickRect));
                 clickRect.setOnMouseEntered(event -> {
                     clickRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
                 });
@@ -155,7 +153,7 @@ public class DayInfoTable extends Main {
                 if(!usedCells.contains(i)){
                     Rectangle unusedRect = new Rectangle(200, 40, Color.TRANSPARENT);
                     Integer startCellToCreate = i;
-                    unusedRect.setOnMouseClicked(event -> CreateAppointmentDialog.show(master, date, startCellToCreate, appointments));
+                    unusedRect.setOnMouseClicked(event -> CreateAppointmentDialog.show(master, date, startCellToCreate, appointments, unusedRect));
                     table.add(unusedRect, countColumn, i);
                     unusedRect.setOnMouseEntered(event -> {
                         unusedRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");

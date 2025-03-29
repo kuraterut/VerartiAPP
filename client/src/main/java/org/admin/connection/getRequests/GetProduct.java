@@ -1,8 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.Product;
+import org.admin.model.Product;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -39,8 +38,8 @@ public class GetProduct extends Connection {
             }
             return products;
         }
-        catch (Exception e){
-            System.out.println(e);
+        catch (Exception ex){
+            System.out.println("class: GetProduct, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -67,8 +66,8 @@ public class GetProduct extends Connection {
 
             return product;
         }
-        catch (Exception e){
-            System.out.println(e);
+        catch (Exception ex){
+            System.out.println("class: GetProduct, method: getById, exception: " + ex.getMessage());
             return null;
         }
     }

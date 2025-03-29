@@ -1,4 +1,4 @@
-package org.admin.utils;
+package org.admin.model;
 
 public class Response{
 	private Integer code;

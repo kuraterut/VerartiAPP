@@ -1,6 +1,6 @@
-package org.admin.utils.entities;
+package org.admin.model;
 
-import org.admin.utils.Response;
+import org.json.simple.JSONObject;
 
 public class Product extends Response {
 	private Long id;
@@ -24,4 +24,34 @@ public class Product extends Response {
 	public void setDescription(String description)	{this.description = description;}
 	public void setPrice(Long price)				{this.price = price;}
 	public void setCount(Integer count)				{this.count = count;}
+
+
+	public JSONObject toJson(){
+		JSONObject obj = new JSONObject();
+
+		obj.put("name", this.name);
+		obj.put("description", this.description);
+		obj.put("price", this.price);
+		obj.put("count", this.count);
+
+		return obj;
+	}
+
+	public static Product fromJson(JSONObject obj){
+		Product product = new Product();
+
+		Long id = (Long) obj.get("id");
+		String name = (String) obj.get("name");
+		String description = (String) obj.get("description");
+		Long price = (Long) obj.get("price");
+		Integer count = (Integer) obj.get("count");
+
+		product.setId(id);
+		product.setName(name);
+		product.setDescription(description);
+		product.setPrice(price);
+		product.setCount(count);
+
+		return product;
+	}
 }

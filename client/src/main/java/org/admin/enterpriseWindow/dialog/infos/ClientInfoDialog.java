@@ -16,10 +16,10 @@ import org.admin.connection.deleteRequests.DeleteClient;
 import org.admin.connection.getRequests.GetAppointment;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.putRequests.UpdateClient;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Client;
-import org.admin.utils.entities.Option;
+import org.admin.model.Response;
+import org.admin.model.Appointment;
+import org.admin.model.Client;
+import org.admin.model.Option;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,7 +10,7 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.utils.entities.Master;
+import org.admin.model.Master;
 
 import java.util.ArrayList;
 import java.util.List;

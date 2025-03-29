@@ -14,8 +14,8 @@ import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.postRequests.PutMasterOnDate;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringMasters;
 import org.admin.enterpriseWindow.dialog.creation.CreateMasterDialog;
-import org.admin.utils.entities.Master;
-import org.admin.utils.Response;
+import org.admin.model.Master;
+import org.admin.model.Response;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

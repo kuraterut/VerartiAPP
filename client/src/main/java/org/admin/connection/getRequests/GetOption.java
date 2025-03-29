@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Option;
+import org.admin.model.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -41,8 +41,8 @@ public class GetOption extends Connection {
             }
             return options;
 
-        }catch (Exception e){
-            System.out.println("class GetService, getAll " + e);
+        }catch (Exception ex){
+            System.out.println("class: GetOption, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -73,7 +73,7 @@ public class GetOption extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetOption, method: getById, exception: " + ex.getMessage());
             return null;
         }
     }
@@ -110,7 +110,7 @@ public class GetOption extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println("class GetOption, getListByMasterId " + ex);
+            System.out.println("class: GetOption, method: getListByMasterId, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }

@@ -1,8 +1,8 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Response;
+import org.admin.model.Option;
 import org.json.simple.JSONObject;
 
 public class CreateOption extends Connection {
@@ -36,7 +36,7 @@ public class CreateOption extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: CreateOption, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

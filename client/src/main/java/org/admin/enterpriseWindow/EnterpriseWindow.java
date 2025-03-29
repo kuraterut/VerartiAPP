@@ -18,10 +18,10 @@ import org.admin.enterpriseWindow.dialog.infos.*;
 
 import org.admin.enterpriseWindow.searchingStrings.*;
 import org.admin.sideMenu.SideMenu;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.Client;
-import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Option;
+import org.admin.model.Admin;
+import org.admin.model.Client;
+import org.admin.model.Master;
+import org.admin.model.Option;
 
 import java.util.List;
 
