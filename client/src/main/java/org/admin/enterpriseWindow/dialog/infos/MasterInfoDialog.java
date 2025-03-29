@@ -167,6 +167,7 @@ public class MasterInfoDialog extends Main {
 
         VBox root = new VBox();
         root.setSpacing(50);
+        root.setAlignment(Pos.CENTER);
         Label errorMsg = new Label("");
         Label headerLabel = new Label("Выберите услугу");
         Button cancelButton = new Button("Отмена");
@@ -182,7 +183,6 @@ public class MasterInfoDialog extends Main {
             else{
                 errorMsg.setText(response.getMsg());
             }
-            //TODO Отправить данные на сервер
         });
         searchingStringServices.setMaxWidth(500);
 
@@ -232,6 +232,17 @@ public class MasterInfoDialog extends Main {
             });
 
             servicesTable.addRow(index, serviceIdLabel, serviceNameLabel, servicePriceLabel, serviceDurationLabel, deleteService);
+            GridPane.setValignment(serviceIdLabel, VPos.CENTER);
+            GridPane.setHalignment(serviceIdLabel, HPos.CENTER);
+            GridPane.setValignment(serviceNameLabel, VPos.CENTER);
+            GridPane.setHalignment(serviceNameLabel, HPos.CENTER);
+            GridPane.setValignment(servicePriceLabel, VPos.CENTER);
+            GridPane.setHalignment(servicePriceLabel, HPos.CENTER);
+            GridPane.setValignment(serviceDurationLabel, VPos.CENTER);
+            GridPane.setHalignment(serviceDurationLabel, HPos.CENTER);
+            GridPane.setValignment(deleteService, VPos.CENTER);
+            GridPane.setHalignment(deleteService, HPos.CENTER);
+
             index++;
         }
         servicesTable.getColumnConstraints().add(new ColumnConstraints(100));

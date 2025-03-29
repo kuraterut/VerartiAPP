@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,11 +17,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.connection.getRequests.GetAppointment;
-import org.admin.model.Appointment;
-import org.admin.model.Client;
-import org.admin.model.Master;
-import org.admin.model.Option;
+import org.admin.connection.getRequests.GetOption;
+import org.admin.connection.getRequests.GetProduct;
+import org.admin.connection.putRequests.UpdateAppointment;
+import org.admin.model.*;
 import org.admin.utils.HelpFuncs;
+import org.controlsfx.control.spreadsheet.Grid;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,44 +47,14 @@ public class AppointmentInfoDialog extends Main {
         Label masterLbl = new Label("Мастер: " + master.getFio());
         Label clientLbl = new Label("Клиент: " + client.toString());
         Label servicesLbl = new Label("Услуги:");
+        Label messageLabel = new Label("");
 
-        ScrollPane servicesScrollPane = new ScrollPane();
-        servicesScrollPane.setPrefViewportHeight(300);
-        servicesScrollPane.setPrefViewportWidth(400);
-        servicesScrollPane.setFitToHeight(true);
-        servicesScrollPane.setFitToWidth(true);
-
-        GridPane servicesTable = new GridPane();
-        servicesTable.setGridLinesVisible(true);
-        servicesTable.setAlignment(Pos.CENTER);
-
-        servicesScrollPane.setContent(servicesTable);
-
-        Label serviceHeadTable = new Label("Услуга");
-        Label timeHeadTable = new Label("Рассчетное время");
-        Label priceHeadTable = new Label("Прайс");
-
-        servicesTable.add(serviceHeadTable, 0, 0);
-        servicesTable.add(timeHeadTable, 1, 0);
-        servicesTable.add(priceHeadTable, 2, 0);
-
-        int numServiceRow = 0;
-        for(Option option : options){
-            numServiceRow++;
-            Label serviceLbl = new Label(option.getName());
-            Label durationLbl = new Label(HelpFuncs.localTimeToString(option.getDuration(), "HH:mm"));
-            Label priceLbl = new Label(Double.toString(option.getPrice()));
-            servicesTable.add(serviceLbl, 0, numServiceRow);
-            servicesTable.add(durationLbl, 1, numServiceRow);
-            servicesTable.add(priceLbl, 2, numServiceRow);
-            GridPane.setHalignment(serviceLbl, HPos.CENTER);
-            GridPane.setValignment(serviceLbl, VPos.CENTER);
-            GridPane.setHalignment(durationLbl, HPos.CENTER);
-            GridPane.setValignment(durationLbl, VPos.CENTER);
-            GridPane.setHalignment(priceLbl, HPos.CENTER);
-            GridPane.setValignment(priceLbl, VPos.CENTER);
-        }
-        Button addServiceBtn = new Button("Добавить услугу");
+        ScrollPane optionsInfoScrollPane = new ScrollPane();
+        optionsInfoScrollPane.setPrefViewportHeight(300);
+        optionsInfoScrollPane.setPrefViewportWidth(400);
+        optionsInfoScrollPane.setFitToHeight(true);
+        optionsInfoScrollPane.setFitToWidth(true);
+        buildOptionsTable(optionsInfoScrollPane, appointment);
 
         TextArea commentsArea = new TextArea();
         commentsArea.setWrapText(true);
@@ -99,12 +71,26 @@ public class AppointmentInfoDialog extends Main {
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
         Button cancelOptionBtn = new Button("Отмена Записи");
+        Button addOptionBtn = new Button("Добавить услугу");
         Button saveAppointmentBtn = new Button("Сохранить");
         Button paymentBtn = new Button("Оплата");
-        closeBtn.setOnAction(event -> dialog.close());
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, cancelOptionBtn, addServiceBtn, saveAppointmentBtn, paymentBtn);
-        bottomBtnsBox.setSpacing(100);
+        closeBtn.setOnAction(event -> dialog.close());
+        addOptionBtn.setOnAction(event -> {
+            AddOptionToAppoinmentDialog.show(appointment, GetOption.getListByMasterId(token, master.getId()));
+            buildOptionsTable(optionsInfoScrollPane, appointment);
+        });
+
+
+        saveAppointmentBtn.setOnAction(event -> {
+            appointment.setComment(commentsArea.getText());
+            Response response = UpdateAppointment.updateInfo(token, appointment);
+            if (response.getCode() == 200) messageLabel.setText("Сохранено");
+            else messageLabel.setText(response.getMsg());
+        });
+
+        bottomBtnsBox.getChildren().addAll(closeBtn, cancelOptionBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
+        bottomBtnsBox.setSpacing(50);
         bottomBtnsBox.setAlignment(Pos.CENTER);
 
         VBox root = new VBox(15);
@@ -116,11 +102,68 @@ public class AppointmentInfoDialog extends Main {
 
         root.getChildren().addAll(dateTimeLbl, appointmentHeadLbl);
         root.getChildren().addAll(masterLbl, clientLbl);
-        root.getChildren().addAll(servicesLbl, servicesScrollPane, commentsArea, bottomBtnsBox);
+        root.getChildren().addAll(servicesLbl, optionsInfoScrollPane, commentsArea, messageLabel, bottomBtnsBox);
 
-        Scene dialogScene = new Scene(root, 1000, 800);
+        Scene dialogScene = new Scene(root, 1200, 800);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
+    }
+
+
+    public static void buildOptionsTable(ScrollPane scrollPane, Appointment appointment) {
+        //Options table
+        GridPane optionsTable = new GridPane();
+        Label optionNameHeadLabel = new Label("Услуга");
+        Label optionTimeHeadLabel = new Label("Длительность");
+        Label optionPriceHeadLabel = new Label("Прайс");
+
+        optionsTable.addRow(0, optionNameHeadLabel, optionTimeHeadLabel, optionPriceHeadLabel);
+        optionsTable.getColumnConstraints().add(new ColumnConstraints(200));
+        optionsTable.getColumnConstraints().add(new ColumnConstraints(100));
+        optionsTable.getColumnConstraints().add(new ColumnConstraints(100));
+        optionsTable.getColumnConstraints().add(new ColumnConstraints(60));
+
+        GridPane.setValignment(optionNameHeadLabel, VPos.CENTER);
+        GridPane.setHalignment(optionNameHeadLabel, HPos.CENTER);
+        GridPane.setValignment(optionTimeHeadLabel, VPos.CENTER);
+        GridPane.setHalignment(optionTimeHeadLabel, HPos.CENTER);
+        GridPane.setValignment(optionPriceHeadLabel, VPos.CENTER);
+        GridPane.setHalignment(optionPriceHeadLabel, HPos.CENTER);
+
+        List<Option> options = appointment.getOptions();
+
+        int optionsRowNum = 1;
+        for(Option option : options) {
+            Label optionNameLabel = new Label(option.getName());
+            Label optionDurationLabel = new Label(HelpFuncs.localTimeToString(option.getDuration(), "HH:mm"));
+            Label optionPriceLabel = new Label(Long.toString(option.getPrice()));
+            Button deleteOptionBtn = new Button("Удалить");
+
+            optionsTable.addRow(optionsRowNum, optionNameLabel, optionDurationLabel, optionPriceLabel, deleteOptionBtn);
+
+            GridPane.setValignment(optionNameLabel, VPos.CENTER);
+            GridPane.setHalignment(optionNameLabel, HPos.CENTER);
+            GridPane.setValignment(optionDurationLabel, VPos.CENTER);
+            GridPane.setHalignment(optionDurationLabel, HPos.CENTER);
+            GridPane.setValignment(optionPriceLabel, VPos.CENTER);
+            GridPane.setHalignment(optionPriceLabel, HPos.CENTER);
+            GridPane.setValignment(deleteOptionBtn, VPos.CENTER);
+            GridPane.setHalignment(deleteOptionBtn, HPos.CENTER);
+
+            final int rowNumForDeleteBtn = optionsRowNum;
+            deleteOptionBtn.setOnAction(event -> {
+                appointment.getOptions().remove(rowNumForDeleteBtn-1);
+                buildOptionsTable(scrollPane, appointment);
+            });
+            optionsRowNum++;
+        }
+
+
+        optionsTable.setAlignment(Pos.CENTER);
+
+        optionsTable.setGridLinesVisible(true);
+
+        scrollPane.setContent(optionsTable);
     }
 }

@@ -32,12 +32,13 @@ public class Appointment extends Response {
 
 	public JSONObject toJson(){
 		JSONObject obj = new JSONObject();
-		obj.put("date", HelpFuncs.localDateToString(this.date, "yyyy-MM-dd"));
-		obj.put("start_time", HelpFuncs.localTimeToString(this.startTime, "HH:mm"));
-		JSONArray optionIds = new JSONArray();
+		List<Long> optionIds = new ArrayList<>();
 		for(Option option : this.options){
 			optionIds.add(option.getId());
 		}
+
+		obj.put("date", HelpFuncs.localDateToString(this.date, "yyyy-MM-dd"));
+		obj.put("start_time", HelpFuncs.localTimeToString(this.startTime, "HH:mm"));
 		obj.put("option_ids", optionIds);
 		obj.put("client_id", this.client.getId());
 		obj.put("master_id", this.master.getId());
@@ -52,59 +53,19 @@ public class Appointment extends Response {
 		AppointmentStatus status = AppointmentStatus.valueOf(((String)obj.get("status")).toUpperCase());
 
 		//Parse Client
-		Client client = new Client();
 		JSONObject clientObj = (JSONObject)obj.get("client");
-		Long clientId = (Long)clientObj.get("id");
-		String clientName = (String)clientObj.get("name");
-		String clientSurname = (String)clientObj.get("surname");
-		String clientPatronymic = (String)clientObj.get("patronymic");
-		String clientPhone = (String)clientObj.get("phone");
-		String clientComment = (String)clientObj.get("comment");
-		LocalDate clientBirthday = HelpFuncs.stringToLocalDate((String)clientObj.get("birthday"));
-
-		client.setId(clientId);
-		client.setName(clientName);
-		client.setSurname(clientSurname);
-		client.setPatronymic(clientPatronymic);
-		client.setPhone(clientPhone);
-		client.setComment(clientComment);
-		client.setBirthday(clientBirthday);
+		Client client = Client.fromJson(clientObj);
 
 		//Parse Master
-		Master master = new Master();
 		JSONObject masterObj = (JSONObject)obj.get("master");
-		Long masterId = (Long)masterObj.get("id");
-		String masterName = (String)masterObj.get("name");
-		String masterSurname = (String)masterObj.get("surname");
-		String masterPatronymic = (String)masterObj.get("patronymic");
-		String masterPhone = (String)masterObj.get("phone");
-		String masterBio = (String)masterObj.get("bio");
-
-		master.setId(masterId);
-		master.setName(masterName);
-		master.setSurname(masterSurname);
-		master.setPatronymic(masterPatronymic);
-		master.setPhone(masterPhone);
-		master.setBio(masterBio);
+		Master master = Master.fromJson(masterObj);
 
 		//Parse Options
 		List<Option> options = new ArrayList<>();
 		JSONArray optionsArr = (JSONArray)obj.get("options");
 		for(Object optionObj: optionsArr){
 			JSONObject optionJson = (JSONObject)optionObj;
-			Option option = new Option();
-			Long optionId = (Long)optionJson.get("id");
-			String optionName = (String)optionJson.get("name");
-			Long optionPrice = (Long)optionJson.get("price");
-			String optionDescription = (String)optionJson.get("description");
-			LocalTime optionDuration = LocalTime.parse((String)optionJson.get("duration"));
-
-			option.setId(optionId);
-			option.setName(optionName);
-			option.setPrice(optionPrice);
-			option.setDescription(optionDescription);
-			option.setDuration(optionDuration);
-
+			Option option = Option.fromJson(optionJson);
 			options.add(option);
 		}
 
