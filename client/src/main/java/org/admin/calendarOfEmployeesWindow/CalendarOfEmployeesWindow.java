@@ -25,10 +25,7 @@ import java.time.*;
 public class CalendarOfEmployeesWindow extends Main{
     public static GridPane buildCalendarByYM(int year, int month){
         GridPane calendar           = new GridPane();
-        
-        // for(String fontName : Font.getFontNames()){
-        //     System.out.println(fontName);
-        // }
+
         
         int monthLen                = YearMonth.of(year, month).lengthOfMonth();
         int firstDayInWeek          = AdminInterface.getDayOfWeekByStr(year+"-"+month+"-01");
@@ -63,22 +60,14 @@ public class CalendarOfEmployeesWindow extends Main{
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 
-            if(admin == null){
-                admin = new Admin();
-                admin.setSurname("Ошибка подключения");
-                admin.setName(" ");
-            }
-            if(masters == null) masters = new ArrayList<>();
-
-            Label adminLbl = new Label(admin.getSurname() + " " + admin.getName().charAt(0) + ".");
+            Label adminLbl = new Label(admin==null?"Не назначен":admin.getSmallFio());
             adminLbl.setFont(Font.font("Open Sans Bold"));
             cellInfo.getChildren().add(adminLbl);
             for(Master master: masters){
                 Label masterLbl = new Label(master.getSurname() + " " + master.getName().charAt(0) + ".");
                 cellInfo.getChildren().add(masterLbl);
             }
-            
-            
+
             rect.setOnMouseClicked(event -> AdminInterface.loadDayInfoWindow(rect, date));
             rect.setOnMouseEntered(event -> {
                 rect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
@@ -170,7 +159,7 @@ public class CalendarOfEmployeesWindow extends Main{
 
         centerBox.setAlignment(Pos.TOP_CENTER);
         centerBox.setMargin(title, new Insets(50, 10, 10, 10));
-        centerBox.setSpacing(50);
+        centerBox.setSpacing(20);
 
         confirmBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override

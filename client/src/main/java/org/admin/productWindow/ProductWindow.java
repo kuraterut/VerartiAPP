@@ -96,10 +96,16 @@ public class ProductWindow extends Main{
         centerBox.setSpacing(50);
 
         Button createNewProductButton = new Button("Создать товар");
+        Button buyProduct = new Button("Покупка товара");
+
+        HBox buttons = new HBox();
+        buttons.getChildren().addAll(createNewProductButton, buyProduct);
+        buttons.setAlignment(Pos.CENTER);
+        buttons.setSpacing(50);
 
         createNewProductButton.setOnAction(event -> CreateProductDialog.show(createNewProductButton));
 
-        centerBox.getChildren().addAll(title, scrollTable, createNewProductButton);
+        centerBox.getChildren().addAll(title, scrollTable, buttons);
         root.setCenter(centerBox);
         root.setLeft(sideMenuStack);
         root.setRight(rightBox);

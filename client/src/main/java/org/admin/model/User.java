@@ -44,6 +44,7 @@ public abstract class User extends Response {
     public String getFio(){
         return surname + " " + name + " " + patronymic;
     }
+    public String getSmallFio() {return surname + " " + name.charAt(0) + ".";}
 
     public JSONObject toJson(){
         JSONObject obj = new JSONObject();
