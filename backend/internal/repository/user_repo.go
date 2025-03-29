@@ -38,7 +38,6 @@ func (r *UserPostgres) GetAllMasters() ([]models.Users, error) {
 			WHERE us_rl.users_id = us.id AND rl.name = '%s'
 		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
 
-	fmt.Println(query)
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err

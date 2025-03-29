@@ -35,6 +35,10 @@ func (r *ResourcePostgres) GetAll() ([]models.Resource, error) {
 	query := fmt.Sprintf("Select * from %s", database.ResourceTable)
 	err := r.db.Select(&resources, query)
 
+	if len(resources) == 0 {
+		return []models.Resource{}, nil
+	}
+
 	return resources, err
 }
 
@@ -56,6 +60,10 @@ func (r *ResourcePostgres) GetByMasterId(masterId int) ([]models.Resource, error
 		" INNER JOIN %s res on us_res.resource_id = res.id"+
 		" WHERE us.id = $1", database.UserTable, database.UserResourceTable, database.ResourceTable)
 	err := r.db.Select(&resources, query, masterId)
+
+	if len(resources) == 0 {
+		return []models.Resource{}, nil
+	}
 
 	return resources, err
 }

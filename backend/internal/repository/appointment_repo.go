@@ -179,7 +179,7 @@ func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool)
 	}
 
 	if len(masters) == 0 {
-		return nil, nil
+		return []models.Users{}, nil
 	}
 
 	return masters, nil
@@ -262,64 +262,74 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 }
 
 func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error) {
-	//var (
-	//	id        int
-	//	appointments []models.MasterAppointment
-	//	appointment  models.MasterAppointmentInput
-	//	master    models.Users
-	//	client    models.Client
-	//)
-	//
-	//// проверка существования клиента с таким id
-	//queryGetClient := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.ClientTable)
-	//err := r.db.Get(&id, queryGetClient, clientId)
-	//if err != nil {
-	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, domain.NewErrorResponse(404, "client with this id was not found")
-	//	}
-	//
-	//	return nil, err
-	//}
-	//
-	//query := fmt.Sprintf(`
-	//	SELECT app.id AS id, TO_CHAR(app.start_time, 'HH:MM') AS start_time, TO_CHAR(app.date, 'YYYY-MM-DD') AS date, st.name AS status
-	// 	(
-	//		SELECT array_remove(array_agg(rl.name), NULL)
-	//		FROM %s AS us_rl
-	//		LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-	//		WHERE us_rl.users_id = us.id
-	//	) AS status
-	//	FROM %s AS app
-	//	INNER JOIN %s AS st on st.id = app.status_id
-	//	WHERE us.id = $1`, database.UsersRoleTable, database.RoleTable, database.UserTable)
-	//rows, err := r.db.Query(query, clientId)
-	//if err != nil {
-	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, domain.NewErrorResponse(404, "no appointments found for this client")
-	//	}
-	//
-	//	return nil, err
-	//}
-	//defer rows.Close()
-	//
-	//for rows.Next() {
-	//	err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	if user.Roles == nil {
-	//		continue
-	//	}
-	//
-	//	admins = append(admins, user)
-	//}
-	//
-	//if user.Roles == nil {
-	//	return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
-	//}
+	var (
+		appointments []models.MasterAppointment
+	)
 
-	return nil, nil
+	client, err := r.clientPostgres.GetClientById(clientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewErrorResponse(404, fmt.Sprintf("client with this id = %d not found", clientId))
+		}
+
+		return nil, err
+	}
+
+	query := fmt.Sprintf(`
+		SELECT app.id AS id, app.start_time AS start_time, TO_CHAR(app.date, 'YYYY-MM-DD') AS date, 
+		st.name AS status, app.comment AS comment, app.users_id, app.client_id
+		FROM %s AS app
+		INNER JOIN %s AS st on st.id = app.status_id
+		WHERE app.client_id = $1`, database.MasterAppointmentTable, database.StatusTable)
+	rows, err := r.db.Query(query, clientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			masterId, clientId int
+			appointment        models.MasterAppointment
+			master             models.Users
+			options            []models.Option
+		)
+
+		err = rows.Scan(&appointment.Id, &appointment.StartTime, &appointment.Date, &appointment.Status, &appointment.Comment, &masterId, &clientId)
+		if err != nil {
+			return nil, err
+		}
+
+		master, err = r.userPostgres.GetMasterById(masterId)
+		if err != nil {
+			continue // todo возможно стоит по-другому обрабатывать эти ошибки. Например логировать их в какой-то файл
+		}
+
+		queryGetOptions := fmt.Sprintf("SELECT opt.id, opt.name, opt.description, opt.duration, opt.price "+
+			" FROM %s as opt "+
+			" INNER JOIN %s as app_opt on app_opt.option_id = opt.id"+
+			" WHERE app_opt.master_appointment_id = $1", database.OptionTable, database.MasterAppointmentOptionTable)
+		err = r.db.Select(&options, queryGetOptions, appointment.Id)
+		if err != nil {
+			continue
+		}
+
+		appointment.Client = client
+		appointment.Master = master
+		appointment.Options = options
+
+		appointments = append(appointments, appointment)
+	}
+
+	if len(appointments) == 0 {
+		return []models.MasterAppointment{}, nil
+	}
+
+	return appointments, nil
 }
 
 func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error) {
@@ -381,6 +391,10 @@ func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.Ma
 		appointment.Options = options
 
 		appointments = append(appointments, appointment)
+	}
+
+	if len(appointments) == 0 {
+		return []models.MasterAppointment{}, nil
 	}
 
 	return appointments, nil
