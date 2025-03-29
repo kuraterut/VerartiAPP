@@ -3,6 +3,7 @@ package org.admin.dayInfoWindow.dialog;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -11,15 +12,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.AdminInterface;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.postRequests.CreateAppointment;
 import org.admin.dayInfoWindow.tables.DayInfoTable;
+import org.admin.model.*;
 import org.admin.utils.*;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Client;
-import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Option;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateAppointmentDialog extends Main {
-    public static void show(Master master, LocalDate date, Integer startCell, List<Appointment> appointments){
+    public static void show(Master master, LocalDate date, Integer startCell, List<Appointment> appointments, Node node){
         //TODO При создании записи запрашивать номер телефона, если есть,
         // то создавать готовые Label с инфой о клиенте и подтверждать, если нет
         // создавать TextField для создания нового клиента
@@ -76,7 +75,7 @@ public class CreateAppointmentDialog extends Main {
         HBox buttonsBox = new HBox();
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setSpacing(50);
-
+        //TODO Alert когда ячеек для записи недостаточно
         Button cancelButton = new Button("Отмена");
         Button addServiceButton = new Button("Добавить услугу");
         Button createAppointmentButton = new Button("Создать");
@@ -95,7 +94,10 @@ public class CreateAppointmentDialog extends Main {
             appointment.setDate(date);
             appointment.setComment(commentsArea.getText());
             Response response = CreateAppointment.post(token, appointment);
-            if(response.getCode() == 200) dialog.close();
+            if(response.getCode() == 200) {
+                dialog.close();
+                AdminInterface.loadDayInfoWindow(node, date);
+            }
             else {messageLabel.setText(response.getMsg());}
         });
 

@@ -10,7 +10,7 @@ import org.admin.sideMenu.SideMenu;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
-import org.admin.utils.entities.Product;
+import org.admin.model.Product;
 
 import java.util.*;
 

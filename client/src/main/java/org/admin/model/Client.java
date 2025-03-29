@@ -1,6 +1,7 @@
-package org.admin.utils.entities;
+package org.admin.model;
 
-import org.admin.utils.Response;
+import org.admin.utils.HelpFuncs;
+import org.json.simple.JSONObject;
 
 import java.time.*;
 
@@ -63,9 +64,40 @@ public class Client extends Response {
 	public void setPhone(String phone)			{this.phone = phone;}
 	public void setComment(String comment)		{this.comment = comment;}
 	public void setBirthday(LocalDate birthday)	{this.birthday = birthday;}
-	public void setBirthdayStr(String birthday){
-		String[] arr = birthday.split("-");
-		this.birthday = LocalDate.of(Integer.valueOf(arr[0]), Integer.valueOf(arr[1]), Integer.valueOf(arr[2]));
+
+
+	public JSONObject toJson(){
+		JSONObject obj = new JSONObject();
+		obj.put("name", this.name);
+		obj.put("surname", this.surname);
+		obj.put("patronymic", this.patronymic);
+		obj.put("phone", this.phone);
+		obj.put("comment", this.comment);
+		obj.put("birthday", HelpFuncs.localDateToString(this.birthday, "yyyy-MM-dd"));
+
+		return obj;
+	}
+
+	public static Client fromJson(JSONObject obj){
+		Client client = new Client();
+
+		Long id = (Long) obj.get("id");
+		String name = (String) obj.get("name");
+		String surname = (String) obj.get("surname");
+		String patronymic = (String) obj.get("patronymic");
+		String phone = (String) obj.get("phone");
+		String comment = (String) obj.get("comment");
+		LocalDate birthday = HelpFuncs.stringToLocalDate((String) obj.get("birthday"));
+
+		client.setId(id);
+		client.setName(name);
+		client.setSurname(surname);
+		client.setPatronymic(patronymic);
+		client.setPhone(phone);
+		client.setComment(comment);
+		client.setBirthday(birthday);
+
+		return client;
 	}
 
 }

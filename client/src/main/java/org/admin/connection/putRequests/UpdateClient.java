@@ -1,9 +1,9 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Client;
+import org.admin.model.Client;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.Response;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 public class UpdateClient extends Connection {
@@ -28,8 +28,8 @@ public class UpdateClient extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: UpdateClient, method: updateInfo, exception: " + ex.getMessage());
             return new Response();
         }
     }

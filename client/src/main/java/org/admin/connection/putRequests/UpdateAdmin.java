@@ -1,8 +1,8 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.Response;
+import org.admin.model.Admin;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 public class UpdateAdmin extends Connection {
@@ -18,7 +18,6 @@ public class UpdateAdmin extends Connection {
             out.put("surname", admin.getSurname());
             out.put("patronymic", admin.getPatronymic());
             out.put("phone", admin.getPhone());
-            out.put("email", admin.getEmail());
             out.put("bio", admin.getBio());
             sendJson(out);
 
@@ -28,8 +27,8 @@ public class UpdateAdmin extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: UpdateAdmin, method: updateInfo, exception: " + ex.getMessage());
             return new Response();
         }
     }

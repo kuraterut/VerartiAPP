@@ -3,6 +3,7 @@ package org.admin.dayInfoWindow.dialog;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,17 +16,17 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.connection.getRequests.GetAppointment;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Client;
-import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Option;
+import org.admin.model.Appointment;
+import org.admin.model.Client;
+import org.admin.model.Master;
+import org.admin.model.Option;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AppointmentInfoDialog extends Main {
-    public static void show(Long appointmentId) {
+    public static void show(Long appointmentId, Node node) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Информация о записи");
@@ -87,7 +88,8 @@ public class AppointmentInfoDialog extends Main {
         commentsArea.setMinWidth(400);
         commentsArea.setMinHeight(200);
 
-
+        //TODO Отмена услуги
+        //TODO Оплата услуги
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
         Button cancelServiceBtn = new Button("Отмена услуги");

@@ -1,4 +1,4 @@
-package org.admin.utils.entities;
+package org.admin.utils;
 
 public enum TransactionType {
     PRODUCT,

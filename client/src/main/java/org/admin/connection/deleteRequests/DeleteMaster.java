@@ -1,8 +1,7 @@
 package org.admin.connection.deleteRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
-import org.json.simple.JSONObject;
+import org.admin.model.Response;
 
 public class DeleteMaster extends Connection {
     public static Response deleteById(String token, Long id){
@@ -17,8 +16,8 @@ public class DeleteMaster extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: DeleteMaster, method: deleteById, exception: " + ex.getMessage());
             return new Response();
         }
     }

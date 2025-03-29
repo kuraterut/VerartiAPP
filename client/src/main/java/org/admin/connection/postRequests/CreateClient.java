@@ -1,9 +1,9 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Client;
+import org.admin.model.Client;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.Response;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 import java.time.LocalDate;
@@ -41,7 +41,7 @@ public class CreateClient extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: CreateClient, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

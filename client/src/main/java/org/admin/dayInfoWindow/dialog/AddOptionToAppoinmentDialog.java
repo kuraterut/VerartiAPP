@@ -9,8 +9,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringOptions;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Option;
+import org.admin.model.Appointment;
+import org.admin.model.Option;
 
 import java.util.List;
 

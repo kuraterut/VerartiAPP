@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Admin;
+import org.admin.model.Admin;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,6 +22,7 @@ public class GetAdmin extends Connection {
             JSONObject data = getJson();
             List<Admin> admins = new ArrayList<>();
             JSONArray adminsJSON = (JSONArray) data.get("admins");
+            System.out.println(data);
             for(Object adminObj : adminsJSON){
                 JSONObject adminJSON = (JSONObject) adminObj;
                 Admin admin = new Admin();
@@ -44,8 +45,8 @@ public class GetAdmin extends Connection {
             }
             return admins;
         }
-        catch (Exception e){
-            System.out.println(e);
+        catch (Exception ex){
+            System.out.println("class: GetAdmin, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -68,7 +69,6 @@ public class GetAdmin extends Connection {
                 String name = (String)data.get("name");
                 String surname = (String)data.get("surname");
                 String patronymic = (String)data.get("patronymic");
-                String email = (String)data.get("email");
                 String phone = (String)data.get("phone");
                 String bio = (String)data.get("bio");
 
@@ -76,14 +76,13 @@ public class GetAdmin extends Connection {
                 admin.setName(name);
                 admin.setSurname(surname);
                 admin.setPatronymic(patronymic);
-                admin.setEmail(email);
                 admin.setPhone(phone);
                 admin.setBio(bio);
             }
             return admin;
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetAdmin, method: getByDate, exception: " + ex.getMessage());
             return null;
         }
     }
@@ -112,10 +111,9 @@ public class GetAdmin extends Connection {
             admin.setBio(bio);
 
             return admin;
-
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetAdmin, method: getById, exception: " + ex.getMessage());
             return null;
         }
     }

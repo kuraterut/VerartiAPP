@@ -15,11 +15,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
-import org.admin.connection.postRequests.CreateAdmin;
 import org.admin.connection.postRequests.CreateProduct;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.Product;
+import org.admin.model.Response;
+import org.admin.model.Product;
 
 public class CreateProductDialog extends Main {
     public static void show(Node node){

@@ -18,9 +18,9 @@ import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.postRequests.AddOptionToMaster;
 import org.admin.connection.putRequests.UpdateMaster;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringOptions;
-import org.admin.utils.entities.Master;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Master;
+import org.admin.model.Response;
+import org.admin.model.Option;
 
 import java.util.ArrayList;
 import java.util.List;

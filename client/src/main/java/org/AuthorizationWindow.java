@@ -83,8 +83,8 @@ public class AuthorizationWindow extends Main{
                 String login    = loginField.getText();
                 String password = passwordField.getText();
                 String chosenRole = null;
-                if(rolesComboBox.getValue().equals("Мастер")){chosenRole = "master";}
-                if(rolesComboBox.getValue().equals("Администратор")){chosenRole = "admin";}
+                if(rolesComboBox.getValue().equals("Мастер")){chosenRole = "MASTER";}
+                if(rolesComboBox.getValue().equals("Администратор")){chosenRole = "ADMIN";}
 
                 try{long k = Long.parseLong(login.substring(1));}
                 catch(Exception ex){
@@ -112,10 +112,10 @@ public class AuthorizationWindow extends Main{
                 System.out.println(token);
 
 
-                if(Main.role.equals("master")){
+                if(Main.role.equals("MASTER")){
                     MasterInterface.loadCalendarWindow(authorizationBtn);
                 }
-                else if(Main.role.equals("admin")){
+                else if(Main.role.equals("ADMIN")){
                     AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
                 }
             }

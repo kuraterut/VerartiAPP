@@ -2,14 +2,12 @@ package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Transaction;
-import org.admin.utils.entities.TransactionType;
+import org.admin.model.Response;
+import org.admin.model.Transaction;
+import org.admin.utils.TransactionType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CreateTransaction extends Connection {
@@ -49,7 +47,7 @@ public class CreateTransaction extends Connection {
             return new Response(status, getErrorMsg());
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: CreateTransaction, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

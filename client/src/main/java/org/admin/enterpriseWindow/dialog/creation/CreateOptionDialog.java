@@ -16,8 +16,8 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.postRequests.CreateOption;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Response;
+import org.admin.model.Option;
 
 import java.time.LocalTime;
 

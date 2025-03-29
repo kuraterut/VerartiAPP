@@ -2,14 +2,13 @@ package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.entities.Master;
+import org.admin.model.Master;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ public class GetMaster extends Connection {
             List<Master> masters = new ArrayList<>();
 
             JSONObject data = getJson();
+            System.out.println(data);
             JSONArray jsonArr = (JSONArray) data.get("masters");
 
             for(Object elem: jsonArr){
@@ -47,12 +47,10 @@ public class GetMaster extends Connection {
                 masters.add(master);
             }
             return masters;
-
-
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetMaster, method: getAll, exception: " + ex.getMessage());
+            return new ArrayList<>();
         }
     }
 
@@ -83,7 +81,7 @@ public class GetMaster extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetMaster, method: getById, exception: " + ex.getMessage());
             return null;
         }
     }
@@ -100,8 +98,8 @@ public class GetMaster extends Connection {
 
 
             List<Master> masters = new ArrayList<>();
-
             JSONObject data = getJson();
+
             JSONArray mastersArr = (JSONArray)data.get("masters");
             for(Object elem: mastersArr){
                 JSONObject masterJSON = (JSONObject)elem;
@@ -127,7 +125,7 @@ public class GetMaster extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetMaster, method: getListByDate, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }

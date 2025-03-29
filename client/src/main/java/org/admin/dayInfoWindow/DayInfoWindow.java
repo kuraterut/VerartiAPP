@@ -11,15 +11,13 @@ import org.admin.dayInfoWindow.tables.DayInfoTable;
 import org.admin.enterpriseWindow.dialog.infos.ClientInfoDialog;
 import org.admin.enterpriseWindow.searchingStrings.SearchingStringClients;
 import org.admin.sideMenu.SideMenu;
-import org.admin.utils.*;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.geometry.*;
-import javafx.collections.*;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.Client;
+import org.admin.model.Admin;
+import org.admin.model.Client;
 
 import java.util.*;
 import java.time.*;

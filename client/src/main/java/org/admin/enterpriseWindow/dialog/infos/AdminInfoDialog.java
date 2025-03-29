@@ -17,8 +17,8 @@ import org.admin.AdminInterface;
 import org.admin.connection.deleteRequests.DeleteAdmin;
 import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.putRequests.UpdateAdmin;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.Response;
+import org.admin.model.Admin;
+import org.admin.model.Response;
 
 public class AdminInfoDialog extends Main {
     public static void show(Long id, Node node){
@@ -45,14 +45,12 @@ public class AdminInfoDialog extends Main {
         Label surnameLabel      = new Label("Фамилия: ");
         Label patronymicLabel   = new Label("Отчество: ");
         Label phoneLabel        = new Label("Телефон: ");
-        Label emailLabel        = new Label("Email: ");
         Label bioLabel          = new Label("Биография: ");
 
         Label adminIdLabel             = new Label(admin.getId().toString());
         TextField nameTextField         = new TextField(admin.getName());
         TextField surnameTextField      = new TextField(admin.getSurname());
         TextField patronymicTextField   = new TextField(admin.getPatronymic());
-        TextField emailTextField        = new TextField(admin.getEmail());
         TextField phoneTextField        = new TextField(admin.getPhone());
         TextArea bioTextArea            = new TextArea(admin.getBio());
 
@@ -67,11 +65,11 @@ public class AdminInfoDialog extends Main {
         infoTable.getRowConstraints().add(new RowConstraints(150));
 
         infoTable.addColumn(0,
-                idLabel, nameLabel, surnameLabel, patronymicLabel, emailLabel, phoneLabel, bioLabel);
+                idLabel, nameLabel, surnameLabel, patronymicLabel, phoneLabel, bioLabel);
 
         infoTable.addColumn(1,
                 adminIdLabel, nameTextField, surnameTextField,
-                patronymicTextField, emailTextField, phoneTextField, bioTextArea);
+                patronymicTextField, phoneTextField, bioTextArea);
 
         GridPane.setHalignment(idLabel, HPos.CENTER);
         GridPane.setValignment(idLabel, VPos.CENTER);
@@ -81,8 +79,6 @@ public class AdminInfoDialog extends Main {
         GridPane.setValignment(surnameLabel, VPos.CENTER);
         GridPane.setHalignment(patronymicLabel, HPos.CENTER);
         GridPane.setValignment(patronymicLabel, VPos.CENTER);
-        GridPane.setHalignment(emailLabel, HPos.CENTER);
-        GridPane.setValignment(emailLabel, VPos.CENTER);
         GridPane.setHalignment(phoneLabel, HPos.CENTER);
         GridPane.setValignment(phoneLabel, VPos.CENTER);
         GridPane.setHalignment(bioLabel, HPos.CENTER);
@@ -96,8 +92,6 @@ public class AdminInfoDialog extends Main {
         GridPane.setValignment(surnameTextField, VPos.CENTER);
         GridPane.setHalignment(patronymicTextField, HPos.CENTER);
         GridPane.setValignment(patronymicTextField, VPos.CENTER);
-        GridPane.setHalignment(emailTextField, HPos.CENTER);
-        GridPane.setValignment(emailTextField, VPos.CENTER);
         GridPane.setHalignment(phoneTextField, HPos.CENTER);
         GridPane.setValignment(phoneTextField, VPos.CENTER);
         GridPane.setHalignment(bioTextArea, HPos.CENTER);
@@ -130,7 +124,6 @@ public class AdminInfoDialog extends Main {
             newAdmin.setName(nameTextField.getText());
             newAdmin.setSurname(surnameTextField.getText());
             newAdmin.setPatronymic(patronymicTextField.getText());
-            newAdmin.setEmail(emailTextField.getText());
             newAdmin.setPhone(phoneTextField.getText());
             newAdmin.setBio(bioTextArea.getText());
 

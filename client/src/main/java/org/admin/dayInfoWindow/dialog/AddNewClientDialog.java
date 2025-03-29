@@ -16,8 +16,8 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.AdminInterface;
 import org.admin.connection.postRequests.CreateClient;
-import org.admin.utils.entities.Client;
-import org.admin.utils.Response;
+import org.admin.model.Client;
+import org.admin.model.Response;
 
 import java.time.LocalDate;
 

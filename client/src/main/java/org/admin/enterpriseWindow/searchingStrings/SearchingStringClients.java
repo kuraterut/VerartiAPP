@@ -11,7 +11,7 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.utils.entities.Client;
+import org.admin.model.Client;
 
 import java.util.ArrayList;
 import java.util.List;

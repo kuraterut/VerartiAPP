@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Client;
+import org.admin.model.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -50,7 +50,7 @@ public class GetClient extends Connection {
             return clients;
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetClient, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -86,7 +86,7 @@ public class GetClient extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetClient, method: getById, exception: " + ex.getMessage());
             return null;
         }
     }
@@ -130,7 +130,7 @@ public class GetClient extends Connection {
             }
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetClient, method: getByPhone, exception: " + ex.getMessage());
             Client client = new Client();
             client.setCode(500);
             client.setMsg(ex.getMessage());

@@ -2,9 +2,9 @@ package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Appointment;
+import org.admin.model.Response;
+import org.admin.model.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -42,7 +42,7 @@ public class CreateAppointment extends Connection {
             outJson.put("option_ids", optionsJSON);
             outJson.put("client_id", clientId);
             outJson.put("master_id", masterId);
-//            outJson.put("comment", comment);
+            outJson.put("comment", comment);
 
             sendJson(outJson);
 
@@ -53,10 +53,8 @@ public class CreateAppointment extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
-
-            Response response = new Response();
-            return response;
+            System.out.println("class: CreateAppointment, method: post, exception: " + ex.getMessage());
+            return new Response();
         }
     }
 }

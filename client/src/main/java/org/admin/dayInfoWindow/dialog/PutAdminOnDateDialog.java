@@ -15,8 +15,8 @@ import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.postRequests.PutAdminOnDate;
 import org.admin.dayInfoWindow.searchingStrings.SearchingStringAdmins;
 import org.admin.enterpriseWindow.dialog.creation.CreateAdminDialog;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.Response;
+import org.admin.model.Admin;
+import org.admin.model.Response;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

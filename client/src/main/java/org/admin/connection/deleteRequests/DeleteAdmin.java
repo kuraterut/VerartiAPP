@@ -1,8 +1,7 @@
 package org.admin.connection.deleteRequests;
 
-import org.Main;
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
+import org.admin.model.Response;
 
 public class DeleteAdmin extends Connection {
     public static Response deleteById(String token, Long id){
@@ -17,8 +16,8 @@ public class DeleteAdmin extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: DeleteAdmin, method: deleteById, exception: " + ex.getMessage());
             return new Response();
         }
     }
