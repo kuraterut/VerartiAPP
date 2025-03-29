@@ -14,12 +14,7 @@ public class UpdateClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", client.getName());
-            out.put("surname", client.getSurname());
-            out.put("patronymic", client.getPatronymic());
-            out.put("phone", client.getPhone());
-            out.put("birthday", HelpFuncs.localDateToString(client.getBirthday(), "yyyy-MM-dd"));
+            JSONObject out = client.toJson();
             sendJson(out);
 
             int status = connection.getResponseCode();

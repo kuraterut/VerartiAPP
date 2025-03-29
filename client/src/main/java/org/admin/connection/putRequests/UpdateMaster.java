@@ -13,12 +13,8 @@ public class UpdateMaster extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", master.getName());
-            out.put("surname", master.getSurname());
-            out.put("patronymic", master.getPatronymic());
-            out.put("phone", master.getPhone());
-            out.put("bio", master.getBio());
+            JSONObject out = master.toJson();
+            out.remove("password");
             sendJson(out);
 
             int status = connection.getResponseCode();

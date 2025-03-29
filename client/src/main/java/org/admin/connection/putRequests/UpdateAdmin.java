@@ -13,12 +13,8 @@ public class UpdateAdmin extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", admin.getName());
-            out.put("surname", admin.getSurname());
-            out.put("patronymic", admin.getPatronymic());
-            out.put("phone", admin.getPhone());
-            out.put("bio", admin.getBio());
+            JSONObject out = admin.toJson();
+            out.remove("password");
             sendJson(out);
 
             int status = connection.getResponseCode();

@@ -13,18 +13,7 @@ public class CreateOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-
-            String name = option.getName();
-            Long price = option.getPrice();
-            String duration = option.getDurationString();
-            String description = option.getDescription();
-
-
-            JSONObject outJson = new JSONObject();
-            outJson.put("name", name);
-            outJson.put("price", price.intValue());
-            outJson.put("duration", duration);
-            outJson.put("description", description);
+            JSONObject outJson = option.toJson();
 
             sendJson(outJson);
 

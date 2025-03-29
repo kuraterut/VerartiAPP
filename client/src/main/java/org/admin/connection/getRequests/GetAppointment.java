@@ -55,7 +55,6 @@ public class GetAppointment extends Connection {
 
     public static List<Appointment> getListByDate(String token, LocalDate date){
         try{
-            //TODO Сделать Мапперы
             getConnection("http://localhost:8000/api/admin/appointment/date?date=" + HelpFuncs.localDateToString(date, "yyyy-MM-dd"));
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -68,7 +67,6 @@ public class GetAppointment extends Connection {
             for(Object elem : jsonArr){
                 JSONObject obj = (JSONObject)elem;
                 Appointment appointment = Appointment.fromJson(obj);
-
                 appointments.add(appointment);
             }
             return appointments;

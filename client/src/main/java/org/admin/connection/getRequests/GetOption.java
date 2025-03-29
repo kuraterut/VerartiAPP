@@ -19,24 +19,10 @@ public class GetOption extends Connection {
             JSONObject data = getJson();
 
             List<Option> options = new ArrayList<>();
-            JSONArray servicesArray = (JSONArray) data.get("options");
-            for (Object serviceObj : servicesArray) {
-                JSONObject serviceJSON = (JSONObject) serviceObj;
-                Option option = new Option();
-
-                Long id = (Long) serviceJSON.get("id");
-                String name = (String) serviceJSON.get("name");
-                String description = (String) serviceJSON.get("description");
-                Long price = (Long) serviceJSON.get("price");
-                String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
-                LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
-
-                option.setId(id);
-                option.setName(name);
-                option.setDescription(description);
-                option.setPrice(price);
-                option.setDuration(duration);
-
+            JSONArray optionsArray = (JSONArray) data.get("options");
+            for (Object optionObj : optionsArray) {
+                JSONObject optionJSON = (JSONObject) optionObj;
+                Option option = Option.fromJson(optionJSON);
                 options.add(option);
             }
             return options;
@@ -54,22 +40,7 @@ public class GetOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-
-
-            Option option = new Option();
-            String name = (String)data.get("name");
-            String description = (String)data.get("description");
-            Long price = (Long)data.get("price");
-            String[] durationStr = ((String)data.get("duration")).split(":");
-            LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
-
-            option.setId(id);
-            option.setName(name);
-            option.setDescription(description);
-            option.setPrice(price);
-            option.setDuration(duration);
-
-            return option;
+            return Option.fromJson(data);
 
         }
         catch(Exception ex){
@@ -84,26 +55,11 @@ public class GetOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-            System.out.println(data);
             List<Option> options = new ArrayList<>();
             JSONArray optionsArray = (JSONArray) data.get("options");
-            for (Object serviceObj : optionsArray) {
-                JSONObject serviceJSON = (JSONObject) serviceObj;
-                Option option = new Option();
-
-                Long id = (Long) serviceJSON.get("id");
-                String name = (String) serviceJSON.get("name");
-                String description = (String) serviceJSON.get("description");
-                Long price = (Long) serviceJSON.get("price");
-                String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
-                LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
-
-                option.setId(id);
-                option.setName(name);
-                option.setDescription(description);
-                option.setPrice(price);
-                option.setDuration(duration);
-
+            for (Object optionObj : optionsArray) {
+                JSONObject optionJSON = (JSONObject) optionObj;
+                Option option = Option.fromJson(optionJSON);
                 options.add(option);
             }
             return options;

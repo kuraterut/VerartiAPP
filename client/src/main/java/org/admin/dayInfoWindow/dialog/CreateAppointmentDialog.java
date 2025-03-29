@@ -86,8 +86,8 @@ public class CreateAppointmentDialog extends Main {
             String clientPhone = clientPhoneTextField.getText();
             if(!HelpFuncs.checkPhone(clientPhone)){messageLabel.setText("Некорректный номер телефона"); return;}
             Client client = GetClient.getByPhone(token, clientPhone);
-            if(client.getCode() == 404){messageLabel.setText("Пользователь с таким номером не найден"); return;}
-            if(client.getCode() != 200){messageLabel.setText(client.getMsg()); return;}
+            if(client == null){messageLabel.setText("Ошибка номера пользователя"); return;}
+//            if(client.getCode() != 200){messageLabel.setText(client.getMsg()); return;}
             appointment.setClient(client);
             appointment.setMaster(master);
             appointment.setStartTime(startTime);

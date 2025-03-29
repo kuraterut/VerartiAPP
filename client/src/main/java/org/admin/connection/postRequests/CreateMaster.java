@@ -15,22 +15,10 @@ public class CreateMaster extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            String name = master.getName();
-            String surname = master.getSurname();
-            String patronymic = master.getPatronymic();
-            String phone = master.getPhone();
-            String password = master.getPassword();
-
+            JSONObject outJson = master.toJson();
             ArrayList<String> roles = new ArrayList<>();
             roles.add("MASTER");
             if(master.getIsAdmin()) roles.add("ADMIN");
-
-            JSONObject outJson = new JSONObject();
-            outJson.put("name", name);
-            outJson.put("surname", surname);
-            outJson.put("patronymic", patronymic);
-            outJson.put("phone", phone);
-            outJson.put("password", password);
             outJson.put("roles", roles);
 
             sendJson(outJson);

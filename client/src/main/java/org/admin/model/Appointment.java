@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 
 import java.util.*;
 import java.time.*;
-
+//TODO Добавить Lombok
 public class Appointment extends Response {
 	private Long id;
 	private AppointmentStatus status;
