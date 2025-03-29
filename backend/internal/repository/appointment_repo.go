@@ -468,3 +468,9 @@ func (r *AppointmentPostgres) GetAppointmentById(appointmentId int) (models.Mast
 
 	return appointment, err
 }
+
+func (r *AppointmentPostgres) DeleteAppointmentById(appointmentId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", database.MasterAppointmentTable)
+	_, err := r.db.Exec(query, appointmentId)
+	return err
+}

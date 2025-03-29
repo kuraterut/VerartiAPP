@@ -49,6 +49,7 @@ type Appointment interface {
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
+	DeleteAppointmentById(appointmentId int) error
 }
 
 type Profile interface {

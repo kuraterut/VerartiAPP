@@ -34,7 +34,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) putMasterToDate(c *gin.Context) {
@@ -62,7 +62,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) getAdminByDate(c *gin.Context) {
@@ -246,6 +246,28 @@ func (h *Handler) getAppointmentById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, appointment)
+}
+
+func (h *Handler) deleteAppointmentById(c *gin.Context) {
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	err = h.services.Appointment.DeleteAppointmentById(appointmentId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) getDailyAppointment(c *gin.Context) {}
