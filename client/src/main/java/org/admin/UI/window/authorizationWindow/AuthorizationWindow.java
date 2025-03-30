@@ -84,6 +84,7 @@ public class AuthorizationWindow extends Main {
                 }
 
                 Main.token = authResponse.getAuthToken();
+                Main.login = login;
                 System.out.println(token);
 
                 AdminController.loadDayInfoWindow(authorizationBtn, LocalDate.now());

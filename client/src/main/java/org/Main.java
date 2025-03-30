@@ -19,7 +19,7 @@ import java.time.*;
 public class Main extends Application{
     public static Properties properties;
 
-    public static String role;
+    public static String login;
     public static String token; 
     public static GridPane calendar;
     public static boolean isMenuVisible = true;
