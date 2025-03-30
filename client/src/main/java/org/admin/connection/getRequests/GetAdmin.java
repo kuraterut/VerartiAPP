@@ -77,4 +77,22 @@ public class GetAdmin extends Connection {
             return new Admin(404, ex.getMessage());
         }
     }
+
+    public static Admin getByPhone(String token, String phone){
+        try{
+            getConnection("http://localhost:8000/api/admin/users/phone?phone=" + phone+"&role=ADMIN");
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+
+            JSONObject data = getJson();
+
+            int code = connection.getResponseCode();
+            if (code != 200) return new Admin(code, getErrorMsg());
+            return Admin.fromJson(data);
+        }
+        catch(Exception ex){
+            System.out.println("class: GetAdmin, method: getByPhone, exception: " + ex.getMessage());
+            return new Admin(404, ex.getMessage());
+        }
+    }
 }

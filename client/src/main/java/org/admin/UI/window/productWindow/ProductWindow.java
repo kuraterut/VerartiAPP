@@ -2,6 +2,7 @@ package org.admin.UI.window.productWindow;
 
 import org.Main;
 
+import org.admin.UI.window.productWindow.dialog.BuyProductDialog;
 import org.admin.connection.getRequests.GetProduct;
 import org.admin.UI.window.productWindow.dialog.CreateProductDialog;
 import org.admin.UI.components.sideMenu.SideMenu;
@@ -104,6 +105,9 @@ public class ProductWindow extends Main{
         buttons.setSpacing(50);
 
         createNewProductButton.setOnAction(event -> CreateProductDialog.show(createNewProductButton));
+        buyProduct.setOnAction(event -> {
+            BuyProductDialog.show(buyProduct);
+        });
 
         centerBox.getChildren().addAll(title, scrollTable, buttons);
         root.setCenter(centerBox);
