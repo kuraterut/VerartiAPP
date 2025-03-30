@@ -5,26 +5,8 @@ import org.master.calendarWindow.CalendarWindow;
 import org.master.helpWindow.HelpWindow;
 import org.master.profileWindow.ProfileWindow;
 import org.master.resourceWindow.ResourceWindow;
-import org.master.sideMenu.SideMenu;
-import org.AuthorizationWindow;
-
-import javafx.application.*;
-import javafx.stage.*;
 
 import javafx.scene.*;
-
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.image.*;
-import javafx.scene.shape.*;
-import javafx.scene.paint.*;
-import javafx.geometry.*;
-import javafx.event.*;
-import javafx.animation.*;
-import javafx.collections.*;
-import javafx.util.*;
 
 import java.time.*;
 

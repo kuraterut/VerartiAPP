@@ -16,6 +16,7 @@ import javafx.geometry.*;
 import javafx.collections.*;
 import org.admin.model.Admin;
 import org.admin.model.Master;
+import org.admin.utils.HelpFuncs;
 
 import java.io.*;
 import java.util.*;
@@ -30,7 +31,7 @@ public class CalendarOfEmployeesWindow extends Main{
 
         
         int monthLen                = YearMonth.of(year, month).lengthOfMonth();
-        int firstDayInWeek          = AdminController.getDayOfWeekByStr(year+"-"+month+"-01");
+        int firstDayInWeek          = HelpFuncs.getDayOfWeekByStr(year+"-"+month+"-01");
         
         Label[] daysOfWeekArr = {new Label("ПН"), new Label("ВТ"), new Label("СР"), new Label("ЧТ"), 
                                 new Label("ПТ"), new Label("СБ"), new Label("ВС")};

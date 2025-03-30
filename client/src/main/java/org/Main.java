@@ -1,26 +1,14 @@
 package org;
 
-import org.AuthorizationWindow;
+import org.admin.UI.window.authorizationWindow.AuthorizationWindow;
 
 import javafx.application.*;
 import javafx.stage.*;
 
 import javafx.scene.*;
 
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
-import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.image.*;
-import javafx.scene.shape.*;
-import javafx.scene.paint.*;
-import javafx.geometry.*;
-import javafx.event.*;
-import javafx.animation.*;
-import javafx.collections.*;
-import javafx.util.*;
 
-import java.nio.file.*;
 import java.io.*;
 import java.util.*;
 import java.time.*;
