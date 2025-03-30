@@ -16,7 +16,7 @@ import org.Main;
 import org.admin.controller.AdminController;
 import org.admin.connection.deleteRequests.DeleteAdmin;
 import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.putRequests.UpdateAdmin;
+import org.admin.connection.putRequests.UpdateProfile;
 import org.admin.model.Admin;
 import org.admin.model.Response;
 
@@ -128,7 +128,7 @@ public class AdminInfoDialog extends Main {
             newAdmin.setPhone(phoneTextField.getText());
             newAdmin.setBio(bioTextArea.getText());
 
-            Response response = UpdateAdmin.updateInfo(token, newAdmin);
+            Response response = UpdateProfile.updateInfo(token, newAdmin);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
             else{messageLabel.setText(response.getMsg());}
         });

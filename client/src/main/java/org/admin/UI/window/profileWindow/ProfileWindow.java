@@ -1,8 +1,12 @@
 package org.admin.UI.window.profileWindow;
 
 import org.Main;
+import org.admin.UI.window.profileWindow.dialog.ChangePasswordDialog;
+import org.admin.UI.window.profileWindow.dialog.ChangeProfileInfoDialog;
+import org.admin.connection.getRequests.GetAdmin;
+import org.admin.connection.getRequests.GetPhoto;
+import org.admin.connection.putRequests.UpdateProfile;
 import org.admin.controller.AdminController;
-import org.admin.connection.profile.*;
 import org.admin.model.Response;
 import org.admin.UI.components.sideMenu.SideMenu;
 
@@ -19,235 +23,9 @@ import org.admin.model.Admin;
 import java.io.*;
 
 public class ProfileWindow extends Main{
-	public static BorderPane loadChangeProfileWindow(){
-        BorderPane root                 = new BorderPane();
-        StackPane sideMenuStack         = SideMenu.buildSideMenu(3);
-        GridPane table                  = new GridPane();
-
-        VBox rightBox                   = new VBox();
-        VBox centerBox                  = new VBox();
-
-        HBox btnsBox                    = new HBox();
-
-        TextField nameField             = new TextField();
-        TextField surnameField          = new TextField();
-        TextField patronymicField       = new TextField();
-        TextField emailField            = new TextField();
-        TextField phoneField            = new TextField();
-        TextField bioField              = new TextField();
-
-        Label title                     = new Label(); 
-        Label nameLbl                   = new Label();
-        Label surnameLbl                = new Label();
-        Label patronymicLbl             = new Label();
-        Label emailLbl                  = new Label();
-        Label phoneLbl                  = new Label();
-        Label bioLbl                    = new Label();
-        Label errorMsg                  = new Label();
-
-        Button cancel                   = new Button();
-        Button saveChanges              = new Button();
-
-        
-        title.setText("Изменение информации профиля");
-        nameLbl.setText("Имя");
-        surnameLbl.setText("Фамилия");
-        patronymicLbl.setText("Отчество");
-        emailLbl.setText("Email");
-        phoneLbl.setText("Телефон");
-        bioLbl.setText("Биография");
-        errorMsg.setText("");
-
-        cancel.setText("Отмена");
-        saveChanges.setText("Сохранить изменения");
-
-        rightBox.setPrefWidth(MENU_WIDTH);
-
-        Admin admin = (Admin) ConnectionProfile.getProfileInfo(token);
-        if(admin.getCode() == 200){
-            nameField.setText(admin.getName());
-            surnameField.setText(admin.getSurname());
-            patronymicField.setText(admin.getPatronymic());
-            phoneField.setText(admin.getPhone());
-            bioField.setText(admin.getBio());
-        }
-
-        
-
-        table.add(nameLbl, 0, 0);
-        table.add(nameField, 1, 0);
-        GridPane.setHalignment(nameLbl, HPos.CENTER);
-        GridPane.setValignment(nameLbl, VPos.CENTER);
-        GridPane.setHalignment(nameField, HPos.CENTER);
-        GridPane.setValignment(nameField, VPos.CENTER);
-
-        table.add(surnameLbl, 0, 1);
-        table.add(surnameField, 1, 1);
-        GridPane.setHalignment(surnameLbl, HPos.CENTER);
-        GridPane.setValignment(surnameLbl, VPos.CENTER);
-        GridPane.setHalignment(surnameField, HPos.CENTER);
-        GridPane.setValignment(surnameField, VPos.CENTER);
-
-        table.add(patronymicLbl, 0, 2);
-        table.add(patronymicField, 1, 2);
-        GridPane.setHalignment(patronymicLbl, HPos.CENTER);
-        GridPane.setValignment(patronymicLbl, VPos.CENTER);
-        GridPane.setHalignment(patronymicField, HPos.CENTER);
-        GridPane.setValignment(patronymicField, VPos.CENTER);
-
-        table.add(emailLbl, 0, 3);
-        table.add(emailField, 1, 3);
-        GridPane.setHalignment(emailLbl, HPos.CENTER);
-        GridPane.setValignment(emailLbl, VPos.CENTER);
-        GridPane.setHalignment(emailField, HPos.CENTER);
-        GridPane.setValignment(emailField, VPos.CENTER);
-
-        table.add(phoneLbl, 0, 4);
-        table.add(phoneField, 1, 4);
-        GridPane.setHalignment(phoneLbl, HPos.CENTER);
-        GridPane.setValignment(phoneLbl, VPos.CENTER);
-        GridPane.setHalignment(phoneField, HPos.CENTER);
-        GridPane.setValignment(phoneField, VPos.CENTER);
-        
-        table.add(bioLbl, 0, 5);
-        table.add(bioField, 1, 5);
-        GridPane.setHalignment(bioLbl, HPos.CENTER);
-        GridPane.setValignment(bioLbl, VPos.CENTER);
-        GridPane.setHalignment(bioField, HPos.CENTER);
-        GridPane.setValignment(bioField, VPos.CENTER);
-
-        table.setAlignment(Pos.CENTER);
-        table.setVgap(15);
-        table.setHgap(30);
-
-        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
-        centerBox.setAlignment(Pos.TOP_CENTER);
-        btnsBox.setAlignment(Pos.CENTER);
-
-        btnsBox.setSpacing(100);
-        centerBox.setSpacing(50);
-
-        cancel.setOnAction(event -> AdminController.loadProfileWindow(cancel));
-        
-        saveChanges.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String newName          = nameField.getText();
-                String newSurname       = surnameField.getText();
-                String newPatronymic    = patronymicField.getText();
-                String newEmail         = emailField.getText();
-                String newPhone         = phoneField.getText();
-                String newBio           = bioField.getText();
-
-                Admin newAdmin = new Admin();
-                newAdmin.setName(newName);
-                newAdmin.setSurname(newSurname);
-                newAdmin.setPatronymic(newPatronymic);
-                newAdmin.setPhone(newPhone);
-                newAdmin.setBio(newBio);
-
-                Response response = ConnectionProfile.changeProfileInfo(token, newAdmin);
-                if(response.getCode() == 200){
-                    AdminController.loadProfileWindow(cancel);}
-                else {errorMsg.setText(response.getMsg());}
-            }
-        });
-
-
-        btnsBox.getChildren().addAll(cancel, saveChanges);
-        centerBox.getChildren().addAll(title, table, errorMsg, btnsBox);
-        root.setCenter(centerBox);
-        root.setLeft(sideMenuStack);
-        root.setRight(rightBox);
-
-        return root;
-    }
-
-    public static BorderPane loadChangeProfilePasswordWindow(){
-        BorderPane root                 = new BorderPane();
-        StackPane sideMenuStack         = SideMenu.buildSideMenu(2);
-        GridPane table                  = new GridPane();
-
-        VBox rightBox                   = new VBox();
-        VBox centerBox                  = new VBox();
-
-        HBox btnsBox                    = new HBox();
-
-        TextField oldPasswordField      = new TextField();
-        TextField newPasswordField      = new TextField();
-        
-        Label title                     = new Label(); 
-        Label oldPasswordLbl            = new Label();
-        Label newPasswordLbl            = new Label();
-        Label errorMsg                  = new Label();
-        
-        Button cancel                   = new Button();
-        Button saveChanges              = new Button();
-
-        
-        title.setText("Изменение пароля профиля");
-        errorMsg.setText("");
-        oldPasswordLbl.setText("Старый пароль");
-        newPasswordLbl.setText("Новый пароль");
-        
-        cancel.setText("Отмена");
-        saveChanges.setText("Сохранить изменения");
-
-        rightBox.setPrefWidth(MENU_WIDTH);
-
-        table.add(oldPasswordLbl, 0, 0);
-        table.add(oldPasswordField, 1, 0);
-        GridPane.setHalignment(oldPasswordLbl, HPos.CENTER);
-        GridPane.setValignment(oldPasswordLbl, VPos.CENTER);
-        GridPane.setHalignment(oldPasswordField, HPos.CENTER);
-        GridPane.setValignment(oldPasswordField, VPos.CENTER);
-
-        table.add(newPasswordLbl, 0, 1);
-        table.add(newPasswordField, 1, 1);
-        GridPane.setHalignment(newPasswordLbl, HPos.CENTER);
-        GridPane.setValignment(newPasswordLbl, VPos.CENTER);
-        GridPane.setHalignment(newPasswordField, HPos.CENTER);
-        GridPane.setValignment(newPasswordField, VPos.CENTER);
-
-        table.setAlignment(Pos.CENTER);
-        table.setVgap(15);
-        table.setHgap(30);
-
-        centerBox.setMargin(title, new Insets(50, 10, 100, 10));
-        centerBox.setAlignment(Pos.TOP_CENTER);
-        btnsBox.setAlignment(Pos.CENTER);
-
-        btnsBox.setSpacing(100);
-        centerBox.setSpacing(50);
-
-        cancel.setOnAction(event -> AdminController.loadProfileWindow(cancel));
-        
-        saveChanges.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String oldPassword      = oldPasswordField.getText();
-                String newPassword       = newPasswordField.getText();
-                
-                Response response = ConnectionProfile.changeProfilePassword(token, oldPassword, newPassword);
-                if(response.getCode() == 200){
-                    AdminController.loadProfileWindow(cancel);}
-                else {errorMsg.setText(response.getMsg());}
-            }
-        });
-
-        btnsBox.getChildren().addAll(cancel, saveChanges);
-        centerBox.getChildren().addAll(title, table, errorMsg, btnsBox);
-        root.setCenter(centerBox);
-        root.setLeft(sideMenuStack);
-        root.setRight(rightBox);
-
-        return root;
-    }
-
-
     public static BorderPane loadProfileWindow(){
         BorderPane root             = new BorderPane();
-        StackPane sideMenuStack     = SideMenu.buildSideMenu(2);
+        StackPane sideMenuStack     = SideMenu.buildSideMenu(3);
         GridPane table              = new GridPane();
         
         VBox rightBox               = new VBox();
@@ -261,65 +39,40 @@ public class ProfileWindow extends Main{
         Button changePasswordBtn    = new Button();
         Button changeInfoBtn        = new Button();
 
-        Label nameLbl               = new Label();
-        Label surnameLbl            = new Label();
-        Label patronymicLbl         = new Label();
-        Label birthdayLbl           = new Label();
-        Label phoneLbl              = new Label();
-        Label emailLbl              = new Label();
-        Label bioLbl                = new Label();
-        Label roleLbl               = new Label();
-        Label curSalaryLbl          = new Label();
+        Label nameHeadLbl               = new Label();
+        Label surnameHeadLbl            = new Label();
+        Label patronymicHeadLbl         = new Label();
+        Label phoneHeadLbl              = new Label();
+        Label bioHeadLbl                = new Label();
+        Label roleHeadLbl               = new Label();
 
-        Label name                  = new Label();
-        Label surname               = new Label();
-        Label patronymic            = new Label();
-        Label birthday              = new Label();
-        Label phone                 = new Label();
-        Label email                 = new Label();
-        Label bio                   = new Label();
-        Label role                  = new Label();
+        Label nameLbl                 = new Label();
+        Label surnameLbl               = new Label();
+        Label patronymicLbl            = new Label();
+        Label phoneLbl                 = new Label();
+        Label bioLbl                   = new Label();
+        Label roleLbl                  = new Label();
        
         Label title                 = new Label();
 
         
         title.setText("Профиль");
-        nameLbl.setText("Имя");
-        surnameLbl.setText("Фамилия");
-        patronymicLbl.setText("Отчество");
-        birthdayLbl.setText("Дата рождения");
-        phoneLbl.setText("Телефон");
-        emailLbl.setText("Email");
-        bioLbl.setText("Биография");
-        roleLbl.setText("Роль");
+        nameHeadLbl.setText("Имя");
+        surnameHeadLbl.setText("Фамилия");
+        patronymicHeadLbl.setText("Отчество");
+        phoneHeadLbl.setText("Телефон");
+        bioHeadLbl.setText("Биография");
+        roleHeadLbl.setText("Роль");
 
-        Response response = ConnectionProfile.getProfileInfo(token);
-        Admin admin = new Admin();
-        Image avatarImage = null;
-        if(response.getCode() != 200){
+        Admin admin = GetAdmin.getByPhone(token, Main.login);
+        Image avatarImage = GetPhoto.getProfilePhoto(admin.getPhotoURL(), properties);
 
-        }
-
-
-        if(admin.getCode() != 200) {
-            avatarImage = ConnectionProfile.getProfilePhoto(null);
-            name.setText(admin.getMsg());
-            surname.setText(admin.getMsg());
-            patronymic.setText(admin.getMsg());
-            phone.setText(admin.getMsg());
-            email.setText(admin.getMsg());
-            bio.setText(admin.getMsg());
-            role.setText(admin.getMsg());
-        }
-        else{
-            avatarImage = ConnectionProfile.getProfilePhoto(admin.getPhotoURL());
-            name.setText(admin.getName());
-            surname.setText(admin.getSurname());
-            patronymic.setText(admin.getPatronymic());
-            phone.setText(admin.getPhone());
-            bio.setText(admin.getBio());
-            role.setText("Администратор");
-        }
+        nameLbl.setText(admin.getName());
+        surnameLbl.setText(admin.getSurname());
+        patronymicLbl.setText(admin.getPatronymic());
+        phoneLbl.setText(admin.getPhone());
+        bioLbl.setText(admin.getBio());
+        roleLbl.setText("Администратор");
         
         ImageView avatarImageView = new ImageView(avatarImage);
         Circle circle = new Circle(avatarImageView.getImage().getHeight()/20);
@@ -330,61 +83,48 @@ public class ProfileWindow extends Main{
         circle.setCenterX(avatarImageView.getImage().getWidth()/20);
         circle.setCenterY(avatarImageView.getImage().getHeight()/20);
 
-        table.add(nameLbl, 0, 0);
-        table.add(name, 1, 0);
+        table.add(nameHeadLbl, 0, 0);
+        table.add(nameLbl, 1, 0);
+        GridPane.setHalignment(nameHeadLbl, HPos.CENTER);
+        GridPane.setValignment(nameHeadLbl, VPos.CENTER);
         GridPane.setHalignment(nameLbl, HPos.CENTER);
         GridPane.setValignment(nameLbl, VPos.CENTER);
-        GridPane.setHalignment(name, HPos.CENTER);
-        GridPane.setValignment(name, VPos.CENTER);
 
-        table.add(surnameLbl, 0, 1);
-        table.add(surname, 1, 1);
+        table.add(surnameHeadLbl, 0, 1);
+        table.add(surnameLbl, 1, 1);
+        GridPane.setHalignment(surnameHeadLbl, HPos.CENTER);
+        GridPane.setValignment(surnameHeadLbl, VPos.CENTER);
         GridPane.setHalignment(surnameLbl, HPos.CENTER);
         GridPane.setValignment(surnameLbl, VPos.CENTER);
-        GridPane.setHalignment(surname, HPos.CENTER);
-        GridPane.setValignment(surname, VPos.CENTER);
 
-        table.add(patronymicLbl, 0, 2);
-        table.add(patronymic, 1, 2);
+        table.add(patronymicHeadLbl, 0, 2);
+        table.add(patronymicLbl, 1, 2);
+        GridPane.setHalignment(patronymicHeadLbl, HPos.CENTER);
+        GridPane.setValignment(patronymicHeadLbl, VPos.CENTER);
         GridPane.setHalignment(patronymicLbl, HPos.CENTER);
         GridPane.setValignment(patronymicLbl, VPos.CENTER);
-        GridPane.setHalignment(patronymic, HPos.CENTER);
-        GridPane.setValignment(patronymic, VPos.CENTER);
 
-        table.add(birthdayLbl, 0, 3);
-        table.add(birthday, 1, 3);
-        GridPane.setHalignment(birthdayLbl, HPos.CENTER);
-        GridPane.setValignment(birthdayLbl, VPos.CENTER);
-        GridPane.setHalignment(birthday, HPos.CENTER);
-        GridPane.setValignment(birthday, VPos.CENTER);
 
-        table.add(phoneLbl, 0, 4);
-        table.add(phone, 1, 4);
+        table.add(phoneHeadLbl, 0, 3);
+        table.add(phoneLbl, 1, 3);
+        GridPane.setHalignment(phoneHeadLbl, HPos.CENTER);
+        GridPane.setValignment(phoneHeadLbl, VPos.CENTER);
         GridPane.setHalignment(phoneLbl, HPos.CENTER);
         GridPane.setValignment(phoneLbl, VPos.CENTER);
-        GridPane.setHalignment(phone, HPos.CENTER);
-        GridPane.setValignment(phone, VPos.CENTER);
-
-        table.add(emailLbl, 0, 5);
-        table.add(email, 1, 5);
-        GridPane.setHalignment(emailLbl, HPos.CENTER);
-        GridPane.setValignment(emailLbl, VPos.CENTER);
-        GridPane.setHalignment(email, HPos.CENTER);
-        GridPane.setValignment(email, VPos.CENTER);
         
-        table.add(bioLbl, 0, 6);
-        table.add(bio, 1, 6);
+        table.add(bioHeadLbl, 0, 4);
+        table.add(bioLbl, 1, 4);
+        GridPane.setHalignment(bioHeadLbl, HPos.CENTER);
+        GridPane.setValignment(bioHeadLbl, VPos.CENTER);
         GridPane.setHalignment(bioLbl, HPos.CENTER);
         GridPane.setValignment(bioLbl, VPos.CENTER);
-        GridPane.setHalignment(bio, HPos.CENTER);
-        GridPane.setValignment(bio, VPos.CENTER);
 
-        table.add(roleLbl, 0, 7);
-        table.add(role, 1, 7);
+        table.add(roleHeadLbl, 0, 5);
+        table.add(roleLbl, 1, 5);
+        GridPane.setHalignment(roleHeadLbl, HPos.CENTER);
+        GridPane.setValignment(roleHeadLbl, VPos.CENTER);
         GridPane.setHalignment(roleLbl, HPos.CENTER);
         GridPane.setValignment(roleLbl, VPos.CENTER);
-        GridPane.setHalignment(role, HPos.CENTER);
-        GridPane.setValignment(role, VPos.CENTER);
 
 
         table.setAlignment(Pos.CENTER);
@@ -409,9 +149,8 @@ public class ProfileWindow extends Main{
         profileInfoBox.setAlignment(Pos.CENTER);
         changeInfoBtnsBox.setAlignment(Pos.CENTER);
 
-
-        changeInfoBtn.setOnAction(event -> AdminController.loadChangeProfileInfoWindow(changeInfoBtn));
-        changePasswordBtn.setOnAction(event -> AdminController.loadChangeProfilePasswordWindow(changePasswordBtn));
+        changeInfoBtn.setOnAction(event -> ChangeProfileInfoDialog.show(admin, changeInfoBtn));
+        changePasswordBtn.setOnAction(event -> ChangePasswordDialog.show(admin, changePasswordBtn));
 
         changeAvatarBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -424,11 +163,12 @@ public class ProfileWindow extends Main{
                     new FileChooser.ExtensionFilter("Картинки (*.jpg)", "*.jpg");
                 
                 fileChooser.getExtensionFilters().add(extFilter1);
-                fileChooser.setInitialDirectory(new File("/home/"));
+                fileChooser.setInitialDirectory(new File("C:/"));
                 File file = fileChooser.showOpenDialog(changeAvatarBtn.getScene().getWindow());
                 if (file != null) {
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
-                    Response status = ConnectionProfile.changeProfilePhoto(token, file);
+                    Response status = UpdateProfile.updateProfilePhoto(token, file);
+                    //TODO Проверять response и сделать messageLabel
                 }
                 AdminController.loadProfileWindow(changeAvatarBtn);
             }
