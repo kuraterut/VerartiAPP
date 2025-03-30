@@ -2,6 +2,7 @@ package org.admin.model;
 
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.admin.utils.AppointmentStatus;
@@ -13,6 +14,7 @@ import java.time.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Appointment extends Response {
 	private Long id;
 	private AppointmentStatus status;
@@ -22,6 +24,11 @@ public class Appointment extends Response {
 	private Client client;
 	private Master master;
 	private String comment;
+
+	public Appointment(int code, String message){
+		this.setCode(code);
+		this.setMsg(message);
+	}
 
 	public void addOption(Option option){this.options.add(option);}
 
@@ -82,6 +89,7 @@ public class Appointment extends Response {
 		appointment.setOptions(options);
 		appointment.setDate(date);
 
+		appointment.setCode(200);
 		return appointment;
 	}
 }

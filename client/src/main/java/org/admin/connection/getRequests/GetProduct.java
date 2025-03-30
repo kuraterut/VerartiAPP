@@ -38,11 +38,15 @@ public class GetProduct extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
+
+            int code = connection.getResponseCode();
+            if(code != 200) return new Product(code, getErrorMsg());
+
             return Product.fromJson(data);
         }
         catch (Exception ex){
             System.out.println("class: GetProduct, method: getById, exception: " + ex.getMessage());
-            return null;
+            return new Product(404, ex.getMessage());
         }
     }
 }

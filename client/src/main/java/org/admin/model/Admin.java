@@ -1,6 +1,7 @@
 package org.admin.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -9,8 +10,14 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Admin extends User {
 	protected Boolean isMaster;
+
+	public Admin(int code, String message){
+		this.setCode(code);
+		this.setMsg(message);
+	}
 
 	public static Admin fromJson(JSONObject obj){
 		Admin admin = new Admin();
@@ -34,6 +41,7 @@ public class Admin extends User {
 		admin.setPhotoURL(photoURL);
 		admin.setIsMaster(isMaster);
 
+		admin.setCode(200);
 		return admin;
 	}
 }

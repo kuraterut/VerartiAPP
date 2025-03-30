@@ -1,6 +1,7 @@
 package org.admin.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONArray;
@@ -12,10 +13,16 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ScheduleDay extends Response{
     private LocalDate date;
     private List<Master> masters;
     private Admin admin;
+
+    public ScheduleDay(int code, String message){
+        this.setCode(code);
+        this.setMsg(message);
+    }
 
     public static ScheduleDay fromJson(JSONObject obj) {
         ScheduleDay scheduleDay = new ScheduleDay();
@@ -39,6 +46,7 @@ public class ScheduleDay extends Response{
         scheduleDay.setMasters(masters);
         scheduleDay.setAdmin(admin);
 
+        scheduleDay.setCode(200);
         return scheduleDay;
     }
 }
