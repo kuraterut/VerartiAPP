@@ -16,4 +16,6 @@ module org {
 
     opens org to javafx.fxml;
     exports org;
+    exports org.admin.UI.window.authorizationWindow;
+    opens org.admin.UI.window.authorizationWindow to javafx.fxml;
 }

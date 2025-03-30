@@ -55,13 +55,12 @@ public class SideMenu extends Main{
         ImageView menuIcon          = new ImageView(menuIconImg);
         LinkedList<ButtonBase>  sideMenuBtnsList = new LinkedList<>();
 
-        ButtonBase[] mainSideMenuBtn = new ButtonBase[6];
+        ButtonBase[] mainSideMenuBtn = new ButtonBase[5];
         mainSideMenuBtn[0] = new Button();
         mainSideMenuBtn[1] = new Button();
         mainSideMenuBtn[2] = new Button();
         mainSideMenuBtn[3] = new Button();
         mainSideMenuBtn[4] = new Button();
-        mainSideMenuBtn[5] = new Button();
 
         Button toggleButton = new Button();
         
@@ -74,8 +73,7 @@ public class SideMenu extends Main{
         mainSideMenuBtn[1].setText("Товары");
         mainSideMenuBtn[2].setText("Календарь сотрудников");
         mainSideMenuBtn[3].setText("Профиль");
-        mainSideMenuBtn[4].setText("Помощь");
-        mainSideMenuBtn[5].setText("Предприятие");
+        mainSideMenuBtn[4].setText("Предприятие");
         VBox.setMargin(mainSideMenuBtn[0], new Insets(100, 0, 0, 0));
 
         mainSideMenuBtn[state].setStyle("-fx-background-color: grey");
@@ -99,8 +97,7 @@ public class SideMenu extends Main{
         mainSideMenuBtn[1].setOnAction(event -> AdminController.loadProductsWindow(mainSideMenuBtn[1]));
         mainSideMenuBtn[2].setOnAction(event -> AdminController.loadCalendarOfEmployeesWindow(mainSideMenuBtn[2]));
         mainSideMenuBtn[3].setOnAction(event -> AdminController.loadProfileWindow(mainSideMenuBtn[3]));
-        mainSideMenuBtn[4].setOnAction(event -> AdminController.loadHelpWindow(mainSideMenuBtn[4]));
-        mainSideMenuBtn[5].setOnAction(event -> AdminController.loadEnterpriseWindow(mainSideMenuBtn[5]));
+        mainSideMenuBtn[4].setOnAction(event -> AdminController.loadEnterpriseWindow(mainSideMenuBtn[4]));
 
 
 

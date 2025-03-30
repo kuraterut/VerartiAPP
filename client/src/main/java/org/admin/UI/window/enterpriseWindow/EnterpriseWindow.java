@@ -29,7 +29,7 @@ public class EnterpriseWindow extends Main {
     public static BorderPane loadEnterpriseWindow() {
         BorderPane root = new BorderPane();
 
-        StackPane sideMenuStack     = SideMenu.buildSideMenu(5);
+        StackPane sideMenuStack     = SideMenu.buildSideMenu(4);
         VBox sideMenuBox            = new VBox(sideMenuStack);
 
         Label headLabel = new Label("Управление предприятием");

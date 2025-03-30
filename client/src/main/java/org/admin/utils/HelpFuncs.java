@@ -1,5 +1,6 @@
 package org.admin.utils;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,4 +38,14 @@ public class HelpFuncs {
     public static Boolean checkEmail(String email) {
         return email.contains("@");
     }
+
+    public static int getDayOfWeekByStr(String date){
+        int year = Integer.parseInt(date.split("-")[0]);
+        int month = Integer.parseInt(date.split("-")[1]);
+        int day = Integer.parseInt(date.split("-")[2]);
+        LocalDate ld = LocalDate.of(year, month, day);
+        DayOfWeek dayOW = ld.getDayOfWeek();
+        return dayOW.getValue();
+    }
+
 }
