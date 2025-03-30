@@ -1,6 +1,6 @@
 package org.admin.controller;
 
-import org.admin.UI.window.ScheduleWindow.CalendarOfEmployeesWindow;
+import org.admin.UI.window.scheduleWindow.ScheduleWindow;
 import org.admin.UI.window.enterpriseWindow.EnterpriseWindow;
 import org.admin.UI.window.profileWindow.ProfileWindow;
 import org.admin.UI.window.productWindow.ProductWindow;
@@ -36,6 +36,6 @@ public class AdminController {
 	}
 
 	public static void loadCalendarOfEmployeesWindow(Node node){
-		node.getScene().setRoot(CalendarOfEmployeesWindow.loadCalendarWindow());	
+		node.getScene().setRoot(ScheduleWindow.loadCalendarWindow());
 	}
 }

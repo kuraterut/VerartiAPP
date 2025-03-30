@@ -93,7 +93,6 @@ public class Connection{
 
 			JSONObject data = getJson();
 
-
 			AuthResponse authResponse = new AuthResponse();
 			int status = connection.getResponseCode();
 			if(status != 200){
