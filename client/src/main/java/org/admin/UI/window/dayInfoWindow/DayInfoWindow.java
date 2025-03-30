@@ -1,6 +1,8 @@
 package org.admin.UI.window.dayInfoWindow;
 
 import org.Main;
+import org.admin.UI.window.dayInfoWindow.dialog.TransactionsInfoDialog;
+import org.admin.connection.getRequests.GetTransaction;
 import org.admin.controller.AdminController;
 import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetClient;
@@ -71,13 +73,14 @@ public class DayInfoWindow extends Main{
         miniCalendar.setMinHeight(40);
         miniCalendar.setMinWidth(200);
 
-        // int totalSum = Connection.getTotalSum(token, date);
-        int totalSum = date.getYear();
+        Long totalSum = TransactionsInfoDialog.calculateTotalAmount(GetTransaction.getListByDate(token, date));
 
         totalSumBtn.setText("Общее: " + totalSum);
         putMasterOnDayBtn.setText("Назначить мастера");
         putAdminOnDayBtn.setText("Назначить администратора");
         addNewClientBtn.setText("Добавить клиента");
+
+        totalSumBtn.setOnAction(event -> TransactionsInfoDialog.show(date));
 
         totalSumBtn.setWrapText(true);
         putAdminOnDayBtn.setWrapText(true);
