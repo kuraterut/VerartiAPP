@@ -1,6 +1,7 @@
 package org.admin.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONObject;
@@ -11,12 +12,18 @@ import java.time.format.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Option extends Response {
 	private Long id;
 	private String name;
 	private String description;
 	private LocalTime duration;
 	private Long price;
+
+	public Option(int code, String message) {
+		this.setCode(code);
+		this.setMsg(message);
+	}
 
 	@Override
 	public boolean equals(Object other){
@@ -56,6 +63,7 @@ public class Option extends Response {
 		option.setDuration(duration);
 		option.setPrice(price);
 
+		option.setCode(200);
 		return option;
 	}
 }

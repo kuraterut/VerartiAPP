@@ -2,6 +2,7 @@ package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
 import org.admin.model.Admin;
+import org.admin.model.Client;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -20,6 +21,7 @@ public class GetAdmin extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
+
             List<Admin> admins = new ArrayList<>();
             JSONArray adminsJSON = (JSONArray) data.get("admins");
             System.out.println(data);
@@ -47,13 +49,13 @@ public class GetAdmin extends Connection {
             JSONObject data = getJson();
 
             int code = connection.getResponseCode();
-            if(code != 200) return null;
+            if(code != 200) return new Admin(code, getErrorMsg());
 
             return Admin.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetAdmin, method: getByDate, exception: " + ex.getMessage());
-            return null;
+            return new Admin(404, ex.getMessage());
         }
     }
 
@@ -65,11 +67,14 @@ public class GetAdmin extends Connection {
 
             JSONObject data = getJson();
 
+            int code = connection.getResponseCode();
+            if (code != 200) return new Admin(code, getErrorMsg());
+
             return Admin.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetAdmin, method: getById, exception: " + ex.getMessage());
-            return null;
+            return new Admin(404, ex.getMessage());
         }
     }
 }

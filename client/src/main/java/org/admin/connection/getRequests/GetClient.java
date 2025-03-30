@@ -45,11 +45,15 @@ public class GetClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
+
+            int code = connection.getResponseCode();
+            if(code != 200) return new Client(code, getErrorMsg());
+
             return Client.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetClient, method: getById, exception: " + ex.getMessage());
-            return null;
+            return new Client(404, ex.getMessage());
         }
     }
 
@@ -60,11 +64,15 @@ public class GetClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
+
+            int code = connection.getResponseCode();
+            if(code != 200) return new Client(code, getErrorMsg());
+
             return Client.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetClient, method: getByPhone, exception: " + ex.getMessage());
-            return null;
+            return new Client(404, ex.getMessage());
         }
     }
 }

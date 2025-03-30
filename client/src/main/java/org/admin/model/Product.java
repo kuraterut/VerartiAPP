@@ -1,6 +1,7 @@
 package org.admin.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.json.simple.JSONObject;
 
@@ -8,12 +9,18 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Product extends Response {
 	private Long id;
 	private String name;
 	private String description;
 	private Long price;
 	private Integer count;
+
+	public Product(int code, String message) {
+		this.setCode(code);
+		this.setMsg(message);
+	}
 
 	@Override
 	public boolean equals(Object other){
@@ -49,6 +56,7 @@ public class Product extends Response {
 		product.setPrice(price);
 		product.setCount(count);
 
+		product.setCode(200);
 		return product;
 	}
 }

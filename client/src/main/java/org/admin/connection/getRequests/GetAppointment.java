@@ -43,13 +43,14 @@ public class GetAppointment extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-
+            int code = connection.getResponseCode();
+            if(code != 200) return new Appointment(code, getErrorMsg());
             return Appointment.fromJson(data);
 
         }
         catch(Exception ex){
             System.out.println("class: GetAppointment, method: getById, exception: " + ex.getMessage());
-            return null;
+            return new Appointment(404, ex.getMessage());
         }
     }
 

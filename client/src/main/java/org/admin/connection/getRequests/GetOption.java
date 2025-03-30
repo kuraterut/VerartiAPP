@@ -40,12 +40,15 @@ public class GetOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-            return Option.fromJson(data);
 
+            int code = connection.getResponseCode();
+            if (code != 200) return new Option(code, getErrorMsg());
+
+            return Option.fromJson(data);
         }
         catch(Exception ex){
             System.out.println("class: GetOption, method: getById, exception: " + ex.getMessage());
-            return null;
+            return new Option(404, ex.getMessage());
         }
     }
     public static List<Option> getListByMasterId(String token, Long masterId){

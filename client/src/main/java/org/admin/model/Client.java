@@ -1,6 +1,7 @@
 package org.admin.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONObject;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Client extends Response {
 	private Long id;
 	private String name;
@@ -18,6 +20,11 @@ public class Client extends Response {
 	private String phone;
 	private String comment;
 	private LocalDate birthday;
+
+	public Client(int code, String message){
+		this.setCode(code);
+		this.setMsg(message);
+	}
 
 	@Override
 	public boolean equals(Object other){
@@ -51,7 +58,6 @@ public class Client extends Response {
     				return new Response(-1, "Неверный формат номера телефона(+7...)");		
     			}
     		}
-    		
     	}
 
     	return new Response(200, "");
@@ -90,6 +96,7 @@ public class Client extends Response {
 		client.setComment(comment);
 		client.setBirthday(birthday);
 
+		client.setCode(200);
 		return client;
 	}
 

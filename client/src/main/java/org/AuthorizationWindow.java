@@ -1,25 +1,13 @@
 package org;
 
 import org.master.MasterInterface;
-import org.admin.AdminInterface;
+import org.admin.controller.AdminController;
 
-import javafx.application.*;
-import javafx.stage.*;
-
-import javafx.scene.*;
-
-import javafx.scene.control.Alert.*;
-import javafx.scene.input.*;    
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.image.*;
-import javafx.scene.shape.*;
-import javafx.scene.paint.*;
 import javafx.geometry.*;
 import javafx.event.*;
-import javafx.animation.*;
 import javafx.collections.*;
-import javafx.util.*;
 
 import java.time.*;
 
@@ -116,7 +104,7 @@ public class AuthorizationWindow extends Main{
                     MasterInterface.loadCalendarWindow(authorizationBtn);
                 }
                 else if(Main.role.equals("ADMIN")){
-                    AdminInterface.loadDayInfoWindow(authorizationBtn, LocalDate.now());
+                    AdminController.loadDayInfoWindow(authorizationBtn, LocalDate.now());
                 }
             }
         });
