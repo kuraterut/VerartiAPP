@@ -47,6 +47,9 @@ type Appointment interface {
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
 	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
+	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
+	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
+	DeleteAppointmentById(appointmentId int) error
 }
 
 type User interface {
@@ -54,7 +57,6 @@ type User interface {
 	GetMasterById(masterId int) (models.Users, error)
 	GetAllAdmins() ([]models.Users, error)
 	GetAdminById(masterId int) (models.Users, error)
-	GetDirector() (models.Users, error)
 	DeleteUser(userId int) error
 }
 
@@ -75,13 +77,16 @@ type Repository struct {
 }
 
 func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
+	user := NewUserPostgres(db)
+	client := NewClientPostgres(db)
+
 	return &Repository{
 		Resource:      NewResourcePostgres(db),
 		Authorization: NewAuthPostgres(db),
 		Profile:       NewProfilePostgres(db),
-		Client:        NewClientPostgres(db),
-		User:          NewUserPostgres(db),
+		Client:        client,
+		User:          user,
 		Option:        NewOptionPostgres(db),
-		Appointment:   NewAppointmentPostgres(db),
+		Appointment:   NewAppointmentPostgres(db, user, client),
 	}
 }

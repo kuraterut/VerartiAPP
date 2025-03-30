@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Client;
+import org.admin.model.Client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -12,6 +12,7 @@ import java.util.List;
 public class GetClient extends Connection {
     public static List<Client> getAll(String token){
         try{
+            //TODO Всегда возвращать с кодом(Юзать наследование от Response)
             getConnection("http://localhost:8000/api/admin/clients/");
 
             connection.setRequestMethod("GET");
@@ -25,32 +26,14 @@ public class GetClient extends Connection {
 
             for(Object elemObj : jsonArr) {
                 JSONObject elem = (JSONObject)elemObj;
-                Client client = new Client();
-
-                Long id = (Long)elem.get("id");
-                String name = (String)elem.get("name");
-                String surname = (String)elem.get("surname");
-                String patronymic = (String)elem.get("patronymic");
-                String phone = (String)elem.get("phone");
-                String comment = (String)elem.get("comment");
-                String[] birthdayStr = ((String)elem.get("birthday")).split("-");
-                LocalDate birthday = LocalDate.of(Integer.valueOf(birthdayStr[0]), Integer.valueOf(birthdayStr[1]), Integer.valueOf(birthdayStr[2]));
-
-                client.setId(id);
-                client.setName(name);
-                client.setSurname(surname);
-                client.setPatronymic(patronymic);
-                client.setPhone(phone);
-                client.setComment(comment);
-                client.setBirthday(birthday);
-
+                Client client = Client.fromJson(elem);
                 clients.add(client);
             }
 
             return clients;
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetClient, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -63,31 +46,14 @@ public class GetClient extends Connection {
 
             JSONObject data = getJson();
 
-            Client client = new Client();
+            int code = connection.getResponseCode();
+            if(code != 200) return new Client(code, getErrorMsg());
 
-            String name = (String)data.get("name");
-            String surname = (String)data.get("surname");
-            String patronymic = (String)data.get("patronymic");
-            String phone = (String)data.get("phone");
-            String comment = (String)data.get("comment");
-            String[] birthdayStr = ((String)data.get("birthday")).split("-");
-            LocalDate birthday = LocalDate.of(Integer.valueOf(birthdayStr[0]), Integer.valueOf(birthdayStr[1]), Integer.valueOf(birthdayStr[2]));
-
-
-            client.setId(id);
-            client.setName(name);
-            client.setSurname(surname);
-            client.setPatronymic(patronymic);
-            client.setPhone(phone);
-            client.setComment(comment);
-            client.setBirthday(birthday);
-
-            return client;
-
+            return Client.fromJson(data);
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetClient, method: getById, exception: " + ex.getMessage());
+            return new Client(404, ex.getMessage());
         }
     }
 
@@ -98,43 +64,15 @@ public class GetClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-            if (connection.getResponseCode() == 200){
-                Client client = new Client();
 
-                Long id = (Long)data.get("id");
-                String name = (String)data.get("name");
-                String surname = (String)data.get("surname");
-                String patronymic = (String)data.get("patronymic");
-                // String phone = (String)data.get("phone");
-                String comment = (String)data.get("comment");
-                String[] birthdayStr = ((String)data.get("birthday")).split("-");
-                LocalDate birthday = LocalDate.of(Integer.valueOf(birthdayStr[0]), Integer.valueOf(birthdayStr[1]), Integer.valueOf(birthdayStr[2]));
+            int code = connection.getResponseCode();
+            if(code != 200) return new Client(code, getErrorMsg());
 
-                client.setCode(200);
-                client.setId(id);
-                client.setName(name);
-                client.setSurname(surname);
-                client.setPatronymic(patronymic);
-                client.setPhone(phone);
-                client.setComment(comment);
-                client.setBirthday(birthday);
-
-                return client;
-            }
-            else{
-                Client client = new Client();
-                client.setCode(connection.getResponseCode());
-                client.setMsg(connection.getResponseMessage());
-
-                return client;
-            }
+            return Client.fromJson(data);
         }
         catch(Exception ex){
-            System.out.println(ex);
-            Client client = new Client();
-            client.setCode(500);
-            client.setMsg(ex.getMessage());
-            return client;
+            System.out.println("class: GetClient, method: getByPhone, exception: " + ex.getMessage());
+            return new Client(404, ex.getMessage());
         }
     }
 }

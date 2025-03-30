@@ -1,8 +1,8 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Response;
+import org.admin.model.Option;
 import org.json.simple.JSONObject;
 
 public class UpdateOption extends Connection {
@@ -13,12 +13,7 @@ public class UpdateOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", option.getName());
-            out.put("price", option.getPrice());
-            out.put("duration", option.getDurationString());
-            out.put("description", option.getDescription());
-
+            JSONObject out = option.toJson();
             sendJson(out);
 
             int status = connection.getResponseCode();
@@ -27,8 +22,8 @@ public class UpdateOption extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: UpdateOption, method: updateInfo, exception: " + ex.getMessage());
             return new Response();
         }
     }

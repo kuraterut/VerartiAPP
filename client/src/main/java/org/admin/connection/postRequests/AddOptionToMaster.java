@@ -1,7 +1,7 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 public class AddOptionToMaster extends Connection {
@@ -23,8 +23,8 @@ public class AddOptionToMaster extends Connection {
 
             return new Response(status, getErrorMsg());
         }
-        catch(Exception e){
-            System.out.println(e);
+        catch(Exception ex){
+            System.out.println("class: AddOptionToMaster, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

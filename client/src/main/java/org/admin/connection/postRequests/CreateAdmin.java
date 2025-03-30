@@ -1,9 +1,8 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.User;
+import org.admin.model.Response;
+import org.admin.model.Admin;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
@@ -16,24 +15,12 @@ public class CreateAdmin extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            String name = admin.getName();
-            String surname = admin.getSurname();
-            String patronymic = admin.getPatronymic();
-            String phone = admin.getPhone();
-            String email = admin.getEmail();
-            String password = admin.getPassword();
+
+            JSONObject outJson = admin.toJson();
 
             ArrayList<String> roles = new ArrayList<>();
-            roles.add("admin");
-            if(admin.getIsMaster()) roles.add("master");
-
-            JSONObject outJson = new JSONObject();
-            outJson.put("name", name);
-            outJson.put("surname", surname);
-            outJson.put("patronymic", patronymic);
-            outJson.put("phone", phone);
-            outJson.put("email", email);
-            outJson.put("password", password);
+            roles.add("ADMIN");
+            if(admin.getIsMaster()) roles.add("MASTER");
             outJson.put("roles", roles);
 
             sendJson(outJson);
@@ -45,7 +32,7 @@ public class CreateAdmin extends Connection {
             return new Response(status, getErrorMsg());
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: CreateAdmin, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

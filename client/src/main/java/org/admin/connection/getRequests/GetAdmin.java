@@ -1,7 +1,8 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Admin;
+import org.admin.model.Admin;
+import org.admin.model.Client;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -20,32 +21,19 @@ public class GetAdmin extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
+
             List<Admin> admins = new ArrayList<>();
             JSONArray adminsJSON = (JSONArray) data.get("admins");
+            System.out.println(data);
             for(Object adminObj : adminsJSON){
                 JSONObject adminJSON = (JSONObject) adminObj;
-                Admin admin = new Admin();
-
-                Long id = (Long) adminJSON.get("id");
-                String name = (String)adminJSON.get("name");
-                String surname = (String)adminJSON.get("surname");
-                String patronymic = (String)adminJSON.get("patronymic");
-                String phone = (String)adminJSON.get("phone");
-                String bio = (String)adminJSON.get("bio");
-
-                admin.setId(id);
-                admin.setName(name);
-                admin.setSurname(surname);
-                admin.setPatronymic(patronymic);
-                admin.setPhone(phone);
-                admin.setBio(bio);
-
+                Admin admin = Admin.fromJson(adminJSON);
                 admins.add(admin);
             }
             return admins;
         }
-        catch (Exception e){
-            System.out.println(e);
+        catch (Exception ex){
+            System.out.println("class: GetAdmin, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -54,37 +42,20 @@ public class GetAdmin extends Connection {
         try{
             String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/shedule/admin?date=" + encodedDate);
+            getConnection("http://localhost:8000/api/admin/appointment/admin?date=" + encodedDate);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
 
-            Admin admin = null;
+            int code = connection.getResponseCode();
+            if(code != 200) return new Admin(code, getErrorMsg());
 
-            Long adminId = (Long) data.get("id");
-            if(adminId != -1){
-                admin = new Admin();
-                String name = (String)data.get("name");
-                String surname = (String)data.get("surname");
-                String patronymic = (String)data.get("patronymic");
-                String email = (String)data.get("email");
-                String phone = (String)data.get("phone");
-                String bio = (String)data.get("bio");
-
-                admin.setId(adminId);
-                admin.setName(name);
-                admin.setSurname(surname);
-                admin.setPatronymic(patronymic);
-                admin.setEmail(email);
-                admin.setPhone(phone);
-                admin.setBio(bio);
-            }
-            return admin;
+            return Admin.fromJson(data);
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetAdmin, method: getByDate, exception: " + ex.getMessage());
+            return new Admin(404, ex.getMessage());
         }
     }
 
@@ -96,27 +67,32 @@ public class GetAdmin extends Connection {
 
             JSONObject data = getJson();
 
-            Admin admin = new Admin();
+            int code = connection.getResponseCode();
+            if (code != 200) return new Admin(code, getErrorMsg());
 
-            String name = (String)data.get("name");
-            String surname = (String)data.get("surname");
-            String patronymic = (String)data.get("patronymic");
-            String phone = (String)data.get("phone");
-            String bio = (String)data.get("bio");
-
-            admin.setId(id);
-            admin.setName(name);
-            admin.setSurname(surname);
-            admin.setPatronymic(patronymic);
-            admin.setPhone(phone);
-            admin.setBio(bio);
-
-            return admin;
-
+            return Admin.fromJson(data);
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetAdmin, method: getById, exception: " + ex.getMessage());
+            return new Admin(404, ex.getMessage());
+        }
+    }
+
+    public static Admin getByPhone(String token, String phone){
+        try{
+            getConnection("http://localhost:8000/api/admin/users/phone?phone=" + phone+"&role=ADMIN");
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+
+            JSONObject data = getJson();
+
+            int code = connection.getResponseCode();
+            if (code != 200) return new Admin(code, getErrorMsg());
+            return Admin.fromJson(data);
+        }
+        catch(Exception ex){
+            System.out.println("class: GetAdmin, method: getByPhone, exception: " + ex.getMessage());
+            return new Admin(404, ex.getMessage());
         }
     }
 }

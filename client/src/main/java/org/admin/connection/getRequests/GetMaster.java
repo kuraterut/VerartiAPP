@@ -1,14 +1,14 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Master;
+import org.admin.utils.HelpFuncs;
+import org.admin.model.Master;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,31 +27,14 @@ public class GetMaster extends Connection {
 
             for(Object elem: jsonArr){
                 JSONObject masterJSON = (JSONObject) elem;
-                Master master = new Master();
-
-                Long id = (Long) masterJSON.get("id");
-                String name = (String) masterJSON.get("name");
-                String surname = (String) masterJSON.get("surname");
-                String patronymic = (String) masterJSON.get("patronymic");
-                String phone = (String) masterJSON.get("phone");
-                String bio = (String) masterJSON.get("bio");
-
-                master.setId(id);
-                master.setName(name);
-                master.setSurname(surname);
-                master.setPatronymic(patronymic);
-                master.setPhone(phone);
-                master.setBio(bio);
-
+                Master master = Master.fromJson(masterJSON);
                 masters.add(master);
             }
             return masters;
-
-
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetMaster, method: getAll, exception: " + ex.getMessage());
+            return new ArrayList<>();
         }
     }
 
@@ -62,35 +45,21 @@ public class GetMaster extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
+            int code = connection.getResponseCode();
+            if(code != 200) return new Master(code, getErrorMsg());
 
-            Master master = new Master();
-
-            String name = (String)data.get("name");
-            String surname = (String)data.get("surname");
-            String patronymic = (String)data.get("patronymic");
-            String bio = (String)data.get("bio");
-            String phone = (String)data.get("phone");
-
-            master.setId(id);
-            master.setName(name);
-            master.setSurname(surname);
-            master.setPatronymic(patronymic);
-            master.setBio(bio);
-            master.setPhone(phone);
-
-            return master;
+            return Master.fromJson(data);
 
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetMaster, method: getById, exception: " + ex.getMessage());
+            return new Master(404, ex.getMessage());
         }
     }
 
     public static List<Master> getListByDate(String token, LocalDate date, boolean appointed){
         try{
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String dateStr = formatter.format(date);
+            String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
             String url = "http://localhost:8000/api/admin/appointment/master?";
             url += "date=" + encodedDate + "&appointed=" + appointed;
@@ -100,26 +69,12 @@ public class GetMaster extends Connection {
 
 
             List<Master> masters = new ArrayList<>();
-
             JSONObject data = getJson();
+
             JSONArray mastersArr = (JSONArray)data.get("masters");
             for(Object elem: mastersArr){
                 JSONObject masterJSON = (JSONObject)elem;
-                Master master = new Master();
-                Long id = (Long)masterJSON.get("id");
-                String name = (String)masterJSON.get("name");
-                String surname = (String)masterJSON.get("surname");
-                String patronymic = (String)masterJSON.get("patronymic");
-                String phone = (String)masterJSON.get("phone");
-                String bio = (String)masterJSON.get("bio");
-
-                master.setId(id);
-                master.setName(name);
-                master.setSurname(surname);
-                master.setPatronymic(patronymic);
-                master.setPhone(phone);
-                master.setBio(bio);
-
+                Master master = Master.fromJson(masterJSON);
                 masters.add(master);
             }
 
@@ -127,7 +82,7 @@ public class GetMaster extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetMaster, method: getListByDate, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }

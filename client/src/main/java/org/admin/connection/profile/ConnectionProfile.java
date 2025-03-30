@@ -1,9 +1,9 @@
 package org.admin.connection.profile;
 
-import org.admin.utils.*;
+import org.admin.model.Response;
 import org.admin.connection.Connection;
 
-import org.admin.utils.entities.Admin;
+import org.admin.model.Admin;
 import org.json.simple.*;
 import javafx.scene.image.*;
 import java.util.*;
@@ -29,7 +29,6 @@ public class ConnectionProfile extends Connection{
 			admin.setName((String) data.get("name"));
 			admin.setSurname((String) data.get("surname"));
 			admin.setPatronymic((String) data.get("patronymic"));
-			admin.setEmail((String) data.get("email"));
 			admin.setPhone((String) data.get("phone"));
 			admin.setBio((String) data.get("bio"));
 			
@@ -56,7 +55,6 @@ public class ConnectionProfile extends Connection{
 			outJson.put("name", admin.getName());
 			outJson.put("surname", admin.getSurname());
 			outJson.put("patronymic", admin.getPatronymic());
-			outJson.put("email", admin.getEmail());
 			outJson.put("phone", admin.getPhone());
 			outJson.put("bio", admin.getBio());
 

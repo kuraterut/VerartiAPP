@@ -1,9 +1,9 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Client;
+import org.admin.model.Client;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.Response;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 public class UpdateClient extends Connection {
@@ -14,12 +14,7 @@ public class UpdateClient extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", client.getName());
-            out.put("surname", client.getSurname());
-            out.put("patronymic", client.getPatronymic());
-            out.put("phone", client.getPhone());
-            out.put("birthday", HelpFuncs.localDateToString(client.getBirthday(), "yyyy-MM-dd"));
+            JSONObject out = client.toJson();
             sendJson(out);
 
             int status = connection.getResponseCode();
@@ -28,8 +23,8 @@ public class UpdateClient extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: UpdateClient, method: updateInfo, exception: " + ex.getMessage());
             return new Response();
         }
     }

@@ -1,16 +1,12 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
+import org.admin.model.Appointment;
 import org.admin.utils.HelpFuncs;
-import org.admin.utils.entities.Appointment;
-import org.admin.utils.entities.Client;
-import org.admin.utils.entities.Master;
-import org.admin.utils.entities.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,47 +24,15 @@ public class GetAppointment extends Connection {
             JSONArray jsonArr = (JSONArray)data.get("appointments");
             for(Object elem : jsonArr){
                 JSONObject obj = (JSONObject)elem;
-
-                Long appointmentId = (Long)obj.get("id");
-                Appointment appointment = getById(token, appointmentId);
-                //TODO Решить комментарии
-
-                // String appointmentStatus = (String)obj.get("status");
-                // String[] appointmentStartTimeStr = ((String)obj.get("start_time")).split(":");
-                // LocalTime appointmentStartTime 	= LocalTime.of(Integer.valueOf(startTimeStr[0]), Integer.valueOf(startTimeStr[1]));
-                // String[] appointmentDateStr = ((String)data.get("date")).split("-");
-                // LocalDate appointmentDate = LocalDate.of(Integer.valueOf(dateStr[0]), Integer.valueOf(dateStr[1]), Integer.valueOf(dateStr[2]));
-
-                // JSONObject clientJSON = (JSONObject)obj.get("client");
-                // JSONObject masterJSON = (JSONObject)obj.get("master");
-                // JSONObject serviceJSON = (JSONObject)obj.get("appointment");
-
-                // ClientInfo client = new ClientInfo();
-                // MasterInfo master = new MasterInfo();
-                // ServiceInfo service = new ServiceInfo();
-
-                // client.setId((Long)clientJSON.get("id"));
-                // client.setName((String)clientJSON.get("name"));
-                // client.setSurname((String)clientJSON.get("surname"));
-                // client.setPatronymic((String)clientJSON.get("patronymic"));
-                // client.setEmail((String)clientJSON.get("email"));
-                // client.setPhone((String)clientJSON.get("phone"));
-                // client.setComment((String)clientJSON.get("comment"));
-                // client.setBirthdayStr((String)clientJSON.get("birthday"));
-
-                // master.setId((Long)masterJSON.get("id"));
-                // master.setName((String)masterJSON.get("name"));
-                // master.setSurname((String)masterJSON.get("surname"));
-                // master.setPatronymic((String)masterJSON.get("patronymic"));
-
+                Appointment appointment = Appointment.fromJson(obj);
                 list.add(appointment);
             }
 
             return list;
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetAppointment, method: getListByClientId, exception: " + ex.getMessage());
+            return new ArrayList<>();
         }
     }
 
@@ -79,49 +43,20 @@ public class GetAppointment extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-
-            Appointment appointment = new Appointment();
-
-            List<Option> options = new ArrayList<>();
-
-            Long masterId 			= (Long)data.get("master_id");
-            Long clientId 			= (Long)data.get("client_id");
-            String comment 			= (String)data.get("comment");
-            String[] startTimeStr 	= ((String)data.get("start_time")).split(":");
-            LocalTime startTime 	= LocalTime.of(Integer.valueOf(startTimeStr[0]), Integer.valueOf(startTimeStr[1]));
-            String[] dateStr = ((String)data.get("date")).split("-");
-            LocalDate date = LocalDate.of(Integer.valueOf(dateStr[0]), Integer.valueOf(dateStr[1]), Integer.valueOf(dateStr[2]));
-
-            JSONArray servicesArr = (JSONArray)data.get("options");
-            for(Object serviceObj: servicesArr){
-                Long serviceId = (Long)serviceObj;
-                Option option = GetOption.getById(token, serviceId);
-                options.add(option);
-            }
-
-            Master master = GetMaster.getById(token, masterId);
-            Client client = GetClient.getById(token, clientId);
-
-            appointment.setId(id);
-            appointment.setStartTime(startTime);
-            appointment.setClient(client);
-            appointment.setMaster(master);
-            appointment.setDate(date);
-            appointment.setOptions(options);
-            appointment.setComment(comment);
-
-            return appointment;
+            int code = connection.getResponseCode();
+            if(code != 200) return new Appointment(code, getErrorMsg());
+            return Appointment.fromJson(data);
 
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetAppointment, method: getById, exception: " + ex.getMessage());
+            return new Appointment(404, ex.getMessage());
         }
     }
 
-    public static List<Appointment> getAllByDate(String token, LocalDate date){
+    public static List<Appointment> getListByDate(String token, LocalDate date){
         try{
-            getConnection("http://localhost:8000/api/admin/appointment/day?date=" + HelpFuncs.localDateToString(date, "yyyy-MM-dd"));
+            getConnection("http://localhost:8000/api/admin/appointment/date?date=" + HelpFuncs.localDateToString(date, "yyyy-MM-dd"));
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -132,25 +67,13 @@ public class GetAppointment extends Connection {
             JSONArray jsonArr = (JSONArray)data.get("appointments");
             for(Object elem : jsonArr){
                 JSONObject obj = (JSONObject)elem;
-                Appointment appointment = new Appointment();
-                Long appointmentId = (Long)obj.get("id");
-                Long masterId 			= (Long)data.get("master_id");
-                Long clientId 			= (Long)data.get("client_id");
-                String comment 			= (String)data.get("comment");
-                LocalTime startTime 	= LocalTime.parse((String)obj.get("start_time"));
-
-                appointment.setId(appointmentId);
-                appointment.setStartTime(startTime);
-                appointment.setDate(date);
-                appointment.setMaster(GetMaster.getById(token, masterId));
-                appointment.setClient(GetClient.getById(token, clientId));
-                appointment.setComment(comment);
+                Appointment appointment = Appointment.fromJson(obj);
                 appointments.add(appointment);
             }
             return appointments;
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: GetAppointment, method: getListByDate, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }

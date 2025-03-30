@@ -18,7 +18,7 @@ func (h *Handler) createClient(c *gin.Context) {
 	}
 
 	if input.Birthday != "" {
-		err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Birthday)
+		err := domain.ValidateDateOnly(input.Birthday)
 		if err != nil {
 			newErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
@@ -118,7 +118,7 @@ func (h *Handler) updateClient(c *gin.Context) {
 	}
 
 	if input.Birthday != "" {
-		err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Birthday)
+		err := domain.ValidateDateOnly(input.Birthday)
 		if err != nil {
 			newErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
@@ -147,5 +147,5 @@ func (h *Handler) updateClient(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }

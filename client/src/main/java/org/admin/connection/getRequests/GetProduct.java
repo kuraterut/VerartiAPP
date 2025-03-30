@@ -1,8 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Admin;
-import org.admin.utils.entities.Product;
+import org.admin.model.Product;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,26 +20,13 @@ public class GetProduct extends Connection {
             JSONArray productsJSON = (JSONArray) data.get("products");
             for(Object productObj : productsJSON){
                 JSONObject productJSON = (JSONObject) productObj;
-                Product product = new Product();
-
-                Long id = (Long) productJSON.get("id");
-                String name = (String)productJSON.get("name");
-                String description = (String)productJSON.get("description");
-                Long price = (Long) productJSON.get("price");
-                Integer count = (Integer) productJSON.get("count");
-
-                product.setId(id);
-                product.setName(name);
-                product.setDescription(description);
-                product.setPrice(price);
-                product.setCount(count);
-
+                Product product = Product.fromJson(productJSON);
                 products.add(product);
             }
             return products;
         }
-        catch (Exception e){
-            System.out.println(e);
+        catch (Exception ex){
+            System.out.println("class: GetProduct, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -52,24 +38,15 @@ public class GetProduct extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-            Product product = new Product();
 
-            String name = (String)data.get("name");
-            String description = (String) data.get("description");
-            Long price = (Long) data.get("price");
-            Integer count = (Integer) data.get("count");
+            int code = connection.getResponseCode();
+            if(code != 200) return new Product(code, getErrorMsg());
 
-            product.setId(id);
-            product.setName(name);
-            product.setDescription(description);
-            product.setPrice(price);
-            product.setCount(count);
-
-            return product;
+            return Product.fromJson(data);
         }
-        catch (Exception e){
-            System.out.println(e);
-            return null;
+        catch (Exception ex){
+            System.out.println("class: GetProduct, method: getById, exception: " + ex.getMessage());
+            return new Product(404, ex.getMessage());
         }
     }
 }

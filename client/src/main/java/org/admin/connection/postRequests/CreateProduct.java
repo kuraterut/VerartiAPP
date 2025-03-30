@@ -1,9 +1,8 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
-import org.admin.utils.entities.Product;
+import org.admin.model.Response;
+import org.admin.model.Product;
 import org.json.simple.JSONObject;
 
 public class CreateProduct extends Connection {
@@ -14,18 +13,7 @@ public class CreateProduct extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-
-            String name = product.getName();
-            String description = product.getDescription();
-            Long price = product.getPrice();
-            Integer count = product.getCount();
-
-            JSONObject outJson = new JSONObject();
-            outJson.put("name", name);
-            outJson.put("description", description);
-            outJson.put("price", price);
-            outJson.put("count", count);
-
+            JSONObject outJson = product.toJson();
             sendJson(outJson);
 
             int status = connection.getResponseCode();
@@ -35,7 +23,7 @@ public class CreateProduct extends Connection {
             return new Response(status, getErrorMsg());
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: CreateProduct, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

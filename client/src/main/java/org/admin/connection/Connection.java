@@ -1,5 +1,6 @@
 package org.admin.connection;
 
+import org.admin.model.AuthResponse;
 import org.admin.utils.*;
 
 import org.json.simple.*;
@@ -73,6 +74,43 @@ public class Connection{
 		catch(Exception ex){
 			System.out.println(ex);
 			return "";
+		}
+	}
+
+	public static AuthResponse checkAuthAndGetToken(String login, String password, UserRole role){
+		try{
+			getConnection("http://localhost:8000/auth/signin");
+
+			connection.setRequestMethod("POST");
+			connection.setDoOutput(true);
+
+			JSONObject outJson = new JSONObject();
+			outJson.put("phone", login);
+			outJson.put("password", password);
+			outJson.put("role", role.toString());
+
+			sendJson(outJson);
+
+			JSONObject data = getJson();
+
+			AuthResponse authResponse = new AuthResponse();
+			int status = connection.getResponseCode();
+			if(status != 200){
+				authResponse.setCode(status);
+				authResponse.setMsg(getErrorMsg());
+				return authResponse;
+			}
+			String token = (String) data.get("token");
+			authResponse.setCode(200);
+			authResponse.setAuthToken(token);
+			return authResponse;
+		}
+		catch(Exception ex){
+			System.out.println("Class Connection, method checkAuthAndGetToken, exception:" + ex.getMessage());
+			AuthResponse authResponse = new AuthResponse();
+			authResponse.setCode(404);
+			authResponse.setMsg(ex.getMessage());
+			return authResponse;
 		}
 	}
 }

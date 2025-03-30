@@ -29,10 +29,6 @@ func (s *UserService) GetAdminById(masterId int) (models.Users, error) {
 	return s.repo.GetAdminById(masterId)
 }
 
-func (s *UserService) GetDirector() (models.Users, error) {
-	return s.repo.GetDirector()
-}
-
 func (s *UserService) DeleteUser(userId int) error {
 	return s.repo.DeleteUser(userId)
 }

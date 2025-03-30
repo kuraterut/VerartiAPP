@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"verarti/internal/domain"
 )
 
 const (
@@ -59,7 +60,7 @@ func (h *Handler) masterIdentity(c *gin.Context) {
 		return
 	}
 
-	if roleStr != "master" {
+	if roleStr != domain.MasterRole {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
 		return
 	}
@@ -78,7 +79,7 @@ func (h *Handler) adminIdentity(c *gin.Context) {
 		return
 	}
 
-	if roleStr != "admin" {
+	if roleStr != domain.AdminRole {
 		newErrorResponse(c, http.StatusUnauthorized, "you have other access rights")
 		return
 	}

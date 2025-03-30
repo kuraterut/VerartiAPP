@@ -12,11 +12,13 @@ import (
 )
 
 type AppointmentPostgres struct {
-	db *sqlx.DB
+	userPostgres   *UserPostgres
+	clientPostgres *ClientPostgres
+	db             *sqlx.DB
 }
 
-func NewAppointmentPostgres(db *sqlx.DB) *AppointmentPostgres {
-	return &AppointmentPostgres{db: db}
+func NewAppointmentPostgres(db *sqlx.DB, userPostgres *UserPostgres, clientPostgres *ClientPostgres) *AppointmentPostgres {
+	return &AppointmentPostgres{db: db, userPostgres: userPostgres, clientPostgres: clientPostgres}
 }
 
 func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error {
@@ -28,8 +30,8 @@ func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error
 			SELECT 1
 			FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'admin'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.AdminRole)
 	err := r.db.Get(&id, queryGetAdmin, adminShift.AdminId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -39,14 +41,27 @@ func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error
 		return err
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
-		"VALUES ($1, $2) RETURNING id", database.AdminShiftTable)
-	row := r.db.QueryRow(query, adminShift.AdminId, adminShift.Date)
-	if err := row.Scan(&id); err != nil {
+	queryGetAdminByDate := fmt.Sprintf("SELECT ad_sh.id FROM %s ad_sh "+
+		" WHERE ad_sh.date = $1", database.AdminShiftTable)
+	err = r.db.Get(&id, queryGetAdminByDate, adminShift.Date)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
 
-	return nil
+	if errors.Is(err, sql.ErrNoRows) {
+		query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
+			"VALUES ($1, $2) RETURNING id", database.AdminShiftTable)
+		row := r.db.QueryRow(query, adminShift.AdminId, adminShift.Date)
+		if err := row.Scan(&id); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET users_id = $1 WHERE id = $2", database.AdminShiftTable)
+	_, err = r.db.Exec(query, adminShift.AdminId, id)
+	return err
 }
 
 func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) error {
@@ -58,8 +73,8 @@ func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) er
 			SELECT 1
 			FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'master'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
 	err := r.db.Get(&id, queryGetMaster, masterShift.MasterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -150,10 +165,10 @@ func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool)
 			WHERE EXISTS (
 			SELECT 1 FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON us_rl.role_id = rl.id
-			WHERE us_rl.users_id = us.id AND rl.name = 'master'
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
 		) AND us.id NOT IN (
 			SELECT users_id FROM %s WHERE date = $1
-		    )`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable, database.MasterShiftTable)
+		    )`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole, database.MasterShiftTable)
 	}
 
 	rows, err := r.db.Query(queryGetMasters, date)
@@ -177,11 +192,7 @@ func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool)
 	}
 
 	if len(masters) == 0 {
-		if isAppointed {
-			return nil, domain.NewErrorResponse(404, "there are no appointed masters for this date")
-		}
-
-		return nil, domain.NewErrorResponse(404, "no free masters. Everything is booked for this date")
+		return []models.Users{}, nil
 	}
 
 	return masters, nil
@@ -196,8 +207,8 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 			SELECT 1
 			FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'master'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable)
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
 	err := r.db.Get(&id, queryGetMaster, appointment.MasterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -224,9 +235,9 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 	defer tx.Rollback()
 
 	var appointmentId int
-	query := fmt.Sprintf("INSERT INTO %s (users_id, client_id, start_time, date)"+
-		"VALUES ($1, $2, $3, $4) RETURNING id", database.MasterAppointmentTable)
-	row := tx.QueryRow(query, appointment.MasterId, appointment.ClientId, appointment.StartTime, appointment.Date)
+	query := fmt.Sprintf("INSERT INTO %s (users_id, client_id, start_time, date, comment)"+
+		"VALUES ($1, $2, $3, $4, $5) RETURNING id", database.MasterAppointmentTable)
+	row := tx.QueryRow(query, appointment.MasterId, appointment.ClientId, appointment.StartTime, appointment.Date, appointment.Comment)
 	if err := row.Scan(&appointmentId); err != nil {
 		return 0, err
 	}
@@ -264,62 +275,215 @@ func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppoint
 }
 
 func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error) {
-	//var (
-	//	id        int
-	//	appointments []models.MasterAppointment
-	//	appointment  models.MasterAppointmentInput
-	//	master    models.Users
-	//	client    models.Client
-	//)
-	//
-	//// проверка существования клиента с таким id
-	//queryGetClient := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.ClientTable)
-	//err := r.db.Get(&id, queryGetClient, clientId)
-	//if err != nil {
-	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, domain.NewErrorResponse(404, "client with this id was not found")
-	//	}
-	//
-	//	return nil, err
-	//}
-	//
-	//query := fmt.Sprintf(`
-	//	SELECT sch.id AS id, TO_CHAR(sch.start_time, 'HH:MM') AS start_time, TO_CHAR(sch.date, 'YYYY-MM-DD') AS date, st.name AS status
-	//   	(
-	//		SELECT array_remove(array_agg(rl.name), NULL)
-	//		FROM %s AS us_rl
-	//		LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-	//		WHERE us_rl.users_id = us.id
-	//	) AS status
-	//	FROM %s AS sch
-	//	INNER JOIN %s AS st on st.id = sch.status_id
-	//	WHERE us.id = $1`, database.UsersRoleTable, database.RoleTable, database.UserTable)
-	//rows, err := r.db.Query(query, clientId)
-	//if err != nil {
-	//	if errors.Is(err, sql.ErrNoRows) {
-	//		return nil, domain.NewErrorResponse(404, "no appointments found for this client")
-	//	}
-	//
-	//	return nil, err
-	//}
-	//defer rows.Close()
-	//
-	//for rows.Next() {
-	//	err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	if user.Roles == nil {
-	//		continue
-	//	}
-	//
-	//	admins = append(admins, user)
-	//}
-	//
-	//if user.Roles == nil {
-	//	return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
-	//}
+	var (
+		appointments []models.MasterAppointment
+	)
 
-	return nil, nil
+	client, err := r.clientPostgres.GetClientById(clientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewErrorResponse(404, fmt.Sprintf("client with this id = %d not found", clientId))
+		}
+
+		return nil, err
+	}
+
+	query := fmt.Sprintf(`
+		SELECT app.id AS id, app.start_time AS start_time, TO_CHAR(app.date, 'YYYY-MM-DD') AS date, 
+		st.name AS status, app.comment AS comment, app.users_id, app.client_id
+		FROM %s AS app
+		INNER JOIN %s AS st on st.id = app.status_id
+		WHERE app.client_id = $1`, database.MasterAppointmentTable, database.StatusTable)
+	rows, err := r.db.Query(query, clientId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			masterId, clientId int
+			appointment        models.MasterAppointment
+			master             models.Users
+			options            []models.Option
+		)
+
+		err = rows.Scan(&appointment.Id, &appointment.StartTime, &appointment.Date, &appointment.Status, &appointment.Comment, &masterId, &clientId)
+		if err != nil {
+			return nil, err
+		}
+
+		master, err = r.userPostgres.GetMasterById(masterId)
+		if err != nil {
+			continue // todo возможно стоит по-другому обрабатывать эти ошибки. Например логировать их в какой-то файл
+		}
+
+		queryGetOptions := fmt.Sprintf("SELECT opt.id, opt.name, opt.description, opt.duration, opt.price "+
+			" FROM %s as opt "+
+			" INNER JOIN %s as app_opt on app_opt.option_id = opt.id"+
+			" WHERE app_opt.master_appointment_id = $1", database.OptionTable, database.MasterAppointmentOptionTable)
+		err = r.db.Select(&options, queryGetOptions, appointment.Id)
+		if err != nil {
+			continue
+		}
+
+		appointment.Client = client
+		appointment.Master = master
+		appointment.Options = options
+
+		appointments = append(appointments, appointment)
+	}
+
+	if len(appointments) == 0 {
+		return []models.MasterAppointment{}, nil
+	}
+
+	return appointments, nil
+}
+
+func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error) {
+	var (
+		appointments []models.MasterAppointment
+	)
+
+	query := fmt.Sprintf(`
+		SELECT app.id AS id, app.start_time AS start_time, TO_CHAR(app.date, 'YYYY-MM-DD') AS date, 
+		st.name AS status, app.comment AS comment, app.users_id, app.client_id
+		FROM %s AS app
+		INNER JOIN %s AS st on st.id = app.status_id
+		WHERE app.date = $1`, database.MasterAppointmentTable, database.StatusTable)
+	rows, err := r.db.Query(query, date)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			masterId, clientId int
+			appointment        models.MasterAppointment
+			master             models.Users
+			client             models.Client
+			options            []models.Option
+		)
+
+		err = rows.Scan(&appointment.Id, &appointment.StartTime, &appointment.Date, &appointment.Status, &appointment.Comment, &masterId, &clientId)
+		if err != nil {
+			return nil, err
+		}
+
+		master, err = r.userPostgres.GetMasterById(masterId)
+		if err != nil {
+			continue // todo возможно стоит по-другому обрабатывать эти ошибки. Например логировать их в какой-то файл
+		}
+
+		client, err = r.clientPostgres.GetClientById(clientId)
+		if err != nil {
+			continue
+		}
+
+		queryGetOptions := fmt.Sprintf("SELECT opt.id, opt.name, opt.description, opt.duration, opt.price "+
+			" FROM %s as opt "+
+			" INNER JOIN %s as app_opt on app_opt.option_id = opt.id"+
+			" WHERE app_opt.master_appointment_id = $1", database.OptionTable, database.MasterAppointmentOptionTable)
+		err = r.db.Select(&options, queryGetOptions, appointment.Id)
+		if err != nil {
+			continue
+		}
+
+		appointment.Client = client
+		appointment.Master = master
+		appointment.Options = options
+
+		appointments = append(appointments, appointment)
+	}
+
+	if len(appointments) == 0 {
+		return []models.MasterAppointment{}, nil
+	}
+
+	return appointments, nil
+}
+
+func (r *AppointmentPostgres) GetAppointmentById(appointmentId int) (models.MasterAppointment, error) {
+	var (
+		masterId, clientId int
+		master             models.Users
+		client             models.Client
+		options            []models.Option
+		appointment        models.MasterAppointment
+		appointments       []models.MasterAppointment
+	)
+
+	query := fmt.Sprintf(`
+		SELECT app.id AS id, app.start_time AS start_time, TO_CHAR(app.date, 'YYYY-MM-DD') AS date, 
+		st.name AS status, app.comment AS comment, app.users_id, app.client_id
+		FROM %s AS app
+		INNER JOIN %s AS st on st.id = app.status_id
+		WHERE app.id = $1`, database.MasterAppointmentTable, database.StatusTable)
+	rows, err := r.db.Query(query, appointmentId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.MasterAppointment{}, domain.NewErrorResponse(404, "appointment with this id not found")
+		}
+
+		return models.MasterAppointment{}, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&appointment.Id, &appointment.StartTime, &appointment.Date, &appointment.Status, &appointment.Comment, &masterId, &clientId)
+		if err != nil {
+			return models.MasterAppointment{}, err
+		}
+
+		master, err = r.userPostgres.GetMasterById(masterId)
+		if err != nil {
+			return models.MasterAppointment{}, domain.NewErrorResponse(404, fmt.Sprintf("master id = %d, error: %v", masterId, err))
+		}
+
+		client, err = r.clientPostgres.GetClientById(clientId)
+		if err != nil {
+			return models.MasterAppointment{}, domain.NewErrorResponse(404, fmt.Sprintf("client id = %d, error: %v", clientId, err))
+		}
+
+		queryGetOptions := fmt.Sprintf("SELECT opt.id, opt.name, opt.description, opt.duration, opt.price "+
+			" FROM %s as opt "+
+			" INNER JOIN %s as app_opt on app_opt.option_id = opt.id"+
+			" WHERE app_opt.master_appointment_id = $1", database.OptionTable, database.MasterAppointmentOptionTable)
+		err = r.db.Select(&options, queryGetOptions, appointment.Id)
+		if err != nil {
+			return models.MasterAppointment{}, domain.NewErrorResponse(500, fmt.Sprintf("error with getting options: %v", err))
+		}
+
+		appointment.Client = client
+		appointment.Master = master
+		appointment.Options = options
+
+		appointments = append(appointments, appointment)
+	}
+
+	if len(appointments) == 0 {
+		return models.MasterAppointment{}, domain.NewErrorResponse(404, "appointment with this id not found")
+	}
+
+	if len(appointments) > 1 {
+		return models.MasterAppointment{}, domain.NewErrorResponse(500, "multiple records found for this id")
+	}
+
+	return appointment, err
+}
+
+func (r *AppointmentPostgres) DeleteAppointmentById(appointmentId int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", database.MasterAppointmentTable)
+	_, err := r.db.Exec(query, appointmentId)
+	return err
 }

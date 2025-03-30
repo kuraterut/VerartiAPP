@@ -48,10 +48,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				appointment.GET("/admin", h.getAdminByDate)
 				appointment.GET("/master", h.getAllMastersByDate)
-
-				appointment.GET("/day", h.getDailyAppointment)
-				appointment.GET("/month", h.getMonthlyAppointment)
-				appointment.POST("/request", h.cancellationRequest)
 			}
 
 			option := master.Group("/option")
@@ -136,16 +132,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			appointment := admin.Group("/appointment")
 			{
 				appointment.POST("/", h.createAppointment)
+				appointment.DELETE("/:id", h.deleteAppointmentById)
+				//appointment.PUT("/:id", h.updateAppointmentById)
+				appointment.GET("/:id", h.getAppointmentById)
+
+				appointment.GET("/date", h.getAllAppointmentsByDate)
 				appointment.GET("/client/:id", h.getAppointmentByClientId)
 
 				appointment.POST("/admin", h.putAdminToDate)
 				appointment.POST("/master", h.putMasterToDate)
 				appointment.GET("/admin", h.getAdminByDate)
 				appointment.GET("/master", h.getAllMastersByDate)
-
-				appointment.GET("/day", h.getDailyAppointment)
-				appointment.GET("/month", h.getMonthlyAppointment)
-				appointment.POST("/request", h.cancellationRequest)
 			}
 		}
 

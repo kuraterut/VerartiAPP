@@ -1,8 +1,8 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
+import org.admin.model.Response;
+import org.admin.model.Option;
 import org.json.simple.JSONObject;
 
 public class CreateOption extends Connection {
@@ -13,18 +13,7 @@ public class CreateOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-
-            String name = option.getName();
-            Long price = option.getPrice();
-            String duration = option.getDurationString();
-            String description = option.getDescription();
-
-
-            JSONObject outJson = new JSONObject();
-            outJson.put("name", name);
-            outJson.put("price", price.intValue());
-            outJson.put("duration", duration);
-            outJson.put("description", description);
+            JSONObject outJson = option.toJson();
 
             sendJson(outJson);
 
@@ -36,7 +25,7 @@ public class CreateOption extends Connection {
 
         }
         catch(Exception ex){
-            System.out.println(ex);
+            System.out.println("class: CreateOption, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

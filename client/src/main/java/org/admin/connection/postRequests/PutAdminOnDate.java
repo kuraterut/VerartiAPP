@@ -1,7 +1,7 @@
 package org.admin.connection.postRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.Response;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 import java.time.LocalDate;
@@ -31,7 +31,7 @@ public class PutAdminOnDate extends Connection {
             return new Response(status, getErrorMsg());
         }
         catch (Exception ex){
-            System.out.println(ex);
+            System.out.println("class: PutAdminOnDate, method: post, exception: " + ex.getMessage());
             return new Response();
         }
     }

@@ -16,7 +16,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidateDateOnly(input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -34,7 +34,7 @@ func (h *Handler) putAdminToDate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) putMasterToDate(c *gin.Context) {
@@ -44,7 +44,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidateDateOnly(input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -62,7 +62,7 @@ func (h *Handler) putMasterToDate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) getAdminByDate(c *gin.Context) {
@@ -72,7 +72,7 @@ func (h *Handler) getAdminByDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", date)
+	err := domain.ValidateDateOnly(date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -100,7 +100,7 @@ func (h *Handler) getAllMastersByDate(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", date)
+	err := domain.ValidateDateOnly(date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -143,13 +143,13 @@ func (h *Handler) createAppointment(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatorDateAndTimeFormat("2006-01-02", input.Date)
+	err := domain.ValidateDateOnly(input.Date)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err = domain.ValidatorDateAndTimeFormat("15:04", input.StartTime)
+	err = domain.ValidateTimeOnly(input.StartTime)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -196,8 +196,116 @@ func (h *Handler) getAppointmentByClientId(c *gin.Context) {
 	})
 }
 
-func (h *Handler) getDailyAppointment(c *gin.Context) {}
+func (h *Handler) getAllAppointmentsByDate(c *gin.Context) {
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
+		return
+	}
 
-func (h *Handler) getMonthlyAppointment(c *gin.Context) {}
+	err := domain.ValidateDateOnly(date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 
-func (h *Handler) cancellationRequest(c *gin.Context) {}
+	appointments, err := h.services.Appointment.GetAllAppointmentsByDate(date)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"appointments": appointments,
+	})
+}
+
+func (h *Handler) getAppointmentById(c *gin.Context) {
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	appointment, err := h.services.Appointment.GetAppointmentById(appointmentId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, appointment)
+}
+
+func (h *Handler) deleteAppointmentById(c *gin.Context) {
+	appointmentId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	err = h.services.Appointment.DeleteAppointmentById(appointmentId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.StatusOK)
+}
+
+//func (h *Handler) updateAppointmentById(c *gin.Context) {
+//	appointmentId, err := strconv.Atoi(c.Param("id"))
+//	if err != nil {
+//		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+//		return
+//	}
+//
+//	var input models.MasterAppointmentInput
+//	if err := c.BindJSON(&input); err != nil {
+//		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+//		return
+//	}
+//
+//	err := domain.ValidateDateOnly(input.Date)
+//	if err != nil {
+//		newErrorResponse(c, http.StatusBadRequest, err.Error())
+//		return
+//	}
+//
+//	err = domain.ValidateTimeOnly(input.StartTime)
+//	if err != nil {
+//		newErrorResponse(c, http.StatusBadRequest, err.Error())
+//		return
+//	}
+//
+//	err = h.services.Appointment.UpdateAppointmentById(appointmentId)
+//	if err != nil {
+//		var errResp *domain.ErrorResponse
+//		if errors.As(err, &errResp) {
+//			newErrorResponse(c, errResp.Code, errResp.Text)
+//			return
+//		}
+//
+//		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+//		return
+//	}
+//
+//	c.JSON(http.StatusOK, domain.StatusOK)
+//}

@@ -35,8 +35,8 @@ func (r *UserPostgres) GetAllMasters() ([]models.Users, error) {
 			SELECT 1
 			FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'master'
-		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable)
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -93,7 +93,7 @@ func (r *UserPostgres) GetMasterById(masterId int) (models.Users, error) {
 		return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
 	} else {
 		for _, role := range master.Roles {
-			if role == "master" {
+			if role == domain.MasterRole {
 				return master, nil
 			}
 		}
@@ -118,8 +118,8 @@ func (r *UserPostgres) GetAllAdmins() ([]models.Users, error) {
 			SELECT 1
 			FROM %s AS us_rl
 			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'admin'
-		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable)
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.AdminRole)
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -176,63 +176,13 @@ func (r *UserPostgres) GetAdminById(masterId int) (models.Users, error) {
 		return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
 	} else {
 		for _, role := range admin.Roles {
-			if role == "admin" {
+			if role == domain.AdminRole {
 				return admin, nil
 			}
 		}
 	}
 
 	return models.Users{}, domain.NewErrorResponse(400, "this user does not have the admin role")
-}
-
-func (r *UserPostgres) GetDirector() (models.Users, error) {
-	var directors []models.Users
-
-	query := fmt.Sprintf(`
-		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary, 
-	   	(
-			SELECT array_remove(array_agg(rl.name), NULL)
-			FROM %s AS us_rl
-			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id
-		) AS roles
-		FROM %s us
-		WHERE EXISTS (
-			SELECT 1
-			FROM %s AS us_rl
-			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = 'director'
-		)`, database.UsersRoleTable, database.RoleTable, database.UserTable, database.UsersRoleTable, database.RoleTable)
-
-	rows, err := r.db.Query(query)
-	if err != nil {
-		return models.Users{}, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var user models.Users
-		err = rows.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
-		if err != nil {
-			return models.Users{}, err
-		}
-
-		if user.Roles == nil {
-			continue
-		}
-
-		directors = append(directors, user)
-	}
-
-	if len(directors) == 0 {
-		return models.Users{}, domain.NewErrorResponse(404, "director not found")
-	}
-
-	if len(directors) > 1 {
-		return models.Users{}, domain.NewErrorResponse(404, "several directors found, not just one")
-	}
-
-	return directors[0], nil
 }
 
 func (r *UserPostgres) DeleteUser(userId int) error {

@@ -1,7 +1,7 @@
 package org.admin.connection.getRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Option;
+import org.admin.model.Option;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -19,30 +19,16 @@ public class GetOption extends Connection {
             JSONObject data = getJson();
 
             List<Option> options = new ArrayList<>();
-            JSONArray servicesArray = (JSONArray) data.get("options");
-            for (Object serviceObj : servicesArray) {
-                JSONObject serviceJSON = (JSONObject) serviceObj;
-                Option option = new Option();
-
-                Long id = (Long) serviceJSON.get("id");
-                String name = (String) serviceJSON.get("name");
-                String description = (String) serviceJSON.get("description");
-                Long price = (Long) serviceJSON.get("price");
-                String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
-                LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
-
-                option.setId(id);
-                option.setName(name);
-                option.setDescription(description);
-                option.setPrice(price);
-                option.setDuration(duration);
-
+            JSONArray optionsArray = (JSONArray) data.get("options");
+            for (Object optionObj : optionsArray) {
+                JSONObject optionJSON = (JSONObject) optionObj;
+                Option option = Option.fromJson(optionJSON);
                 options.add(option);
             }
             return options;
 
-        }catch (Exception e){
-            System.out.println("class GetService, getAll " + e);
+        }catch (Exception ex){
+            System.out.println("class: GetOption, method: getAll, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -55,26 +41,14 @@ public class GetOption extends Connection {
 
             JSONObject data = getJson();
 
+            int code = connection.getResponseCode();
+            if (code != 200) return new Option(code, getErrorMsg());
 
-            Option option = new Option();
-            String name = (String)data.get("name");
-            String description = (String)data.get("description");
-            Long price = (Long)data.get("price");
-            String[] durationStr = ((String)data.get("duration")).split(":");
-            LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
-
-            option.setId(id);
-            option.setName(name);
-            option.setDescription(description);
-            option.setPrice(price);
-            option.setDuration(duration);
-
-            return option;
-
+            return Option.fromJson(data);
         }
         catch(Exception ex){
-            System.out.println(ex);
-            return null;
+            System.out.println("class: GetOption, method: getById, exception: " + ex.getMessage());
+            return new Option(404, ex.getMessage());
         }
     }
     public static List<Option> getListByMasterId(String token, Long masterId){
@@ -84,33 +58,18 @@ public class GetOption extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
             JSONObject data = getJson();
-            System.out.println(data);
             List<Option> options = new ArrayList<>();
             JSONArray optionsArray = (JSONArray) data.get("options");
-            for (Object serviceObj : optionsArray) {
-                JSONObject serviceJSON = (JSONObject) serviceObj;
-                Option option = new Option();
-
-                Long id = (Long) serviceJSON.get("id");
-                String name = (String) serviceJSON.get("name");
-                String description = (String) serviceJSON.get("description");
-                Long price = (Long) serviceJSON.get("price");
-                String[] durationStr = ((String)serviceJSON.get("duration")).split(":");
-                LocalTime duration = LocalTime.of(Integer.parseInt(durationStr[0]), Integer.parseInt(durationStr[1]));
-
-                option.setId(id);
-                option.setName(name);
-                option.setDescription(description);
-                option.setPrice(price);
-                option.setDuration(duration);
-
+            for (Object optionObj : optionsArray) {
+                JSONObject optionJSON = (JSONObject) optionObj;
+                Option option = Option.fromJson(optionJSON);
                 options.add(option);
             }
             return options;
 
         }
         catch(Exception ex){
-            System.out.println("class GetOption, getListByMasterId " + ex);
+            System.out.println("class: GetOption, method: getListByMasterId, exception: " + ex.getMessage());
             return new ArrayList<>();
         }
     }

@@ -107,5 +107,5 @@ func (h *Handler) deleteUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, domain.StatusOK)
 }

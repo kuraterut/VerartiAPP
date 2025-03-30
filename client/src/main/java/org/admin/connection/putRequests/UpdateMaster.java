@@ -1,10 +1,8 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.utils.entities.Master;
-import org.admin.utils.Response;
-import org.admin.utils.entities.Option;
-import org.json.simple.JSONArray;
+import org.admin.model.Master;
+import org.admin.model.Response;
 import org.json.simple.JSONObject;
 
 public class UpdateMaster extends Connection {
@@ -15,12 +13,8 @@ public class UpdateMaster extends Connection {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
 
-            JSONObject out = new JSONObject();
-            out.put("name", master.getName());
-            out.put("surname", master.getSurname());
-            out.put("patronymic", master.getPatronymic());
-            out.put("phone", master.getPhone());
-            out.put("bio", master.getBio());
+            JSONObject out = master.toJson();
+            out.remove("password");
             sendJson(out);
 
             int status = connection.getResponseCode();
@@ -29,8 +23,8 @@ public class UpdateMaster extends Connection {
             }
             return new Response(200, "OK");
         }
-        catch (Exception e) {
-            System.out.println(e);
+        catch (Exception ex) {
+            System.out.println("class: UpdateMaster, method: updateInfo, exception: " + ex.getMessage());
             return new Response();
         }
     }
