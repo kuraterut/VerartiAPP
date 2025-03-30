@@ -1,6 +1,7 @@
-package org.admin.UI.window.ScheduleWindow;
+package org.admin.UI.window.scheduleWindow;
 
 import org.Main;
+import org.admin.connection.getRequests.GetSchedule;
 import org.admin.controller.AdminController;
 import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetMaster;
@@ -16,20 +17,20 @@ import javafx.geometry.*;
 import javafx.collections.*;
 import org.admin.model.Admin;
 import org.admin.model.Master;
+import org.admin.model.ScheduleDay;
 import org.admin.utils.HelpFuncs;
 
 import java.io.*;
 import java.util.*;
 import java.time.*;
 
-public class CalendarOfEmployeesWindow extends Main{
+public class ScheduleWindow extends Main{
     private static final int CALENDAR_ROW_CONSTRAINT = 85;
     private static final int CALENDAR_COLUMN_CONSTRAINT = 120;
 
     public static GridPane buildCalendarByYM(int year, int month){
         GridPane calendar           = new GridPane();
 
-        
         int monthLen                = YearMonth.of(year, month).lengthOfMonth();
         int firstDayInWeek          = HelpFuncs.getDayOfWeekByStr(year+"-"+month+"-01");
         
@@ -39,6 +40,15 @@ public class CalendarOfEmployeesWindow extends Main{
         calendar.setAlignment(Pos.CENTER);
         calendar.setGridLinesVisible(true);
         
+        List<ScheduleDay> schedule = GetSchedule.getListByMonthAndYear(token, year, month);
+//        if(schedule.isEmpty()){
+//            for(int i = 0; i < 31; i++){
+//                ScheduleDay scheduleDay = new ScheduleDay();
+//                scheduleDay.setDate(LocalDate.of(year, month, i + 1));
+//                schedule.add(scheduleDay);
+//            }
+//        }
+
 
         calendar.getRowConstraints().add(new RowConstraints(50));
 
@@ -52,13 +62,14 @@ public class CalendarOfEmployeesWindow extends Main{
         int row = 1;
         int column = firstDayInWeek-1;
 
-        for(int day = 1; day <= monthLen; day++){
+        for(ScheduleDay scheduleDay : schedule){
             Rectangle rect = new Rectangle(CALENDAR_COLUMN_CONSTRAINT, CALENDAR_ROW_CONSTRAINT, Color.TRANSPARENT); // Прозрачный
+            int day = scheduleDay.getDate().getDayOfMonth();
             Label dayLbl = new Label(String.valueOf(day));
-            
-            LocalDate date = LocalDate.of(year, month, day);
-            Admin admin = GetAdmin.getByDate(token, date);
-            List<Master> masters = GetMaster.getListByDate(token, date, true);
+
+            LocalDate date = scheduleDay.getDate();
+            Admin admin = scheduleDay.getAdmin();
+            List<Master> masters = scheduleDay.getMasters();
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 
