@@ -68,8 +68,7 @@ CREATE TABLE status
 INSERT INTO status (name)
 VALUES ('WAITING'),   -- ждет подтверждения
        ('CONFIRMED'), -- подтвержденный
-       ('COMPLETED'), -- завершенный
-       ('CANCELLED'); -- отмененный
+       ('COMPLETED'); -- завершенный
 
 CREATE TABLE master_appointment
 (
@@ -90,24 +89,27 @@ CREATE TABLE master_appointment_option
     CONSTRAINT unique_option_master_appointment UNIQUE (option_id, master_appointment_id)
 );
 
-CREATE OR REPLACE FUNCTION clean_orphaned_appointments()
+CREATE
+OR REPLACE FUNCTION clean_orphaned_appointments()
 RETURNS TRIGGER AS $$
 BEGIN
-    DELETE FROM master_appointment
-        WHERE id IN (
-            SELECT OLD.master_appointment_id
-            WHERE NOT EXISTS (
-                SELECT 1 FROM master_appointment_option mao
-                WHERE mao.master_appointment_id = OLD.master_appointment_id
-            )
-        );
-    RETURN NULL;
+DELETE
+FROM master_appointment
+WHERE id IN (SELECT OLD.master_appointment_id
+WHERE NOT EXISTS (
+    SELECT 1 FROM master_appointment_option mao
+    WHERE mao.master_appointment_id = OLD.master_appointment_id
+    )
+    );
+RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$
+LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_clean_orphaned_appointments
-AFTER DELETE ON master_appointment_option
-FOR EACH ROW EXECUTE FUNCTION clean_orphaned_appointments();
+    AFTER DELETE
+    ON master_appointment_option
+    FOR EACH ROW EXECUTE FUNCTION clean_orphaned_appointments();
 
 CREATE TABLE admin_shift
 (
@@ -124,19 +126,12 @@ CREATE TABLE master_shift
     CONSTRAINT unique_user_date UNIQUE (users_id, date)
 );
 
-CREATE TABLE resource
+CREATE TABLE product
 (
-    id          serial       not null unique,
-    name        varchar(255) not null unique,
-    description varchar(255) not null
-);
-
-CREATE TABLE users_resource
-(
-    id          serial                                         not null unique,
-    users_id    int references users (id) on delete cascade    not null,
-    resource_id int references resource (id) on delete cascade not null,
-    CONSTRAINT unique_user_resource UNIQUE (users_id, resource_id)
+    id    serial       not null unique,
+    name  varchar(255) not null unique,
+    price int          not null,
+    count int default 0
 );
 
 CREATE TABLE feedback
