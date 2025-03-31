@@ -50,6 +50,7 @@ type Appointment interface {
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
+	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
 }
 
 type User interface {
