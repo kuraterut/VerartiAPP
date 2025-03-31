@@ -34,7 +34,6 @@ public class AdminInfoDialog extends Main {
 
         Button cancelButton = new Button("Отмена");
         Button deleteButton = new Button("Удалить админа");
-        Button saveButton = new Button("Сохранить");
 
         HBox btns = new HBox();
         btns.setAlignment(Pos.CENTER);
@@ -104,7 +103,7 @@ public class AdminInfoDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(20);
 
-        btns.getChildren().addAll(cancelButton, deleteButton, saveButton);
+        btns.getChildren().addAll(cancelButton, deleteButton);
         root.getChildren().addAll(infoTable, messageLabel, btns);
 
 
@@ -120,18 +119,6 @@ public class AdminInfoDialog extends Main {
             else{messageLabel.setText(response.getMsg());}
         });
 
-        saveButton.setOnAction(event -> {
-            Admin newAdmin = new Admin();
-            newAdmin.setName(nameTextField.getText());
-            newAdmin.setSurname(surnameTextField.getText());
-            newAdmin.setPatronymic(patronymicTextField.getText());
-            newAdmin.setPhone(phoneTextField.getText());
-            newAdmin.setBio(bioTextArea.getText());
-
-            Response response = UpdateProfile.updateInfo(token, newAdmin);
-            if(response.getCode() == 200){messageLabel.setText("Сохранено");}
-            else{messageLabel.setText(response.getMsg());}
-        });
 
         Scene dialogScene = new Scene(root, 1200, 600);
 
