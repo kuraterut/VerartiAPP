@@ -9,14 +9,14 @@ import (
 	"verarti/models"
 )
 
-func (h *Handler) createResource(c *gin.Context) {
-	var input models.Resource
+func (h *Handler) createProduct(c *gin.Context) {
+	var input models.Product
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	resourceId, err := h.services.Resource.Create(input)
+	productId, err := h.services.Product.Create(input)
 	if err != nil {
 		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -29,16 +29,12 @@ func (h *Handler) createResource(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"resourceId": resourceId,
+		"productId": productId,
 	})
 }
 
-type getAllResourcesResponse struct {
-	Data []models.Resource `json:"data"`
-}
-
-func (h *Handler) getAllResources(c *gin.Context) {
-	resources, err := h.services.Resource.GetAll()
+func (h *Handler) getAllProducts(c *gin.Context) {
+	products, err := h.services.Product.GetAll()
 	if err != nil {
 		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -50,19 +46,19 @@ func (h *Handler) getAllResources(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, getAllResourcesResponse{
-		Data: resources,
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"products": products,
 	})
 }
 
-func (h *Handler) getResourceById(c *gin.Context) {
-	resourceId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) getProductById(c *gin.Context) {
+	productId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	resource, err := h.services.GetById(resourceId)
+	product, err := h.services.Product.GetById(productId)
 	if err != nil {
 		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -74,45 +70,23 @@ func (h *Handler) getResourceById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, resource)
+	c.JSON(http.StatusOK, product)
 }
 
-func (h *Handler) getResourcesByMasterId(c *gin.Context) {
-	masterId, err := getUserId(c)
-	if err != nil {
-		return
-	}
-
-	resources, err := h.services.Resource.GetByMasterId(masterId)
-	if err != nil {
-		var errResp *domain.ErrorResponse
-		if errors.As(err, &errResp) {
-			newErrorResponse(c, errResp.Code, errResp.Text)
-			return
-		}
-
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, getAllResourcesResponse{
-		Data: resources,
-	})
-}
-
-func (h *Handler) addResource(c *gin.Context) {
-	masterId, err := getUserId(c)
-	if err != nil {
-		return
-	}
-
-	resourceId, err := strconv.Atoi(c.Param("id"))
+func (h *Handler) updateProduct(c *gin.Context) {
+	productId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
 		return
 	}
 
-	_, err = h.services.Resource.Add(masterId, resourceId)
+	var input models.ProductUpdate
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	err = h.services.Product.UpdateProduct(productId, input)
 	if err != nil {
 		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -124,17 +98,27 @@ func (h *Handler) addResource(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, responseModel{
-		Response: map[string]interface{}{
-			"resourceId": resourceId,
-		},
-	})
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
-func (h *Handler) createRequest(c *gin.Context) {
+func (h *Handler) deleteProduct(c *gin.Context) {
+	productId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
 
+	err = h.services.Product.DeleteProduct(productId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
-
-func (h *Handler) getRequests(c *gin.Context) {}
-
-func (h *Handler) getResponseByRequestId(c *gin.Context) {}

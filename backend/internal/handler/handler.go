@@ -33,15 +33,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				profile.PUT("/password", h.updatePassword)
 			}
 
-			resource := master.Group("/resource")
+			product := master.Group("/product")
 			{
-				resource.GET("/", h.getResourcesByMasterId)
-				resource.GET("/all", h.getAllResources)
-				resource.GET("/:id", h.getResourceById)
-				resource.POST("/:id", h.addResource)
-				resource.POST("/request", h.createRequest)
-				resource.GET("/request", h.getRequests)
-				resource.GET("/response", h.getResponseByRequestId)
+				product.GET("/", h.getAllProducts)
+				product.GET("/:id", h.getProductById)
 			}
 
 			appointment := master.Group("/appointment")
@@ -108,14 +103,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				feedback.POST("/")
 			}
 
-			resource := admin.Group("/resource")
+			product := admin.Group("/product")
 			{
-				resource.POST("/", h.createResource)
-				resource.GET("/", h.getAllResources)
-				resource.GET("/:id", h.getResourceById)
-				//resource.POST("/response", h.createResponse) // todo
-				//resource.GET("/request", h.getRequests)
-				//resource.GET("/response", h.getResponseByRequestId)
+				product.POST("/", h.createProduct)
+				product.GET("/", h.getAllProducts)
+				product.GET("/:id", h.getProductById)
+				product.PUT("/:id", h.updateProduct)
+				product.DELETE("/:id", h.deleteProduct)
 			}
 
 			option := admin.Group("/option")

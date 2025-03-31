@@ -32,12 +32,12 @@ type Client interface {
 type Feedback interface {
 }
 
-type Resource interface {
-	Create(resource models.Resource) (int, error)
-	GetAll() ([]models.Resource, error)
-	GetById(resourceId int) (models.Resource, error)
-	GetByMasterId(masterId int) ([]models.Resource, error)
-	Add(masterId, resourceId int) (int, error)
+type Product interface {
+	Create(product models.Product) (int, error)
+	GetAll() ([]models.Product, error)
+	GetById(productId int) (models.Product, error)
+	UpdateProduct(productId int, newProduct models.ProductUpdate) error
+	DeleteProduct(productId int) error
 }
 
 type Appointment interface {
@@ -71,7 +71,7 @@ type Repository struct {
 	Authorization
 	Client
 	Feedback
-	Resource
+	Product
 	Appointment
 	User
 	Profile
@@ -82,7 +82,7 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 	client := NewClientPostgres(db)
 
 	return &Repository{
-		Resource:      NewResourcePostgres(db),
+		Product:       NewProductPostgres(db),
 		Authorization: NewAuthPostgres(db),
 		Profile:       NewProfilePostgres(db),
 		Client:        client,
