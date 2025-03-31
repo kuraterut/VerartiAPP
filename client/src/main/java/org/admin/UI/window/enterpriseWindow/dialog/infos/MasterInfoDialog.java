@@ -40,7 +40,7 @@ public class MasterInfoDialog extends Main {
         Button cancelButton = new Button("Отмена");
         Button deleteMasterButton = new Button("Удалить мастера");
         Button addServiceButton = new Button("Добавить услугу");
-        Button saveButton = new Button("Сохранить");
+
         HBox btns = new HBox();
         btns.setAlignment(Pos.CENTER);
         btns.setSpacing(50);
@@ -113,7 +113,7 @@ public class MasterInfoDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(20);
 
-        btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton, saveButton);
+        btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton);
         root.getChildren().addAll(masterInfoTabel, servicesBox, messageLabel, btns);
 
 
@@ -139,19 +139,6 @@ public class MasterInfoDialog extends Main {
                 }
             }
             showChooseServiceDialog(notMasterOptions, master, servicesBox);
-        });
-
-        saveButton.setOnAction(event -> {
-            Master newMaster = new Master();
-            newMaster.setName(nameTextField.getText());
-            newMaster.setSurname(surnameTextField.getText());
-            newMaster.setPatronymic(patronymicTextField.getText());
-            newMaster.setPhone(phoneTextField.getText());
-            newMaster.setBio(bioTextArea.getText());
-
-            Response response = UpdateMaster.updateInfo(token, newMaster);
-            if(response.getCode() == 200){messageLabel.setText("Сохранено");}
-            else{messageLabel.setText(response.getMsg());}
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
