@@ -19,14 +19,6 @@ public class AdminController {
 		node.getScene().setRoot(ProfileWindow.loadProfileWindow());
 	}
 
-	public static void loadChangeProfileInfoWindow(Node node){
-		node.getScene().setRoot(ProfileWindow.loadChangeProfileWindow());	
-	}
-
-	public static void loadChangeProfilePasswordWindow(Node node){
-		node.getScene().setRoot(ProfileWindow.loadChangeProfilePasswordWindow());	
-	}
-
 	public static void loadEnterpriseWindow(Node node){
 		node.getScene().setRoot(EnterpriseWindow.loadEnterpriseWindow());
 	}

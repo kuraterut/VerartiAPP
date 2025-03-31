@@ -248,7 +248,7 @@ public class Connection{
 	public static Image getProfilePhoto(String avatarBytesStr){
 		try{
 			if(avatarBytesStr == null){
-				return new Image(new FileInputStream("client/photos/standard.jpg"));
+				return new Image(new FileInputStream("client/photos/standard_avatar.jpg"));
 			}
 			Image avatarImage = null;
 			FileOutputStream avatarFile = new FileOutputStream("client/photos/avatar.jpg");
