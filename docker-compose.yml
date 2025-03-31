@@ -62,3 +62,14 @@ services:
       mc mb local/photo &&
       mc cp /docs/default_avatar.png local/photo/default/avatar.png
       "
+
+    # Сервис для Telegram-бота
+  telegram-bot:
+    build: ./VerartiTGBotForMaster
+    container_name: telegram-bot
+    environment:
+      - SPRING_PROFILES_ACTIVE=local # Активируем нужный профиль
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN} # Переменные из .env
+    restart: unless-stopped
+    depends_on:
+      - backend # Если бот зависит от API
