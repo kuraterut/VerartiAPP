@@ -21,6 +21,11 @@ type MasterAppointmentInput struct {
 	Comment   string `json:"comment"`
 }
 
+type MasterAppointmentUpdate struct {
+	OptionIds []int  `json:"option_ids"`
+	Comment   string `json:"comment"`
+}
+
 type MasterShift struct {
 	Id       int    `json:"-" db:"id"`
 	MasterId int    `json:"master_id" binding:"required"`

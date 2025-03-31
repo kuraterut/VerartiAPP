@@ -133,7 +133,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				appointment.POST("/", h.createAppointment)
 				appointment.DELETE("/:id", h.deleteAppointmentById)
-				//appointment.PUT("/:id", h.updateAppointmentById)
+				appointment.PUT("/:id", h.updateAppointmentById)
 				appointment.GET("/:id", h.getAppointmentById)
 
 				appointment.GET("/date", h.getAllAppointmentsByDate)

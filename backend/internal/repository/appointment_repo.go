@@ -487,3 +487,100 @@ func (r *AppointmentPostgres) DeleteAppointmentById(appointmentId int) error {
 	_, err := r.db.Exec(query, appointmentId)
 	return err
 }
+
+func (r *AppointmentPostgres) UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error {
+	var appointmentExists int
+	queryCheckAppointment := fmt.Sprintf("SELECT 1 FROM %s WHERE id = $1", database.MasterAppointmentTable)
+	err := r.db.Get(&appointmentExists, queryCheckAppointment, appointmentId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.NewErrorResponse(404, fmt.Sprintf("appointment with this id = %d not found", appointmentId))
+		}
+
+		return fmt.Errorf("failed to check appointment existence: %w", err)
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if input.Comment != "" {
+		queryUpdateComment := fmt.Sprintf("UPDATE %s SET comment = $1 WHERE id = $2", database.MasterAppointmentTable)
+		_, err := tx.Exec(queryUpdateComment, input.Comment, appointmentId)
+		if err != nil {
+			return fmt.Errorf("failed to update comment: %w", err)
+		}
+	}
+
+	if len(input.OptionIds) == 0 {
+		return tx.Commit()
+	}
+
+	var oldOptions []int
+	query := fmt.Sprintf("SELECT option_id FROM %s WHERE master_appointment_id = $1", database.MasterAppointmentOptionTable)
+	err = r.db.Select(&oldOptions, query, appointmentId)
+	if err != nil {
+		return fmt.Errorf("failed to get old options: %w", err)
+	}
+
+	var optionsIdsToInsert, optionsIdsToDelete []int
+	for _, oldOptionId := range oldOptions {
+		exists := false
+
+		for _, newOptionId := range input.OptionIds {
+			if oldOptionId == newOptionId {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
+			optionsIdsToDelete = append(optionsIdsToDelete, oldOptionId)
+		}
+	}
+	for _, newOptionId := range input.OptionIds {
+		exists := false
+
+		for _, oldOptionId := range oldOptions {
+			if oldOptionId == newOptionId {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
+			optionsIdsToInsert = append(optionsIdsToInsert, newOptionId)
+		}
+	}
+
+	for _, optionId := range optionsIdsToInsert {
+		var optionExists int
+		queryCheckOption := fmt.Sprintf("SELECT 1 FROM %s WHERE id = $1", database.OptionTable)
+		err = tx.QueryRow(queryCheckOption, optionId).Scan(&optionExists)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d not found", optionId))
+			}
+
+			return fmt.Errorf("failed to check option existence: %w", err)
+		}
+
+		queryUpdateOptions := fmt.Sprintf("INSERT INTO %s (option_id, master_appointment_id) VALUES ($1, $2)", database.MasterAppointmentOptionTable)
+		_, err := tx.Exec(queryUpdateOptions, optionId, appointmentId)
+		if err != nil {
+			return fmt.Errorf("failed to insert option: %w", err)
+		}
+	}
+
+	for _, optionId := range optionsIdsToDelete {
+		queryDeleteOldOptions := fmt.Sprintf("DELETE FROM %s WHERE master_appointment_id = $1 AND option_id = $2", database.MasterAppointmentOptionTable)
+		_, err = tx.Exec(queryDeleteOldOptions, appointmentId, optionId)
+		if err != nil {
+			return fmt.Errorf("failed to delete old option with id = %d: %w", optionId, err)
+		}
+	}
+
+	return tx.Commit()
+}

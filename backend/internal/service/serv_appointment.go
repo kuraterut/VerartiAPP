@@ -48,3 +48,7 @@ func (s *AppointmentService) GetAppointmentById(appointmentId int) (models.Maste
 func (s *AppointmentService) DeleteAppointmentById(appointmentId int) error {
 	return s.repo.DeleteAppointmentById(appointmentId)
 }
+
+func (s *AppointmentService) UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error {
+	return s.repo.UpdateAppointmentById(appointmentId, input)
+}
