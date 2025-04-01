@@ -2,7 +2,7 @@ package models
 
 type Transaction struct {
 	Id              int    `json:"id" db:"id"`
-	DateAndTime     string `json:"date_and_time" db:"date_and_time"`
+	Timestamp       string `json:"timestamp" db:"date_and_time"`
 	TransactionType string `json:"transaction_type" db:"transaction_type" binding:"required"`
 	PaymentMethod   string `json:"payment_method" db:"payment_method" binding:"required"`
 	PurchaseAmount  int    `json:"purchase_amount" db:"purchase_amount" binding:"required"`

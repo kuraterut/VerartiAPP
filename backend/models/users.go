@@ -6,7 +6,7 @@ type Users struct {
 	Surname    string   `json:"surname" binding:"required" db:"surname"`
 	Patronymic string   `json:"patronymic" binding:"required" db:"patronymic"`
 	Password   string   `json:"password" binding:"required" db:"password_hash"`
-	Email      string   `json:"email" binding:"required" db:"email"`
+	Email      string   `json:"email" db:"email"`
 	Phone      string   `json:"phone" binding:"required" db:"phone"`
 	Photo      string   `json:"photo" db:"photo"`
 	Bio        string   `json:"bio" db:"bio"`
@@ -18,7 +18,7 @@ type Info struct {
 	Name       string `json:"name" binding:"required" db:"name"`
 	Surname    string `json:"surname" binding:"required" db:"surname"`
 	Patronymic string `json:"patronymic" binding:"required" db:"patronymic"`
-	Email      string `json:"email" binding:"required" db:"email"`
+	Email      string `json:"email" db:"email"`
 	Phone      string `json:"phone" binding:"required" db:"phone"`
 	Bio        string `json:"bio" binding:"required" db:"bio"`
 }

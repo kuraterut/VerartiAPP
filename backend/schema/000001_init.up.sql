@@ -15,7 +15,7 @@ CREATE TABLE users
     surname        varchar(255) not null,
     patronymic     varchar(255) default '',
     password_hash  varchar(255) not null,
-    email          varchar(255) not null unique,
+    email          varchar(255) unique,
     phone          varchar(255) not null unique,
     bio            varchar(511) default '',
     photo          varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
@@ -178,5 +178,5 @@ CREATE TABLE transaction
     CONSTRAINT only_one_not_null CHECK (
         (appointment_id IS NOT NULL AND product_id IS NULL) OR
         (appointment_id IS NULL AND product_id IS NOT NULL)
-    )
+        )
 );
