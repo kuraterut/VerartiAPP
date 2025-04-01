@@ -1,3 +1,5 @@
+DROP TABLE transaction;
+
 DROP TABLE master_appointment_option;
 
 DROP TABLE master_appointment;
@@ -23,3 +25,7 @@ DROP TABLE option;
 DROP TABLE status;
 
 DROP TABLE role;
+
+DROP TABLE transaction_type;
+
+DROP TABLE payment_method;

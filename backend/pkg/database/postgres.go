@@ -19,6 +19,9 @@ const (
 	MasterAppointmentTable       = "master_appointment"
 	MasterAppointmentOptionTable = "master_appointment_option"
 	StatusTable                  = "status"
+	TransactionTable             = "transaction"
+	TransactionTypeTable         = "transaction_type"
+	PaymentMethodTable           = "payment_method"
 )
 
 type Config struct {

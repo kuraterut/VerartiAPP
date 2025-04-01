@@ -27,6 +27,7 @@ type Client interface {
 	GetClientById(clientId int) (models.Client, error)
 	GetAllClients() ([]models.Client, error)
 	UpdateClient(clientId int, input models.Client) error
+	CheckingClientExistence(clientId int) error
 }
 
 type Feedback interface {
@@ -38,6 +39,14 @@ type Product interface {
 	GetById(productId int) (models.Product, error)
 	UpdateProduct(productId int, newProduct models.ProductUpdate) error
 	DeleteProduct(productId int) error
+	CheckingProductExistence(productId int) error
+}
+
+type Transaction interface {
+	CreateTransaction(transaction models.Transaction) (int, error)
+	GetAllTransactions() ([]models.Transaction, error)
+	GetTransactionById(transactionId int) (models.Transaction, error)
+	DeleteTransaction(transactionId int) error
 }
 
 type Appointment interface {
@@ -51,6 +60,7 @@ type Appointment interface {
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
 	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
+	CheckingAppointmentExistence(appointmentId int) error
 }
 
 type User interface {
@@ -59,6 +69,7 @@ type User interface {
 	GetAllAdmins() ([]models.Users, error)
 	GetAdminById(masterId int) (models.Users, error)
 	DeleteUser(userId int) error
+	CheckUsersRole(userId int, role string) error
 }
 
 type Profile interface {
@@ -75,6 +86,7 @@ type Repository struct {
 	Appointment
 	User
 	Profile
+	Transaction
 }
 
 func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
@@ -89,5 +101,6 @@ func NewRepository(db *sqlx.DB, minio *minio.Client) *Repository {
 		User:          user,
 		Option:        NewOptionPostgres(db),
 		Appointment:   NewAppointmentPostgres(db, user, client),
+		Transaction:   NewTransactionPostgres(db),
 	}
 }

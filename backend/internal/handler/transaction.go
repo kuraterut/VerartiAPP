@@ -1,0 +1,96 @@
+package handler
+
+import (
+	"errors"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
+	"verarti/internal/domain"
+	"verarti/models"
+)
+
+func (h *Handler) createTransaction(c *gin.Context) {
+	var input models.Transaction
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	transactionId, err := h.services.Transaction.CreateTransaction(input)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"transactionId": transactionId,
+	})
+}
+
+func (h *Handler) getAllTransactions(c *gin.Context) {
+	transactions, err := h.services.Transaction.GetAllTransactions()
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"transactions": transactions,
+	})
+}
+
+func (h *Handler) getTransactionById(c *gin.Context) {
+	transactionId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	transaction, err := h.services.Transaction.GetTransactionById(transactionId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, transaction)
+}
+
+func (h *Handler) deleteTransaction(c *gin.Context) {
+	transactionId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	err = h.services.Transaction.DeleteTransaction(transactionId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.StatusOK)
+}

@@ -100,3 +100,19 @@ func (r *ProductPostgres) DeleteProduct(productId int) error {
 
 	return nil
 }
+
+func (r *ProductPostgres) CheckingProductExistence(productId int) error {
+	var exists int
+
+	queryGetProduct := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.ProductTable)
+	err := r.db.Get(&exists, queryGetProduct, productId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.NewErrorResponse(404, fmt.Sprintf("product with this id = %d was not found", productId))
+		}
+
+		return err
+	}
+
+	return nil
+}
