@@ -40,6 +40,13 @@ type Product interface {
 	DeleteProduct(productId int) error
 }
 
+type Transaction interface {
+	CreateTransaction(transaction models.Transaction) (int, error)
+	GetAllTransactions() ([]models.Transaction, error)
+	GetTransactionById(transactionId int) (models.Transaction, error)
+	DeleteTransaction(transactionId int) error
+}
+
 type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
@@ -77,6 +84,7 @@ type Service struct {
 	Appointment
 	User
 	Profile
+	Transaction
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -88,5 +96,6 @@ func NewService(repos *repository.Repository) *Service {
 		User:          NewUserService(repos),
 		Option:        NewOptionService(repos),
 		Appointment:   NewAppointmentService(repos),
+		Transaction:   NewTransactionService(repos),
 	}
 }

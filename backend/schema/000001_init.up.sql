@@ -142,3 +142,41 @@ CREATE TABLE feedback
     message   varchar(255)                                 not null,
     date      date
 );
+
+CREATE TABLE payment_method
+(
+    id   serial      not null unique,
+    name varchar(20) not null unique
+);
+
+INSERT INTO payment_method (name)
+VALUES ('CARD'),
+       ('CASH');
+
+CREATE TABLE transaction_type
+(
+    id   serial      not null unique,
+    name varchar(20) not null unique
+);
+
+INSERT INTO transaction_type (name)
+VALUES ('PRODUCT'),
+       ('APPOINTMENT');
+
+CREATE TABLE transaction
+(
+    id                  serial                                                 not null unique,
+    users_id            int references users (id) on delete cascade            not null,
+    client_id           int references client (id) on delete cascade           not null,
+    appointment_id      int references master_appointment (id) on delete cascade        default NULL,
+    product_id          int references product (id) on delete cascade                   default NULL,
+    payment_method_id   int references payment_method (id) on delete cascade   not null,
+    transaction_type_id int references transaction_type (id) on delete cascade not null,
+    purchase_amount     int                                                    not null default 0,
+    count               int                                                    not null default 0,
+    date_and_time       timestamp                                              not null default NOW(),
+    CONSTRAINT only_one_not_null CHECK (
+        (appointment_id IS NOT NULL AND product_id IS NULL) OR
+        (appointment_id IS NULL AND product_id IS NOT NULL)
+    )
+);
