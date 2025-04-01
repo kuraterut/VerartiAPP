@@ -82,7 +82,7 @@ func (r *TransactionPostgres) GetAllTransactions() ([]models.Transaction, error)
 		)
 
 		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
-			&paymentMethodId, &transactionTypeId, &transaction.PurchaseAmount, &transaction.Count, &transaction.DateAndTime)
+			&paymentMethodId, &transactionTypeId, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
 		}
@@ -141,7 +141,7 @@ func (r *TransactionPostgres) GetTransactionById(transactionId int) (models.Tran
 		)
 
 		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
-			&paymentMethodId, &transactionTypeId, &transaction.PurchaseAmount, &transaction.Count, &transaction.DateAndTime)
+			&paymentMethodId, &transactionTypeId, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return models.Transaction{}, err
 		}
