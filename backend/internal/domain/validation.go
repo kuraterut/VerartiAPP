@@ -6,8 +6,10 @@ import (
 )
 
 var (
-	ErrInvalidDateFormat = errors.New("invalid date format, expected YYYY-MM-DD")
-	ErrInvalidTimeFormat = errors.New("invalid time format, expected HH:MM")
+	ErrInvalidDateFormat      = errors.New("invalid date format, expected YYYY-MM-DD")
+	ErrInvalidTimeFormat      = errors.New("invalid time format, expected HH:MM")
+	ErrInvalidPaymentMethod   = errors.New("invalid payment method")
+	ErrInvalidTransactionType = errors.New("invalid transaction type")
 )
 
 func ValidateDateOnly(date string) error {
@@ -34,4 +36,24 @@ func ValidateTimeOnly(timeStr string) error {
 	}
 
 	return nil
+}
+
+func ValidatePaymentMethod(paymentMethod string) error {
+	for _, p := range PaymentMethods {
+		if p == paymentMethod {
+			return nil
+		}
+	}
+
+	return ErrInvalidPaymentMethod
+}
+
+func ValidateTransactionType(transactionType string) error {
+	for _, t := range TransactionTypes {
+		if t == transactionType {
+			return nil
+		}
+	}
+
+	return ErrInvalidTransactionType
 }

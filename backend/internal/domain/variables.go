@@ -9,5 +9,8 @@ var (
 	TransactionProduct     = "PRODUCT"
 	TransactionAppointment = "APPOINTMENT"
 
+	PaymentMethods   = []string{"CASH", "CARD"}
+	TransactionTypes = []string{"PRODUCT", "APPOINTMENT"}
+
 	StatusOK = "OK"
 )

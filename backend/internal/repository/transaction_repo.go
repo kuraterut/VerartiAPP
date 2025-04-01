@@ -63,7 +63,7 @@ func (r *TransactionPostgres) GetAllTransactions() ([]models.Transaction, error)
 
 	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method_id, transaction_type_id, purchase_amount, count, 
-    TO_CHAR(date_and_time, 'YYYY-MM-DD HH:MM:SS') AS date_and_time FROM %s`, database.TransactionTable)
+    TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -122,7 +122,7 @@ func (r *TransactionPostgres) GetTransactionById(transactionId int) (models.Tran
 
 	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method_id, transaction_type_id, purchase_amount, count, 
-    TO_CHAR(date_and_time, 'YYYY-MM-DD HH:MM:SS') AS date_and_time FROM %s WHERE id = $1`, database.TransactionTable)
+    TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE id = $1`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions, transactionId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -200,6 +200,146 @@ func (r *TransactionPostgres) DeleteTransaction(transactionId int) error {
 	}
 
 	return nil
+}
+
+func (r *TransactionPostgres) GetTransactionByDateAndMethod(date, paymentMethod string) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	var paymentMethodId int
+
+	queryGetPaymentMethodId := fmt.Sprintf(`SELECT id FROM %s WHERE name = $1`, database.PaymentMethodTable)
+	err := r.db.Get(&paymentMethodId, queryGetPaymentMethodId, paymentMethod)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewErrorResponse(404, fmt.Sprintf("payment method with name = %s not found", paymentMethod))
+		}
+
+		return nil, err
+	}
+
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
+    payment_method_id, transaction_type_id, purchase_amount, count, 
+    TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE DATE(date_and_time) = $1 AND payment_method_id = $2`, database.TransactionTable)
+	rows, err := r.db.Query(queryGetAllTransactions, date, paymentMethodId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []models.Transaction{}, nil
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			appointmentId, productId           sql.NullInt64
+			paymentMethodId, transactionTypeId int
+			transaction                        models.Transaction
+		)
+
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
+			&paymentMethodId, &transactionTypeId, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
+		if err != nil {
+			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
+		}
+
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
+		} else if productId.Valid {
+			transaction.UnitId = int(productId.Int64)
+		} else {
+			return nil, domain.NewErrorResponse(500, "unit id not found")
+		}
+
+		queryGetPaymentMethod := fmt.Sprintf("SELECT name FROM %s WHERE id = $1", database.PaymentMethodTable)
+		err = r.db.Get(&transaction.PaymentMethod, queryGetPaymentMethod, paymentMethodId)
+		if err != nil {
+			continue
+		}
+
+		queryGetTransactionType := fmt.Sprintf("SELECT name FROM %s WHERE id = $1", database.TransactionTypeTable)
+		err = r.db.Get(&transaction.TransactionType, queryGetTransactionType, transactionTypeId)
+		if err != nil {
+			continue
+		}
+
+		transactions = append(transactions, transaction)
+	}
+
+	if len(transactions) == 0 {
+		return []models.Transaction{}, nil
+	}
+
+	return transactions, err
+}
+
+func (r *TransactionPostgres) GetTransactionByDateAndType(date, transactionType string) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	var transactionTypeId int
+
+	queryGetTransactionTypeId := fmt.Sprintf(`SELECT id FROM %s WHERE name = $1`, database.TransactionTypeTable)
+	err := r.db.Get(&transactionTypeId, queryGetTransactionTypeId, transactionType)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewErrorResponse(404, fmt.Sprintf("transaction type with name = %s not found", transactionType))
+		}
+
+		return nil, err
+	}
+
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
+    payment_method_id, transaction_type_id, purchase_amount, count, 
+    TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE DATE(date_and_time) = $1 AND transaction_type_id = $2`, database.TransactionTable)
+	rows, err := r.db.Query(queryGetAllTransactions, date, transactionTypeId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []models.Transaction{}, nil
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			appointmentId, productId           sql.NullInt64
+			paymentMethodId, transactionTypeId int
+			transaction                        models.Transaction
+		)
+
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
+			&paymentMethodId, &transactionTypeId, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
+		if err != nil {
+			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
+		}
+
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
+		} else if productId.Valid {
+			transaction.UnitId = int(productId.Int64)
+		} else {
+			return nil, domain.NewErrorResponse(500, "unit id not found")
+		}
+
+		queryGetPaymentMethod := fmt.Sprintf("SELECT name FROM %s WHERE id = $1", database.PaymentMethodTable)
+		err = r.db.Get(&transaction.PaymentMethod, queryGetPaymentMethod, paymentMethodId)
+		if err != nil {
+			continue
+		}
+
+		queryGetTransactionType := fmt.Sprintf("SELECT name FROM %s WHERE id = $1", database.TransactionTypeTable)
+		err = r.db.Get(&transaction.TransactionType, queryGetTransactionType, transactionTypeId)
+		if err != nil {
+			continue
+		}
+
+		transactions = append(transactions, transaction)
+	}
+
+	if len(transactions) == 0 {
+		return []models.Transaction{}, nil
+	}
+
+	return transactions, err
 }
 
 // the method get the column name by transaction type
