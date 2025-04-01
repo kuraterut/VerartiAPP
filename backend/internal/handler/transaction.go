@@ -94,3 +94,87 @@ func (h *Handler) deleteTransaction(c *gin.Context) {
 
 	c.JSON(http.StatusOK, domain.StatusOK)
 }
+
+func (h *Handler) getTransactionByDateAndMethod(c *gin.Context) {
+	paymentMethod := c.Query("payment_method")
+	if paymentMethod == "" {
+		newErrorResponse(c, http.StatusBadRequest, "payment_method is required")
+		return
+	}
+
+	err := domain.ValidatePaymentMethod(paymentMethod)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
+		return
+	}
+
+	err = domain.ValidateDateOnly(date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	transactions, err := h.services.Transaction.GetTransactionByDateAndMethod(date, paymentMethod)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"transactions": transactions,
+	})
+}
+
+func (h *Handler) getTransactionByDateAndType(c *gin.Context) {
+	transactionType := c.Query("transaction_type")
+	if transactionType == "" {
+		newErrorResponse(c, http.StatusBadRequest, "transaction_type is required")
+		return
+	}
+
+	err := domain.ValidateTransactionType(transactionType)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
+		return
+	}
+
+	err = domain.ValidateDateOnly(date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	transactions, err := h.services.Transaction.GetTransactionByDateAndType(date, transactionType)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"transactions": transactions,
+	})
+}

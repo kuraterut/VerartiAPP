@@ -45,6 +45,8 @@ type Transaction interface {
 	GetAllTransactions() ([]models.Transaction, error)
 	GetTransactionById(transactionId int) (models.Transaction, error)
 	DeleteTransaction(transactionId int) error
+	GetTransactionByDateAndMethod(date, paymentMethod string) ([]models.Transaction, error)
+	GetTransactionByDateAndType(date, transactionType string) ([]models.Transaction, error)
 }
 
 type Appointment interface {

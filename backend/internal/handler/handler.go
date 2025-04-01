@@ -144,6 +144,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				transaction.POST("/", h.createTransaction)
 				transaction.GET("/", h.getAllTransactions)
 				transaction.GET("/:id", h.getTransactionById)
+				transaction.GET("/method", h.getTransactionByDateAndMethod)
+				transaction.GET("/type", h.getTransactionByDateAndType)
 				transaction.DELETE("/:id", h.deleteTransaction)
 			}
 		}

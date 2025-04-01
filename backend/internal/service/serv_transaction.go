@@ -53,3 +53,11 @@ func (s *TransactionService) GetTransactionById(transactionId int) (models.Trans
 func (s *TransactionService) DeleteTransaction(transactionId int) error {
 	return s.repo.DeleteTransaction(transactionId)
 }
+
+func (s *TransactionService) GetTransactionByDateAndMethod(date, paymentMethod string) ([]models.Transaction, error) {
+	return s.repo.GetTransactionByDateAndMethod(date, paymentMethod)
+}
+
+func (s *TransactionService) GetTransactionByDateAndType(date, transactionType string) ([]models.Transaction, error) {
+	return s.repo.GetTransactionByDateAndType(date, transactionType)
+}
