@@ -42,7 +42,7 @@ public class SearchingStringClients extends Main {
 
                     ObservableList<Client> filterClientsObservable = FXCollections.observableArrayList(filterClients);
                     clientsListView.setItems(filterClientsObservable);
-                    if (!filterClients.isEmpty() && !newValue.isEmpty()) {
+                    if (!filterClients.isEmpty()) {
                         root.getChildren().add(clientsListView);
                     }
                 }
@@ -74,7 +74,7 @@ public class SearchingStringClients extends Main {
     private static List<Client> filter(List<Client> clients, String start){
         List<Client> result = new ArrayList<>();
         for(Client client : clients){
-            if(client.getFio().startsWith(start) || client.getPhone().startsWith(start)){
+            if(client.getFio().startsWith(start) || client.getPhone().contains(start)){
                 result.add(client);
             }
         }

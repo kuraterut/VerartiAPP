@@ -50,7 +50,7 @@ public class BuyProductDialog extends Main {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        buildProductsTable(scrollPane, chosenProducts, allProducts);
+        buildProductsTable(scrollPane, chosenProducts);
 
         Button closeDialogBtn = new Button("Закрыть");
         Button addChosenProductBtn = new Button("Добавить товар");
@@ -60,7 +60,7 @@ public class BuyProductDialog extends Main {
         addChosenProductBtn.setOnAction(event -> {
             List<Product> notChosenProducts = allProducts.stream().filter(product -> !chosenProducts.contains(product)).toList();
             AddProductToChosenProductsDialog.show(chosenProducts, notChosenProducts);
-            buildProductsTable(scrollPane, chosenProducts, allProducts);
+            buildProductsTable(scrollPane, chosenProducts);
         });
         paymentBtn.setOnAction(event -> {
             Validation clientPhoneValidation = new PhoneNumberValidation(clientPhoneTextField.getText());
@@ -97,7 +97,8 @@ public class BuyProductDialog extends Main {
         dialog.showAndWait();
     }
 
-    public static void buildProductsTable(ScrollPane scrollPane, List<Product> chosenProducts, List<Product> allProducts){
+    public static void buildProductsTable(ScrollPane scrollPane, List<Product> chosenProducts){
+        List<Product> allProducts = GetProduct.getAll(token);
         GridPane table = new GridPane();
 
         Label productIdHeadLabel = new Label("ID");
@@ -141,15 +142,15 @@ public class BuyProductDialog extends Main {
             final int productNum = numRow-1;
             deleteProductButton.setOnAction(event -> {
                 chosenProducts.remove(productNum);
-                buildProductsTable(scrollPane, chosenProducts, allProducts);
+                buildProductsTable(scrollPane, chosenProducts);
             });
             addProductButton.setOnAction(event -> {
                 product.setCount(product.getCount()+1);
-                buildProductsTable(scrollPane, chosenProducts, allProducts);
+                buildProductsTable(scrollPane, chosenProducts);
             });
             removeProductButton.setOnAction(event -> {
                 product.setCount(product.getCount()-1);
-                buildProductsTable(scrollPane, chosenProducts, allProducts);
+                buildProductsTable(scrollPane, chosenProducts);
             });
 
 

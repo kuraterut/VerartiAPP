@@ -13,7 +13,6 @@ import java.util.Objects;
 public class Product extends Response {
 	private Long id;
 	private String name;
-	private String description;
 	private Long price;
 	private Integer count;
 
@@ -34,7 +33,6 @@ public class Product extends Response {
 		JSONObject obj = new JSONObject();
 
 		obj.put("name", this.name);
-		obj.put("description", this.description);
 		obj.put("price", this.price);
 		obj.put("count", this.count);
 
@@ -46,17 +44,21 @@ public class Product extends Response {
 
 		Long id = (Long) obj.get("id");
 		String name = (String) obj.get("name");
-		String description = (String) obj.get("description");
 		Long price = (Long) obj.get("price");
-		Integer count = (Integer) obj.get("count");
+		Integer count = ((Long) obj.get("count")).intValue();
+
 
 		product.setId(id);
 		product.setName(name);
-		product.setDescription(description);
 		product.setPrice(price);
 		product.setCount(count);
 
 		product.setCode(200);
 		return product;
+	}
+
+	@Override
+	public String toString() {
+		return getId() + " " + getName();
 	}
 }

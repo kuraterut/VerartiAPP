@@ -97,7 +97,15 @@ public class AppointmentInfoDialog extends Main {
         paymentBtn.setOnAction(event -> AppointmentPaymentDialog.show(appointment, node, dialog));
 
         saveAppointmentBtn.setOnAction(event -> {
+            if(appointment.getOptions().isEmpty()){
+                messageLabel.setText("Список услуг не может быть пустым");
+                return;
+            }
             appointment.setComment(commentsArea.getText());
+            for(Option option: appointment.getOptions()) {
+                System.out.println(option.getName());
+            }
+
             Response response = UpdateAppointment.updateInfo(token, appointment);
             if (response.getCode() == 200) messageLabel.setText("Сохранено");
             else messageLabel.setText(response.getMsg());
