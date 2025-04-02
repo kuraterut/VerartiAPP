@@ -18,7 +18,7 @@ import java.time.*;
 
 public class Main extends Application{
     public static Properties properties;
-
+    //TODO Сделать проверку токена везде.
     public static String login;
     public static String token; 
     public static GridPane calendar;

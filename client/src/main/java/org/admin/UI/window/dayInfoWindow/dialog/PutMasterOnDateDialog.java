@@ -9,13 +9,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.postRequests.PutMasterOnDate;
 import org.admin.UI.components.searchingStrings.SearchingStringMasters;
 import org.admin.UI.window.enterpriseWindow.dialog.creation.CreateMasterDialog;
-import org.admin.model.Master;
 import org.admin.model.Response;
+import org.admin.model.User;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,7 +46,7 @@ public class PutMasterOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
-        List<Master> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
+        List<User> mastersNotOnDate = GetUser.getMastersByDate(token, date, false);
 
         VBox choosingMaster = SearchingStringMasters.build(mastersNotOnDate, masterInfo -> {
             if(masterInfo != null) {

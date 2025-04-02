@@ -3,8 +3,8 @@ package org.admin.UI.window.dayInfoWindow;
 import org.Main;
 import org.admin.UI.window.dayInfoWindow.dialog.TransactionsInfoDialog;
 import org.admin.connection.getRequests.GetTransaction;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.UI.window.dayInfoWindow.dialog.AddNewClientDialog;
 import org.admin.UI.window.dayInfoWindow.dialog.PutAdminOnDateDialog;
@@ -18,8 +18,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.geometry.*;
-import org.admin.model.Admin;
 import org.admin.model.Client;
+import org.admin.model.User;
 
 import java.util.*;
 import java.time.*;
@@ -37,9 +37,9 @@ public class DayInfoWindow extends Main{
         VBox rightBox               = new VBox();
         VBox centerBox              = new VBox();
 
-        HBox sheduleHeaders			= new HBox();
-        HBox rightSheduleHeaders	= new HBox();
-        HBox leftSheduleHeaders		= new HBox();
+        HBox scheduleHeaders			= new HBox();
+        HBox rightScheduleHeaders	= new HBox();
+        HBox leftScheduleHeaders		= new HBox();
         HBox centerInfo				= new HBox();
         HBox searchStringBox        = new HBox();
 
@@ -52,9 +52,9 @@ public class DayInfoWindow extends Main{
 
         Region spacer               = new Region();
 
-        Admin todayAdmin = GetAdmin.getByDate(token, date);
+        User todayAdmin = GetUser.getAdminByDate(token, date);
 
-        if(todayAdmin.getCode() != 200){adminLabel.setText("Админ не назначен");}
+        if(todayAdmin.getCode() != 200){adminLabel.setText(todayAdmin.getMsg());}
         else {adminLabel.setText("Админ: " + todayAdmin);}
         addNewClientBtn.setMinHeight(30);
         addNewClientBtn.setMinWidth(120);
@@ -80,52 +80,48 @@ public class DayInfoWindow extends Main{
         putAdminOnDayBtn.setText("Назначить администратора");
         addNewClientBtn.setText("Добавить клиента");
 
-        totalSumBtn.setOnAction(event -> TransactionsInfoDialog.show(date));
 
-        totalSumBtn.setWrapText(true);
-        putAdminOnDayBtn.setWrapText(true);
-        putMasterOnDayBtn.setWrapText(true);
-        addNewClientBtn.setWrapText(true);
+            totalSumBtn.setWrapText(true);
+            putAdminOnDayBtn.setWrapText(true);
+            putMasterOnDayBtn.setWrapText(true);
+            addNewClientBtn.setWrapText(true);
 
-        totalSumBtn.setTextAlignment(TextAlignment.CENTER);
-        putAdminOnDayBtn.setTextAlignment(TextAlignment.CENTER);
-        putMasterOnDayBtn.setTextAlignment(TextAlignment.CENTER);
-        addNewClientBtn.setTextAlignment(TextAlignment.CENTER);
+            totalSumBtn.setTextAlignment(TextAlignment.CENTER);
+            putAdminOnDayBtn.setTextAlignment(TextAlignment.CENTER);
+            putMasterOnDayBtn.setTextAlignment(TextAlignment.CENTER);
+            addNewClientBtn.setTextAlignment(TextAlignment.CENTER);
 
-        VBox.setMargin(sheduleHeaders, new Insets(100, 0, 0, 0));
+            VBox.setMargin(scheduleHeaders, new Insets(100, 0, 0, 0));
 
-        sheduleHeaders.setAlignment(Pos.CENTER);
-        miniCalendar.setValue(date);
+            scheduleHeaders.setAlignment(Pos.CENTER);
+            miniCalendar.setValue(date);
 
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+            HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        List<Client> clients = GetClient.getAll(token);
-        VBox searchStringClients = SearchingStringClients.build(clients, client-> ClientInfoDialog.show(client.getId(), root));
-        ScrollPane scrollTable = DayInfoTable.create(date);
+            List<Client> clients = GetClient.getAll(token);
+            VBox searchStringClients = SearchingStringClients.build(clients, client-> ClientInfoDialog.show(client.getId(), root));
+            ScrollPane scrollTable = DayInfoTable.create(date);
 
-//        TextArea textArea = new TextArea();
-//        textArea.setWrapText(true);
-//        textArea.setScrollLeft(Double.MAX_VALUE);
-        VBox headBox = new VBox();
 
-        searchStringBox.setSpacing(25);
-        searchStringBox.setAlignment(Pos.TOP_CENTER);
-        searchStringBox.setMaxWidth(700);
+            VBox headBox = new VBox();
 
-        headBox.setSpacing(10);
-        headBox.setAlignment(Pos.TOP_CENTER);
-        headBox.setMaxSize(700, 100);
-        headBox.setPadding(new Insets(10, 0, 0, 0));
+            searchStringBox.setSpacing(25);
+            searchStringBox.setAlignment(Pos.TOP_CENTER);
+            searchStringBox.setMaxWidth(700);
 
-        miniCalendar.valueProperty().addListener((observable, oldValue, newValue) -> {
-            AdminController.loadDayInfoWindow(miniCalendar, newValue);
-        });
+            headBox.setSpacing(10);
+            headBox.setAlignment(Pos.TOP_CENTER);
+            headBox.setMaxSize(700, 100);
+            headBox.setPadding(new Insets(10, 0, 0, 0));
+
+            miniCalendar.valueProperty().addListener((observable, oldValue, newValue) -> {
+                    AdminController.loadDayInfoWindow(miniCalendar, newValue);
+            });
 
 
             putMasterOnDayBtn.setOnAction(event -> PutMasterOnDateDialog.show(date, putMasterOnDayBtn));
             putAdminOnDayBtn.setOnAction(event -> PutAdminOnDateDialog.show(date, putAdminOnDayBtn));
-            // сash.setOnAction(event -> showCashDialog());
-            // totalSumBtn.setOnAction(event -> showDayTransactionsDialog());
+            totalSumBtn.setOnAction(event -> TransactionsInfoDialog.show(date));
             addNewClientBtn.setOnAction(event -> AddNewClientDialog.show(addNewClientBtn, date));
 
         stackPane.setAlignment(Pos.CENTER);
@@ -137,11 +133,11 @@ public class DayInfoWindow extends Main{
 
         searchStringBox.getChildren().addAll(searchStringClients, addNewClientBtn);
         headBox.getChildren().addAll(searchStringBox, adminLabel);
-        rightSheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, totalSumBtn);
-        leftSheduleHeaders.getChildren().addAll(miniCalendar);
-        sheduleHeaders.getChildren().addAll(leftSheduleHeaders, spacer, rightSheduleHeaders);
+        rightScheduleHeaders.getChildren().addAll(putAdminOnDayBtn, putMasterOnDayBtn, totalSumBtn);
+        leftScheduleHeaders.getChildren().addAll(miniCalendar);
+        scheduleHeaders.getChildren().addAll(leftScheduleHeaders, spacer, rightScheduleHeaders);
         centerInfo.getChildren().addAll(scrollTable);
-        centerBox.getChildren().addAll(sheduleHeaders, centerInfo);
+        centerBox.getChildren().addAll(scheduleHeaders, centerInfo);
         root.setLeft(sideMenuStack);
         root.setCenter(centerBox);
         root.setRight(rightBox);

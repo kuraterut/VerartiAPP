@@ -11,11 +11,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.UI.components.searchingStrings.SearchingStringClients;
 import org.admin.connection.deleteRequests.DeleteClient;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetAppointment;
-import org.admin.connection.getRequests.GetClient;
-import org.admin.connection.getRequests.GetProduct;
+import org.admin.connection.getRequests.*;
 import org.admin.connection.putRequests.UpdateClient;
 import org.admin.controller.AdminController;
 import org.admin.model.*;
@@ -38,8 +36,22 @@ public class BuyProductDialog extends Main {
 
         HBox clientPhoneBox = new HBox(20);
         Label clientPhoneLabel = new Label("Номер телефона покупателя: ");
-        TextField clientPhoneTextField = new TextField();
-        clientPhoneBox.getChildren().addAll(clientPhoneLabel, clientPhoneTextField);
+
+        Client client = new Client();
+        client.setCode(404);
+        client.setMsg("Клиент не выбран");
+        VBox searchingStringClient = SearchingStringClients.build(GetClient.getAll(token), chosenClient -> {
+            client.setId(chosenClient.getId());
+            client.setName(chosenClient.getName());
+            client.setSurname(chosenClient.getSurname());
+            client.setPatronymic(chosenClient.getPatronymic());
+            client.setPhone(chosenClient.getPhone());
+            client.setBirthday(chosenClient.getBirthday());
+            client.setComment(chosenClient.getComment());
+            client.setCode(200);
+        });
+        searchingStringClient.setMaxHeight(100);
+        clientPhoneBox.getChildren().addAll(clientPhoneLabel, searchingStringClient);
         clientPhoneBox.setAlignment(Pos.CENTER);
 
         Label adminPhoneLabel = new Label("Номер телефона администратора: " + Main.login);
@@ -63,17 +75,11 @@ public class BuyProductDialog extends Main {
             buildProductsTable(scrollPane, chosenProducts);
         });
         paymentBtn.setOnAction(event -> {
-            Validation clientPhoneValidation = new PhoneNumberValidation(clientPhoneTextField.getText());
-            if(!clientPhoneValidation.validate()) {
-                messageLabel.setText("Некорректный номер клиента");
-                return;
-            }
-            Client client = GetClient.getByPhone(token, clientPhoneTextField.getText());
-            if(client.getCode() != 200) {
+            if(client.getCode() != 200){
                 messageLabel.setText(client.getMsg());
                 return;
             }
-            Admin admin = GetAdmin.getByPhone(token, Main.login);
+            User admin = GetUser.getByPhone(token, Main.login);
             if(admin.getCode() != 200) {
                 messageLabel.setText(admin.getMsg());
                 return;

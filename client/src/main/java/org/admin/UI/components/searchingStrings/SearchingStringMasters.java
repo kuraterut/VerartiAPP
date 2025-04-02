@@ -11,14 +11,14 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.model.Master;
+import org.admin.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class SearchingStringMasters extends Main {
-    public static VBox build(List<Master> startList, Consumer<Master> func){
+    public static VBox build(List<User> startList, Consumer<User> func){
         VBox root = new VBox();
 
         root.setPrefSize(300, 600);
@@ -26,18 +26,18 @@ public class SearchingStringMasters extends Main {
         TextField searchTextField = new TextField();
 //        searchTextField.setPrefWidth(300);
 
-        ObservableList<Master> observableList = FXCollections.observableArrayList(startList);
-        ListView<Master> listView = new ListView<>(observableList);
+        ObservableList<User> observableList = FXCollections.observableArrayList(startList);
+        ListView<User> listView = new ListView<>(observableList);
 
-        MultipleSelectionModel<Master> selectionModel = listView.getSelectionModel();
+        MultipleSelectionModel<User> selectionModel = listView.getSelectionModel();
         searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     selectionModel.clearSelection();
                     root.getChildren().remove(listView);
-                    List<Master> filterClients = filter(startList, newValue);
+                    List<User> filterClients = filter(startList, newValue);
 
-                    ObservableList<Master> filteredListObservable = FXCollections.observableArrayList(filterClients);
+                    ObservableList<User> filteredListObservable = FXCollections.observableArrayList(filterClients);
                     listView.setItems(filteredListObservable);
                     if(!filterClients.isEmpty()){
                         root.getChildren().add(listView);
@@ -47,8 +47,8 @@ public class SearchingStringMasters extends Main {
         });
 
         // устанавливаем слушатель для отслеживания изменений
-        selectionModel.selectedItemProperty().addListener(new ChangeListener<Master>(){
-            public void changed(ObservableValue<? extends Master> changed, Master oldValue, Master newValue){
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<User>(){
+            public void changed(ObservableValue<? extends User> changed, User oldValue, User newValue){
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
@@ -68,9 +68,9 @@ public class SearchingStringMasters extends Main {
         return root;
     }
 
-    private static List<Master> filter(List<Master> masters, String start){
-        List<Master> result = new ArrayList<>();
-        for(Master master : masters){
+    private static List<User> filter(List<User> masters, String start){
+        List<User> result = new ArrayList<>();
+        for(User master : masters){
             if(master.getFio().startsWith(start) || master.getPhone().contains(start)){
                 result.add(master);
             }

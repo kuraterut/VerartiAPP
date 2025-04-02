@@ -5,20 +5,18 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.deleteRequests.DeleteAdmin;
 import org.admin.connection.deleteRequests.DeleteProduct;
 import org.admin.connection.putRequests.UpdateProduct;
 import org.admin.controller.AdminController;
 import org.admin.model.Product;
 import org.admin.model.Response;
+
+import java.util.Optional;
 
 public class ProductInfoDialog extends Main {
     public static void show(Product product, Node node) {
@@ -88,7 +86,7 @@ public class ProductInfoDialog extends Main {
         cancelButton.setOnAction(event -> dialog.close());
 
         deleteButton.setOnAction(event -> {
-            //TODO ALERT DELETE
+            if(!showDeleteProductConfirmation()) return;
             Response response = DeleteProduct.deleteById(token, product.getId());
             if(response.getCode() == 200){
                 dialog.close();
@@ -128,5 +126,23 @@ public class ProductInfoDialog extends Main {
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
+    }
+
+    public static boolean showDeleteProductConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Удаление продукта");
+        alert.setContentText("Вы уверены, что хотите безвозвратно удалить продукт?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
     }
 }

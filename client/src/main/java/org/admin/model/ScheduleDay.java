@@ -1,8 +1,6 @@
 package org.admin.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -14,10 +12,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ScheduleDay extends Response{
     private LocalDate date;
-    private List<Master> masters;
-    private Admin admin;
+    private List<User> masters;
+    private User admin;
 
     public ScheduleDay(int code, String message){
         this.setCode(code);
@@ -29,18 +29,18 @@ public class ScheduleDay extends Response{
 
         LocalDate date = HelpFuncs.stringToLocalDate((String) obj.get("date"));
 
-        List<Master> masters = new ArrayList<>();
+        List<User> masters = new ArrayList<>();
         JSONArray mastersJsonArr = (JSONArray) obj.get("masters");
         for (Object masterObj : mastersJsonArr){
             JSONObject masterObjJson = (JSONObject) masterObj;
-            Master master = Master.fromJson(masterObjJson);
+            User master = User.fromJson(masterObjJson);
             masters.add(master);
         }
 
         JSONObject adminJson = (JSONObject) obj.get("admin");
-        Admin admin = null;
+        User admin = null;
         if (adminJson != null){
-            admin = Admin.fromJson(adminJson);
+            admin = User.fromJson(adminJson);
         }
         scheduleDay.setDate(date);
         scheduleDay.setMasters(masters);

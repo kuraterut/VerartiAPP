@@ -13,13 +13,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.Main;
 import org.admin.connection.getRequests.GetAppointment;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.UI.window.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.UI.window.dayInfoWindow.dialog.CreateAppointmentDialog;
-import org.admin.model.Appointment;
-import org.admin.model.Client;
-import org.admin.model.Master;
-import org.admin.model.Option;
+import org.admin.connection.getRequests.GetUser;
+import org.admin.model.*;
+import org.admin.utils.AppointmentStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -58,12 +56,12 @@ public class DayInfoTable extends Main {
 
         table.getColumnConstraints().add(new ColumnConstraints(100));
 
-        List<Master> masters = GetMaster.getListByDate(token, date, true);
+        List<User> masters = GetUser.getMastersByDate(token, date, true);
 
         Map<Long, List<Appointment>> dayInfo = new HashMap<>();
         List<Appointment> dailyAppointments = GetAppointment.getListByDate(token, date);
 
-        for(Master master : masters){
+        for(User master : masters){
             dayInfo.put(master.getId(), new ArrayList<>());
         }
         for(Appointment appointment : dailyAppointments){
@@ -75,7 +73,7 @@ public class DayInfoTable extends Main {
             Set<Integer> usedCells = new HashSet<>();
             countColumn++;
             table.getColumnConstraints().add(new ColumnConstraints(200));
-            Master master = GetMaster.getById(token, masterId);
+            User master = GetUser.getById(token, masterId);
 
             Label masterSurnameLbl = new Label(master.getSurname());
 
@@ -91,6 +89,7 @@ public class DayInfoTable extends Main {
             }
 
             for(Appointment appointment: appointments){
+                if(appointment.getOptions().isEmpty()) continue;
                 Long id = appointment.getId();
                 Client client = appointment.getClient();
                 List<Option> options = appointment.getOptions();
@@ -98,10 +97,10 @@ public class DayInfoTable extends Main {
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
                 Integer cellNumber = calculateCellNumber(options);
                 if(CELLS_IN_COLUMN_COUNT - cellStart < cellNumber){cellNumber = CELLS_IN_COLUMN_COUNT - cellStart+1;}
-                //TODO Сделать разные цвета для записей
-                //TODO Сделать SearchingStringClients в создании записи
-                //TODO Сделать кликабельную Rectangle для Товаров
                 Rectangle rectStart = new Rectangle(200, 40, Color.AQUAMARINE);
+                if(appointment.getStatus() == AppointmentStatus.COMPLETED) rectStart.setFill(Color.ORANGE);
+                if(appointment.getStatus() == AppointmentStatus.CANCELLED) rectStart.setFill(Color.YELLOW);
+
                 Rectangle clickRect = new Rectangle(200, 40, Color.TRANSPARENT);
                 clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id, clickRect));
                 clickRect.setOnMouseEntered(event -> {

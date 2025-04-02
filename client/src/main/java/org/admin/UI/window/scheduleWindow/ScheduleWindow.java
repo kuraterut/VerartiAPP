@@ -3,8 +3,6 @@ package org.admin.UI.window.scheduleWindow;
 import org.Main;
 import org.admin.connection.getRequests.GetSchedule;
 import org.admin.controller.AdminController;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.UI.components.sideMenu.SideMenu;
 
 import javafx.scene.control.*;
@@ -15,9 +13,8 @@ import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 import javafx.geometry.*;
 import javafx.collections.*;
-import org.admin.model.Admin;
-import org.admin.model.Master;
 import org.admin.model.ScheduleDay;
+import org.admin.model.User;
 import org.admin.utils.HelpFuncs;
 
 import java.io.*;
@@ -68,15 +65,15 @@ public class ScheduleWindow extends Main{
             Label dayLbl = new Label(String.valueOf(day));
 
             LocalDate date = scheduleDay.getDate();
-            Admin admin = scheduleDay.getAdmin();
-            List<Master> masters = scheduleDay.getMasters();
+            User admin = scheduleDay.getAdmin();
+            List<User> masters = scheduleDay.getMasters();
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 
             Label adminLbl = new Label(admin.getCode()!=200?"Не назначен":admin.getSmallFio());
             adminLbl.setFont(Font.font("Open Sans Bold"));
             cellInfo.getChildren().add(adminLbl);
-            for(Master master: masters){
+            for(User master: masters){
                 Label masterLbl = new Label(master.getSurname() + " " + master.getName().charAt(0) + ".");
                 cellInfo.getChildren().add(masterLbl);
             }

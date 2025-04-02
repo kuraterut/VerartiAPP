@@ -34,7 +34,7 @@ public class AppointmentInfoDialog extends Main {
         dialog.setTitle("Информация о записи");
 
         Appointment appointment = GetAppointment.getById(token, appointmentId);
-        Master master = appointment.getMaster();
+        User master = appointment.getMaster();
         Client client = appointment.getClient();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 
@@ -65,9 +65,7 @@ public class AppointmentInfoDialog extends Main {
         commentsArea.setMaxWidth(400);
         commentsArea.setMaxHeight(200);
 
-        //TODO Отмена услуги
         //TODO Оплата услуги
-        //TODO Обновить инфу о записи
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
         Button cancelAppointmentBtn = new Button("Отмена Записи");
@@ -102,9 +100,6 @@ public class AppointmentInfoDialog extends Main {
                 return;
             }
             appointment.setComment(commentsArea.getText());
-            for(Option option: appointment.getOptions()) {
-                System.out.println(option.getName());
-            }
 
             Response response = UpdateAppointment.updateInfo(token, appointment);
             if (response.getCode() == 200) messageLabel.setText("Сохранено");

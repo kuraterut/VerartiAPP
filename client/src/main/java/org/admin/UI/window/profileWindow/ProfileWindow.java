@@ -3,8 +3,8 @@ package org.admin.UI.window.profileWindow;
 import org.Main;
 import org.admin.UI.window.profileWindow.dialog.ChangePasswordDialog;
 import org.admin.UI.window.profileWindow.dialog.ChangeProfileInfoDialog;
-import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.getRequests.GetPhoto;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.connection.putRequests.UpdateProfile;
 import org.admin.controller.AdminController;
 import org.admin.model.Response;
@@ -18,7 +18,7 @@ import javafx.scene.image.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.event.*;
-import org.admin.model.Admin;
+import org.admin.model.User;
 
 import java.io.*;
 
@@ -54,6 +54,7 @@ public class ProfileWindow extends Main{
         Label roleLbl                  = new Label();
        
         Label title                 = new Label();
+        Label messageLabel              = new Label("");
 
         
         title.setText("Профиль");
@@ -64,7 +65,7 @@ public class ProfileWindow extends Main{
         bioHeadLbl.setText("Биография");
         roleHeadLbl.setText("Роль");
 
-        Admin admin = GetAdmin.getByPhone(token, Main.login);
+        User admin = GetUser.getByPhone(token, Main.login);
         Image avatarImage = GetPhoto.getProfilePhoto(admin.getPhotoURL(), properties);
 
         nameLbl.setText(admin.getName());
@@ -167,8 +168,8 @@ public class ProfileWindow extends Main{
                 File file = fileChooser.showOpenDialog(changeAvatarBtn.getScene().getWindow());
                 if (file != null) {
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
-                    Response status = UpdateProfile.updateProfilePhoto(token, file);
-                    //TODO Проверять response и сделать messageLabel
+                    Response response = UpdateProfile.updateProfilePhoto(token, file);
+                    if(response.getCode() != 200) messageLabel.setText(response.getMsg()); return;
                 }
                 AdminController.loadProfileWindow(changeAvatarBtn);
             }
@@ -177,7 +178,7 @@ public class ProfileWindow extends Main{
         avatarBox.getChildren().addAll(avatarImageView, changeAvatarBtn);
         changeInfoBtnsBox.getChildren().addAll(changePasswordBtn, changeInfoBtn);
         profileInfoBox.getChildren().addAll(avatarBox, table);
-        centerBox.getChildren().addAll(title, profileInfoBox, changeInfoBtnsBox);
+        centerBox.getChildren().addAll(title, profileInfoBox, messageLabel, changeInfoBtnsBox);
         root.setCenter(centerBox);
         root.setLeft(sideMenuStack);
         root.setRight(rightBox);

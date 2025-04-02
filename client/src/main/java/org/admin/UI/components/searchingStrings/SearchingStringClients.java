@@ -58,6 +58,7 @@ public class SearchingStringClients extends Main {
                         if(newValue != null){
                             selectionModel.clearSelection();
                             func.accept(newValue);
+                            searchTextField.setText(newValue.toString());
                         }
                     }
                 });

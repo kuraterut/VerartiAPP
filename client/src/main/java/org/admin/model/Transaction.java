@@ -1,8 +1,6 @@
 package org.admin.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.admin.utils.HelpFuncs;
 import org.admin.utils.PaymentMethod;
 import org.admin.utils.TransactionType;
@@ -13,6 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Transaction extends Response {
     private Long id;
     private TransactionType transactionType;
