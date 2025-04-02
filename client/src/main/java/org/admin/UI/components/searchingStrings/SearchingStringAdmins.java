@@ -71,7 +71,7 @@ public class SearchingStringAdmins extends Main {
     private static List<Admin> filter(List<Admin> admins, String start){
         List<Admin> result = new ArrayList<>();
         for(Admin admin : admins){
-            if(admin.getFio().startsWith(start) || admin.getPhone().startsWith(start)){
+            if(admin.getFio().startsWith(start) || admin.getPhone().contains(start)){
                 result.add(admin);
             }
         }

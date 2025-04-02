@@ -97,7 +97,10 @@ public class DayInfoTable extends Main {
                 Option firstOption = options.get(0);
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
                 Integer cellNumber = calculateCellNumber(options);
-
+                if(CELLS_IN_COLUMN_COUNT - cellStart < cellNumber){cellNumber = CELLS_IN_COLUMN_COUNT - cellStart+1;}
+                //TODO Сделать разные цвета для записей
+                //TODO Сделать SearchingStringClients в создании записи
+                //TODO Сделать кликабельную Rectangle для Товаров
                 Rectangle rectStart = new Rectangle(200, 40, Color.AQUAMARINE);
                 Rectangle clickRect = new Rectangle(200, 40, Color.TRANSPARENT);
                 clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id, clickRect));

@@ -6,14 +6,11 @@ import org.admin.model.AuthResponse;
 import org.admin.utils.UserRole;
 import org.admin.utils.validation.PhoneNumberValidation;
 import org.admin.utils.validation.Validation;
-import org.master.MasterInterface;
 import org.admin.controller.AdminController;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.*;
-import javafx.event.*;
-import javafx.collections.*;
 
 import java.time.*;
 
@@ -64,9 +61,7 @@ public class AuthorizationWindow extends Main {
         authorizationBtn.setPrefHeight(40);
 
         
-        authorizationBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
+        authorizationBtn.setOnAction(event ->  {
                 String login    = loginField.getText();
                 String password = passwordField.getText();
 
@@ -88,7 +83,6 @@ public class AuthorizationWindow extends Main {
                 System.out.println(token);
 
                 AdminController.loadDayInfoWindow(authorizationBtn, LocalDate.now());
-            }
         });
 
 

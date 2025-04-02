@@ -37,12 +37,10 @@ public class CreateProductDialog extends Main {
         Label nameHeadLbl = new Label("Название: ");
         Label priceHeadLbl = new Label("Прайс: ");
         Label countHeadLbl = new Label("Количество: ");
-        Label descriptionHeadLbl = new Label("Описание: ");
 
         TextField nameTextField = new TextField();
         TextField priceTextField = new TextField();
         TextField countTextField = new TextField();
-        TextArea descriptionTextArea = new TextArea();
 
         errorMsg.setText("");
 
@@ -62,8 +60,8 @@ public class CreateProductDialog extends Main {
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
 
-        table.addColumn(0, nameHeadLbl, priceHeadLbl, countHeadLbl, descriptionHeadLbl);
-        table.addColumn(1, nameTextField, priceTextField, countTextField, descriptionTextArea);
+        table.addColumn(0, nameHeadLbl, priceHeadLbl, countHeadLbl);
+        table.addColumn(1, nameTextField, priceTextField, countTextField);
 
         GridPane.setHalignment(nameHeadLbl, HPos.CENTER);
         GridPane.setValignment(nameHeadLbl, VPos.CENTER);
@@ -71,8 +69,6 @@ public class CreateProductDialog extends Main {
         GridPane.setValignment(priceHeadLbl, VPos.CENTER);
         GridPane.setHalignment(countHeadLbl, HPos.CENTER);
         GridPane.setValignment(countHeadLbl, VPos.CENTER);
-        GridPane.setHalignment(descriptionHeadLbl, HPos.CENTER);
-        GridPane.setValignment(descriptionHeadLbl, VPos.CENTER);
 
         GridPane.setHalignment(nameTextField, HPos.CENTER);
         GridPane.setValignment(nameTextField, VPos.CENTER);
@@ -80,20 +76,16 @@ public class CreateProductDialog extends Main {
         GridPane.setValignment(priceTextField, VPos.CENTER);
         GridPane.setHalignment(countTextField, HPos.CENTER);
         GridPane.setValignment(countTextField, VPos.CENTER);
-        GridPane.setHalignment(descriptionTextArea, HPos.CENTER);
-        GridPane.setValignment(descriptionTextArea, VPos.CENTER);
 
         table.getColumnConstraints().add(new ColumnConstraints(150));
         table.getColumnConstraints().add(new ColumnConstraints(250));
         table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
         table.getRowConstraints().add(new RowConstraints(50));
-        table.getRowConstraints().add(new RowConstraints(150));
 
         cancelBtn.setOnAction(event -> dialog.close());
         addBtn.setOnAction(event -> {
             String name = nameTextField.getText();
-            String description = descriptionTextArea.getText();
 
             Long price = 0L;
             try{price = Long.parseLong(priceTextField.getText());}
@@ -107,7 +99,6 @@ public class CreateProductDialog extends Main {
             Product product = new Product();
 
             product.setName(name);
-            product.setDescription(description);
             product.setPrice(price);
             product.setCount(count);
 

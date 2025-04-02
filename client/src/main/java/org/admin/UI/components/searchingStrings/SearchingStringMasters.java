@@ -71,7 +71,7 @@ public class SearchingStringMasters extends Main {
     private static List<Master> filter(List<Master> masters, String start){
         List<Master> result = new ArrayList<>();
         for(Master master : masters){
-            if(master.getFio().startsWith(start) || master.getPhone().startsWith(start)){
+            if(master.getFio().startsWith(start) || master.getPhone().contains(start)){
                 result.add(master);
             }
         }
