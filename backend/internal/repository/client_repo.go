@@ -146,17 +146,19 @@ func (r *ClientPostgres) UpdateClient(clientId int, input models.Client) error {
 	return err
 }
 
-func (r *ClientPostgres) CheckingClientExistence(clientId int) error {
+func (r *ClientPostgres) CheckingClientsExistence(clientIds []int) error {
 	var exists int
 
-	queryGetClient := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.ClientTable)
-	err := r.db.Get(&exists, queryGetClient, clientId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.NewErrorResponse(404, fmt.Sprintf("client with this id = %d was not found", clientId))
-		}
+	for _, clientId := range clientIds {
+		queryGetClient := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.ClientTable)
+		err := r.db.Get(&exists, queryGetClient, clientId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.NewErrorResponse(404, fmt.Sprintf("client with this id = %d was not found", clientId))
+			}
 
-		return err
+			return err
+		}
 	}
 
 	return nil

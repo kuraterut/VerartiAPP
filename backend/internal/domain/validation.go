@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"time"
+	"verarti/models"
 )
 
 var (
@@ -38,9 +39,9 @@ func ValidateTimeOnly(timeStr string) error {
 	return nil
 }
 
-func ValidatePaymentMethod(paymentMethod string) error {
-	for _, p := range PaymentMethods {
-		if p == paymentMethod {
+func ValidatePaymentMethod(paymentMethod string, availablePaymentMethods []*models.PaymentMethod) error {
+	for _, p := range availablePaymentMethods {
+		if p.Name == paymentMethod {
 			return nil
 		}
 	}
@@ -48,9 +49,9 @@ func ValidatePaymentMethod(paymentMethod string) error {
 	return ErrInvalidPaymentMethod
 }
 
-func ValidateTransactionType(transactionType string) error {
-	for _, t := range TransactionTypes {
-		if t == transactionType {
+func ValidateTransactionType(transactionType string, availableTransactionType []*models.TransactionType) error {
+	for _, t := range availableTransactionType {
+		if t.Name == transactionType {
 			return nil
 		}
 	}

@@ -48,7 +48,7 @@ CREATE TABLE option
     name        varchar(255) not null unique,
     description varchar(255) not null,
     duration    VARCHAR(5)   not null,
-    price       int          not null
+    price       int          not null CHECK (price >= 0)
 );
 
 CREATE TABLE users_option
@@ -130,8 +130,8 @@ CREATE TABLE product
 (
     id    serial       not null unique,
     name  varchar(255) not null unique,
-    price int          not null,
-    count int default 0
+    price int          not null CHECK (price >= 0),
+    count int default 0 CHECK (count >= 0)
 );
 
 CREATE TABLE feedback
@@ -161,22 +161,22 @@ CREATE TABLE transaction_type
 
 INSERT INTO transaction_type (name)
 VALUES ('PRODUCT'),
-       ('APPOINTMENT');
+       ('OPTION');
 
 CREATE TABLE transaction
 (
-    id                  serial                                                 not null unique,
-    users_id            int references users (id) on delete cascade            not null,
-    client_id           int references client (id) on delete cascade           not null,
-    appointment_id      int references master_appointment (id) on delete cascade        default NULL,
-    product_id          int references product (id) on delete cascade                   default NULL,
-    payment_method_id   int references payment_method (id) on delete cascade   not null,
-    transaction_type_id int references transaction_type (id) on delete cascade not null,
-    purchase_amount     int                                                    not null default 0,
-    count               int                                                    not null default 0,
-    date_and_time       timestamp                                              not null default NOW(),
+    id               serial                                       not null unique,
+    users_id         int references users (id) on delete cascade  not null,
+    client_id        int references client (id) on delete cascade not null,
+    option_id        int references option (id) on delete cascade          default NULL,
+    product_id       int references product (id) on delete cascade         default NULL,
+    payment_method   varchar(255)                                 not null,
+    transaction_type varchar(255)                                 not null,
+    purchase_amount  int                                          not null default 0 CHECK (purchase_amount >= 0),
+    count            int                                          not null default 0 CHECK (count >= 0),
+    date_and_time    timestamp                                    not null default NOW(),
     CONSTRAINT only_one_not_null CHECK (
-        (appointment_id IS NOT NULL AND product_id IS NULL) OR
-        (appointment_id IS NULL AND product_id IS NOT NULL)
+        (option_id IS NOT NULL AND product_id IS NULL) OR
+        (option_id IS NULL AND product_id IS NOT NULL)
         )
 );

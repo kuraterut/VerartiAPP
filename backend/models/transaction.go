@@ -11,3 +11,17 @@ type Transaction struct {
 	AdminId         int    `json:"admin_id" db:"admin_id" binding:"required"`
 	ClientId        int    `json:"client_id" db:"client_id" binding:"required"`
 }
+
+type Transactions struct {
+	List []Transaction `json:"transactions"`
+}
+
+type TransactionType struct {
+	Id   int
+	Name string
+}
+
+type PaymentMethod struct {
+	Id   int
+	Name string
+}

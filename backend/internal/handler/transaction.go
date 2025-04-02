@@ -10,13 +10,13 @@ import (
 )
 
 func (h *Handler) createTransaction(c *gin.Context) {
-	var input models.Transaction
+	var input models.Transactions
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	transactionId, err := h.services.Transaction.CreateTransaction(input)
+	err := h.services.Transaction.CreateTransactions(input.List)
 	if err != nil {
 		var errResp *domain.ErrorResponse
 		if errors.As(err, &errResp) {
@@ -28,9 +28,7 @@ func (h *Handler) createTransaction(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"transactionId": transactionId,
-	})
+	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
 func (h *Handler) getAllTransactions(c *gin.Context) {
@@ -95,6 +93,36 @@ func (h *Handler) deleteTransaction(c *gin.Context) {
 	c.JSON(http.StatusOK, domain.StatusOK)
 }
 
+func (h *Handler) getTransactionByDate(c *gin.Context) {
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
+		return
+	}
+
+	err := domain.ValidateDateOnly(date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	transactions, err := h.services.Transaction.GetTransactionByDate(date)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"transactions": transactions,
+	})
+}
+
 func (h *Handler) getTransactionByDateAndMethod(c *gin.Context) {
 	paymentMethod := c.Query("payment_method")
 	if paymentMethod == "" {
@@ -102,7 +130,7 @@ func (h *Handler) getTransactionByDateAndMethod(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidatePaymentMethod(paymentMethod)
+	err := domain.ValidatePaymentMethod(paymentMethod, h.services.Transaction.GetPaymentMethods())
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -144,7 +172,7 @@ func (h *Handler) getTransactionByDateAndType(c *gin.Context) {
 		return
 	}
 
-	err := domain.ValidateTransactionType(transactionType)
+	err := domain.ValidateTransactionType(transactionType, h.services.Transaction.GetTransactionTypes())
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

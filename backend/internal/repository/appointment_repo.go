@@ -584,19 +584,3 @@ func (r *AppointmentPostgres) UpdateAppointmentById(appointmentId int, input mod
 
 	return tx.Commit()
 }
-
-func (r *AppointmentPostgres) CheckingAppointmentExistence(appointmentId int) error {
-	var exists int
-
-	queryGetAppointment := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.MasterAppointmentTable)
-	err := r.db.Get(&exists, queryGetAppointment, appointmentId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.NewErrorResponse(404, fmt.Sprintf("appointment with this id = %d was not found", appointmentId))
-		}
-
-		return err
-	}
-
-	return nil
-}
