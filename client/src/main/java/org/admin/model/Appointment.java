@@ -70,11 +70,14 @@ public class Appointment extends Response {
 		//Parse Options
 		List<Option> options = new ArrayList<>();
 		JSONArray optionsArr = (JSONArray)obj.get("options");
-		for(Object optionObj: optionsArr){
-			JSONObject optionJson = (JSONObject)optionObj;
-			Option option = Option.fromJson(optionJson);
-			options.add(option);
+		if(optionsArr != null){
+			for(Object optionObj: optionsArr){
+				JSONObject optionJson = (JSONObject)optionObj;
+				Option option = Option.fromJson(optionJson);
+				options.add(option);
+			}
 		}
+
 
 		LocalDate date = HelpFuncs.stringToLocalDate((String)obj.get("date"));
 		LocalTime startTime = LocalTime.parse((String)obj.get("start_time"));

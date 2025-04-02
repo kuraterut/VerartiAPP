@@ -17,6 +17,7 @@ import org.admin.UI.window.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.UI.window.dayInfoWindow.dialog.CreateAppointmentDialog;
 import org.admin.connection.getRequests.GetUser;
 import org.admin.model.*;
+import org.admin.utils.AppointmentStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -88,6 +89,7 @@ public class DayInfoTable extends Main {
             }
 
             for(Appointment appointment: appointments){
+                if(appointment.getOptions().isEmpty()) continue;
                 Long id = appointment.getId();
                 Client client = appointment.getClient();
                 List<Option> options = appointment.getOptions();
@@ -95,10 +97,10 @@ public class DayInfoTable extends Main {
                 Integer cellStart = calculateCellStart(appointment.getStartTime());
                 Integer cellNumber = calculateCellNumber(options);
                 if(CELLS_IN_COLUMN_COUNT - cellStart < cellNumber){cellNumber = CELLS_IN_COLUMN_COUNT - cellStart+1;}
-                //TODO Сделать разные цвета для записей
-                //TODO Сделать SearchingStringClients в создании записи
-                //TODO Сделать кликабельную Rectangle для Товаров
                 Rectangle rectStart = new Rectangle(200, 40, Color.AQUAMARINE);
+                if(appointment.getStatus() == AppointmentStatus.COMPLETED) rectStart.setFill(Color.ORANGE);
+                if(appointment.getStatus() == AppointmentStatus.CANCELLED) rectStart.setFill(Color.YELLOW);
+
                 Rectangle clickRect = new Rectangle(200, 40, Color.TRANSPARENT);
                 clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id, clickRect));
                 clickRect.setOnMouseEntered(event -> {

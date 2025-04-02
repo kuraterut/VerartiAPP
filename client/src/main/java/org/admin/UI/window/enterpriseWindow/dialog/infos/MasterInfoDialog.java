@@ -24,6 +24,7 @@ import org.admin.utils.HelpFuncs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MasterInfoDialog extends Main {
     public static void show(Long id, Node node){
@@ -120,7 +121,7 @@ public class MasterInfoDialog extends Main {
         cancelButton.setOnAction(event -> dialog.close());
 
         deleteMasterButton.setOnAction(event -> {
-            //TODO ALERT DELETE
+            if(!showDeleteMasterConfirmation()) return;
             Response response = DeleteUser.deleteById(token, master.getId());
             if(response.getCode() == 200){
                 dialog.close();
@@ -245,5 +246,23 @@ public class MasterInfoDialog extends Main {
         root.setPrefViewportWidth(500);
         servicesTable.setAlignment(Pos.CENTER);
         return root;
+    }
+
+    public static boolean showDeleteMasterConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Удаление мастера");
+        alert.setContentText("Вы уверены, что хотите безвозвратно удалить мастера?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
     }
 }
