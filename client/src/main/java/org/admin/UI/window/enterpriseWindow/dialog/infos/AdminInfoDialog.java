@@ -13,16 +13,15 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.deleteRequests.DeleteUser;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.deleteRequests.DeleteAdmin;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.putRequests.UpdateProfile;
-import org.admin.model.Admin;
 import org.admin.model.Response;
+import org.admin.model.User;
 
 public class AdminInfoDialog extends Main {
     public static void show(Long id, Node node){
-        Admin admin = GetAdmin.getById(token, id);
+        User admin = GetUser.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -111,7 +110,7 @@ public class AdminInfoDialog extends Main {
 
         deleteButton.setOnAction(event -> {
             //TODO ALERT DELETE
-            Response response = DeleteAdmin.deleteById(token, admin.getId());
+            Response response = DeleteUser.deleteById(token, admin.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);

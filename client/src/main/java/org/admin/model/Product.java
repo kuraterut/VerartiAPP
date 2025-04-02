@@ -1,8 +1,6 @@
 package org.admin.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.json.simple.JSONObject;
 
 import java.util.Objects;
@@ -10,6 +8,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product extends Response {
 	private Long id;
 	private String name;

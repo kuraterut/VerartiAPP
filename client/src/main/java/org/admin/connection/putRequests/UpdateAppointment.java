@@ -1,7 +1,6 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.model.Admin;
 import org.admin.model.Appointment;
 import org.admin.model.Response;
 import org.json.simple.JSONObject;

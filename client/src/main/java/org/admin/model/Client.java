@@ -1,8 +1,6 @@
 package org.admin.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.admin.utils.HelpFuncs;
 import org.json.simple.JSONObject;
 
@@ -12,6 +10,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Client extends Response {
 	private Long id;
 	private String name;

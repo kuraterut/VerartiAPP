@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.getRequests.GetAdmin;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.connection.postRequests.CreateTransaction;
 import org.admin.controller.AdminController;
 import org.admin.model.*;
@@ -31,7 +31,7 @@ public class AppointmentPaymentDialog extends Main {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Оплата услуг");
 
-        Admin admin = GetAdmin.getByDate(token, appointment.getDate());
+        User admin = GetUser.getAdminByDate(token, appointment.getDate());
         if(admin.getCode() != 200) admin.setId(-1L);
 
         Long totalPrice = 0L;
@@ -51,7 +51,7 @@ public class AppointmentPaymentDialog extends Main {
         }
 
 
-        Master master = appointment.getMaster();
+        User master = appointment.getMaster();
         Client client = appointment.getClient();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 

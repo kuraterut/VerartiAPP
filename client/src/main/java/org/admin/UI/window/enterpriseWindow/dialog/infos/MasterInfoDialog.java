@@ -10,17 +10,16 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.deleteRequests.DeleteUser;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.deleteRequests.DeleteMaster;
 import org.admin.connection.deleteRequests.DeleteOption;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.postRequests.AddOptionToMaster;
-import org.admin.connection.putRequests.UpdateMaster;
 import org.admin.UI.components.searchingStrings.SearchingStringOptions;
-import org.admin.model.Master;
 import org.admin.model.Response;
 import org.admin.model.Option;
+import org.admin.model.User;
 import org.admin.utils.HelpFuncs;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ import java.util.List;
 
 public class MasterInfoDialog extends Main {
     public static void show(Long id, Node node){
-        Master master = GetMaster.getById(token, id);
+        User master = GetUser.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -68,7 +67,7 @@ public class MasterInfoDialog extends Main {
         masterInfoTabel.getRowConstraints().add(new RowConstraints(50));
         masterInfoTabel.getRowConstraints().add(new RowConstraints(50));
         masterInfoTabel.getRowConstraints().add(new RowConstraints(50));
-        masterInfoTabel.getRowConstraints().add(new RowConstraints(150));
+        masterInfoTabel.getRowConstraints().add(new RowConstraints(100));
 
         masterInfoTabel.addColumn(0,
                 idLabel, nameLabel, surnameLabel, patronymicLabel, phoneLabel, bioLabel);
@@ -101,6 +100,7 @@ public class MasterInfoDialog extends Main {
         GridPane.setValignment(phoneTextField, VPos.CENTER);
         GridPane.setHalignment(bioTextArea, HPos.CENTER);
         GridPane.setValignment(bioTextArea, VPos.CENTER);
+
         masterInfoTabel.setAlignment(Pos.CENTER);
 
 
@@ -121,7 +121,7 @@ public class MasterInfoDialog extends Main {
 
         deleteMasterButton.setOnAction(event -> {
             //TODO ALERT DELETE
-            Response response = DeleteMaster.deleteById(token, master.getId());
+            Response response = DeleteUser.deleteById(token, master.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
@@ -147,7 +147,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<Option> options, Master master, VBox servicesBox) {
+    private static void showChooseServiceDialog(List<Option> options, User master, VBox servicesBox) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -183,7 +183,7 @@ public class MasterInfoDialog extends Main {
 
     }
 
-    private static ScrollPane buildServiceTable(Master master, VBox tableVBox){
+    private static ScrollPane buildServiceTable(User master, VBox tableVBox){
         //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];

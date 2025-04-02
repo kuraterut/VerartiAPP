@@ -3,7 +3,7 @@ package org.admin.connection.deleteRequests;
 import org.admin.connection.Connection;
 import org.admin.model.Response;
 
-public class DeleteMaster extends Connection {
+public class DeleteUser extends Connection {
     public static Response deleteById(String token, Long id){
         try {
             getConnection("http://localhost:8000/api/admin/users/" + id);
@@ -17,7 +17,7 @@ public class DeleteMaster extends Connection {
             return new Response(200, "OK");
         }
         catch (Exception ex) {
-            System.out.println("class: DeleteMaster, method: deleteById, exception: " + ex.getMessage());
+            System.out.println("class: DeleteUser, method: deleteById, exception: " + ex.getMessage());
             return new Response();
         }
     }

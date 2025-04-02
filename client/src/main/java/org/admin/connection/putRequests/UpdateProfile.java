@@ -1,8 +1,8 @@
 package org.admin.connection.putRequests;
 
 import org.admin.connection.Connection;
-import org.admin.model.Admin;
 import org.admin.model.Response;
+import org.admin.model.User;
 import org.json.simple.JSONObject;
 
 import java.io.File;
@@ -10,13 +10,13 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 public class UpdateProfile extends Connection {
-    public static Response updateInfo(String token, Admin admin){
+    public static Response updateInfo(String token, User admin){
         try {
             getConnection("http://localhost:8000/api/admin/profile/info");
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
-            //TODO Убрать Update для Мастеров и Админов в EnterpriseWindow
+
             JSONObject out = new JSONObject();
             out.put("name", admin.getName());
             out.put("surname", admin.getSurname());

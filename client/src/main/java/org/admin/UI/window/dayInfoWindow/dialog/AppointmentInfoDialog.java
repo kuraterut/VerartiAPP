@@ -34,7 +34,7 @@ public class AppointmentInfoDialog extends Main {
         dialog.setTitle("Информация о записи");
 
         Appointment appointment = GetAppointment.getById(token, appointmentId);
-        Master master = appointment.getMaster();
+        User master = appointment.getMaster();
         Client client = appointment.getClient();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 

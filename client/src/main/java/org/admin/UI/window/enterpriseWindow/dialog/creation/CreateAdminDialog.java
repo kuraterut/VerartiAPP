@@ -11,10 +11,13 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.postRequests.CreateUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.postRequests.CreateAdmin;
 import org.admin.model.Response;
-import org.admin.model.Admin;
+import org.admin.model.User;
+import org.admin.utils.UserRole;
+
+import java.util.HashSet;
 
 public class CreateAdminDialog extends Main {
     public static void show(Node node){
@@ -131,14 +134,16 @@ public class CreateAdminDialog extends Main {
             String password = passwordTextField.getText();
             String bio = bioTextArea.getText();
 
-            Admin admin = new Admin();
+            User admin = new User();
 
             admin.setName(name);
             admin.setSurname(surname);
             admin.setPatronymic(patronymic);
             admin.setPhone(phone);
             admin.setPassword(password);
-            admin.setIsMaster(isMasterYesRadioButton.isSelected());
+            admin.setRoles(new HashSet<>());
+            admin.addRole(UserRole.ADMIN);
+            if(isMasterYesRadioButton.isSelected())admin.addRole(UserRole.MASTER);
             admin.setBio(bio);
 
             Response checkInfo = admin.checkInfo();
@@ -149,7 +154,7 @@ public class CreateAdminDialog extends Main {
             }
 
 
-            Response response = CreateAdmin.post(token, admin);
+            Response response = CreateUser.post(token, admin);
             if(response.getCode() == 200) {
                 AdminController.loadEnterpriseWindow(node);
                 dialog.close();

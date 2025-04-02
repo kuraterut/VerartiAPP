@@ -1,9 +1,7 @@
 package org.admin.model;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.admin.utils.HelpFuncs;
 import org.admin.utils.AppointmentStatus;
 import org.json.simple.JSONArray;
@@ -15,6 +13,8 @@ import java.time.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Appointment extends Response {
 	private Long id;
 	private AppointmentStatus status;
@@ -22,7 +22,7 @@ public class Appointment extends Response {
 	private LocalTime startTime;
 	private List<Option> options;
 	private Client client;
-	private Master master;
+	private User master;
 	private String comment;
 
 	public Appointment(int code, String message){
@@ -65,7 +65,7 @@ public class Appointment extends Response {
 
 		//Parse Master
 		JSONObject masterObj = (JSONObject)obj.get("master");
-		Master master = Master.fromJson(masterObj);
+		User master = User.fromJson(masterObj);
 
 		//Parse Options
 		List<Option> options = new ArrayList<>();

@@ -90,7 +90,7 @@ public class ProductWindow extends Main{
         GridPane.setHalignment(countHead, HPos.CENTER);
         GridPane.setValignment(countHead, VPos.CENTER);
 
-        tableProductList.getRowConstraints().add(new RowConstraints(50));
+        tableProductList.getRowConstraints().add(new RowConstraints(30));
 
         for (int i = 0; i < allProducts.size(); i++){
             Product product = allProducts.get(i);
