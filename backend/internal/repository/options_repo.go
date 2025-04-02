@@ -197,3 +197,21 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 
 	return id, nil
 }
+
+func (r *OptionPostgres) CheckingOptionsExistence(optionIds []int) error {
+	var exists int
+
+	for _, optionId := range optionIds {
+		queryGetOption := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.OptionTable)
+		err := r.db.Get(&exists, queryGetOption, optionId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d was not found", optionId))
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}

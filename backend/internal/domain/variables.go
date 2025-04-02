@@ -6,11 +6,11 @@ var (
 	AdminRole  = "ADMIN"
 
 	// Transaction Types
-	TransactionProduct     = "PRODUCT"
-	TransactionAppointment = "APPOINTMENT"
+	TransactionProduct = "PRODUCT"
+	TransactionOption  = "OPTION"
 
 	PaymentMethods   = []string{"CASH", "CARD"}
-	TransactionTypes = []string{"PRODUCT", "APPOINTMENT"}
+	TransactionTypes = []string{"PRODUCT", "OPTION"}
 
 	StatusOK = "OK"
 )

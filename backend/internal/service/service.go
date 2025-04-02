@@ -41,12 +41,15 @@ type Product interface {
 }
 
 type Transaction interface {
-	CreateTransaction(transaction models.Transaction) (int, error)
+	CreateTransactions(transactions []models.Transaction) error
 	GetAllTransactions() ([]models.Transaction, error)
 	GetTransactionById(transactionId int) (models.Transaction, error)
 	DeleteTransaction(transactionId int) error
+	GetTransactionByDate(date string) ([]models.Transaction, error)
 	GetTransactionByDateAndMethod(date, paymentMethod string) ([]models.Transaction, error)
 	GetTransactionByDateAndType(date, transactionType string) ([]models.Transaction, error)
+	GetPaymentMethods() []*models.PaymentMethod
+	GetTransactionTypes() []*models.TransactionType
 }
 
 type Appointment interface {
