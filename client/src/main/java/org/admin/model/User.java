@@ -27,8 +27,7 @@ public class User extends Response {
     public User(int code, String message){
         super(code,message);
     }
-
-    //TODO Убрать деление на Админов и Мастеров
+    //TODO Сделать все на Builder'ах
     public Response checkInfo(){
         if (this.name.equals("")) return new Response(-1, "Введите имя");
         if (this.surname.equals("")) return new Response(-1, "Введите фамилию");

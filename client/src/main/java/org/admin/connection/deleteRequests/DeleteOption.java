@@ -6,7 +6,7 @@ import org.admin.model.Response;
 public class DeleteOption extends Connection {
     public static Response deleteByMasterId(String token, Long option_id, Long master_id) {
         try {
-            getConnection("http://localhost:8000/api/admin/option/master/"+option_id+"?master_id="+master_id);
+            getConnection("http://localhost:8000/api/admin/option/master?option_id="+option_id+"?master_id="+master_id);
             connection.setRequestMethod("DELETE");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

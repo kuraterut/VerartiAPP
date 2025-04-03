@@ -12,7 +12,6 @@ import java.util.List;
 public class GetClient extends Connection {
     public static List<Client> getAll(String token){
         try{
-            //TODO Всегда возвращать с кодом(Юзать наследование от Response)
             getConnection("http://localhost:8000/api/admin/clients/");
 
             connection.setRequestMethod("GET");

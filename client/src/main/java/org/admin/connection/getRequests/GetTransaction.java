@@ -19,7 +19,7 @@ public class GetTransaction extends Connection {
         try{
             String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/transaction/date?date=" + encodedDate);
+            getConnection("http://localhost:8000/api/admin/transaction/date-only?date=" + encodedDate);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

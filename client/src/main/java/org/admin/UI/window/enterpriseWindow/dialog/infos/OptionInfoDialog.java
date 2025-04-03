@@ -17,6 +17,9 @@ import org.admin.connection.putRequests.UpdateOption;
 import org.admin.model.Response;
 import org.admin.model.Option;
 import org.admin.utils.HelpFuncs;
+import org.admin.utils.validation.DurationValidation;
+import org.admin.utils.validation.PriceValidation;
+import org.admin.utils.validation.Validation;
 
 import java.time.LocalTime;
 import java.util.Optional;
@@ -113,17 +116,25 @@ public class OptionInfoDialog extends Main {
 
         saveButton.setOnAction(event -> {
             Option newOption = new Option();
-            try {
-                newOption.setName(nameTextField.getText());
-                newOption.setPrice(Long.parseLong(priceTextField.getText()));
-                newOption.setDuration(LocalTime.parse(durationTextField.getText()));
-                newOption.setDescription(descriptionTextArea.getText());
+            String newName = nameTextField.getText();
+            String newPriceStr = priceTextField.getText();
+            String newDurationStr = durationTextField.getText();
+            String newDescription = descriptionTextArea.getText();
 
-                Response response = UpdateOption.updateInfo(token, newOption);
-                if(response.getCode() == 200){messageLabel.setText("Сохранено");}
-                else{messageLabel.setText(response.getMsg());}
-            } catch (NumberFormatException e) {messageLabel.setText("Введите число в прайс");}
-            catch (Exception e) {messageLabel.setText(e.getMessage());}
+            Validation priceValidation = new PriceValidation(newPriceStr);
+            Validation durationValidation = new DurationValidation(newDurationStr);
+            if(!priceValidation.validate()) {messageLabel.setText("Неправильный формат прайса, должно быть целое число"); return;}
+            if(!durationValidation.validate()) {messageLabel.setText("Неправильный формат количества, должно быть целое число"); return;}
+
+            newOption.setId(option.getId());
+            newOption.setName(newName);
+            newOption.setPrice(Long.valueOf(newPriceStr));
+            newOption.setDuration(LocalTime.parse(newDurationStr));
+            newOption.setDescription(newDescription);
+
+            Response response = UpdateOption.updateInfo(token, newOption);
+            if(response.getCode() == 200){messageLabel.setText("Сохранено");}
+            else{messageLabel.setText(response.getMsg());}
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
