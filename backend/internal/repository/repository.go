@@ -66,6 +66,8 @@ type Appointment interface {
 	CancelMasterEntryForDate(masterId int, date string) error
 	CheckingActiveAppointmentExistenceByMasterId(masterId int) (bool, error)
 
+	CheckingAppointmentsExistence(appointmentIds []int) error
+
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
 
