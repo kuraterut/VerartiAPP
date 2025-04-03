@@ -223,3 +223,34 @@ func (r *UserPostgres) CheckUsersRoles(userIds []int, role string) error {
 
 	return nil
 }
+
+func (r *UserPostgres) GetUserByPhone(phone string) (models.Users, error) {
+	var user models.Users
+
+	query := fmt.Sprintf(`
+		SELECT us.id, us.name, us.surname, us.patronymic, us.email, us.phone, us.bio, us.photo, us.current_salary, 
+	   	(
+			SELECT array_remove(array_agg(rl.name), NULL)
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id
+		) AS roles
+		FROM %s us
+		WHERE us.phone = $1`, database.UsersRoleTable, database.RoleTable, database.UserTable)
+
+	row := r.db.QueryRow(query, phone)
+	err := row.Scan(&user.Id, &user.Name, &user.Surname, &user.Patronymic, &user.Email, &user.Phone, &user.Bio, &user.Photo, &user.CurSalary, pq.Array(&user.Roles))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Users{}, domain.NewErrorResponse(404, "user not found")
+		}
+
+		return models.Users{}, err
+	}
+
+	if user.Roles == nil {
+		return models.Users{}, domain.NewErrorResponse(500, "the user does not have any roles")
+	}
+
+	return user, nil
+}

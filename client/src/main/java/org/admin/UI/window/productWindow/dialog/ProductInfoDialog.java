@@ -105,6 +105,7 @@ public class ProductInfoDialog extends Main {
 
             Validation priceValidation = new PriceValidation(priceStr);
             Validation countValidation = new CountValidation(countStr);
+            if (name.isEmpty()) {messageLabel.setText("Название не может быть пустым"); return;}
             if(!priceValidation.validate()) {messageLabel.setText("Прайс должен быть числом"); return;}
             if(!countValidation.validate()) {messageLabel.setText("Количество должно быть числом"); return;}
 
@@ -119,7 +120,8 @@ public class ProductInfoDialog extends Main {
 
             Response response = UpdateProduct.updateInfo(token, newProduct);
             if(response.getCode() != 200){messageLabel.setText(response.getMsg()); return;}
-            messageLabel.setText("Сохранено");
+            dialog.close();
+            AdminController.loadProductsWindow(node);
         });
 
 

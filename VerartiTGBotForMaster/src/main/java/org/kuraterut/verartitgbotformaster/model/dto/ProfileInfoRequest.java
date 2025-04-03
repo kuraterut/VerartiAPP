@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfileInfoRequest {
-    private String name;
     private String surname;
+    private String name;
     private String patronymic;
 }

@@ -6,8 +6,12 @@ var (
 	AdminRole  = "ADMIN"
 
 	// Transaction Types
-	TransactionProduct = "PRODUCT"
-	TransactionOption  = "OPTION"
+	TransactionProduct     = "PRODUCT"
+	TransactionAppointment = "APPOINTMENT"
 
 	StatusOK = "OK"
+
+	// appointment status
+	StatusWaiting   = "WAITING"
+	StatusCompleted = "COMPLETED"
 )

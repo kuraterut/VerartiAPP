@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"strings"
 	"verarti/internal/domain"
 	"verarti/models"
@@ -25,6 +26,15 @@ func (r *OptionPostgres) CreateOption(option models.Option) (int, error) {
 		"VALUES ($1, $2, $3, $4) RETURNING id", database.OptionTable)
 	row := r.db.QueryRow(query, option.Name, option.Description, option.Duration, option.Price)
 	if err := row.Scan(&id); err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				if strings.Contains(pqErr.Message, "name") {
+					return 0, domain.NewErrorResponse(409, "option with this name already exists")
+				}
+			}
+		}
+
 		return 0, err
 	}
 
@@ -161,33 +171,6 @@ func (r *OptionPostgres) DeleteOption(optionId int) error {
 func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error) {
 	var id int
 
-	queryGetUser := fmt.Sprintf(`
-		SELECT us.id FROM %s us
-		WHERE us.id = $1 AND EXISTS (
-			SELECT 1
-			FROM %s AS us_rl
-			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = '%s'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
-	err := r.db.Get(&id, queryGetUser, masterId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, domain.NewErrorResponse(404, fmt.Sprintf("master with this id = %d not found", masterId))
-		}
-
-		return 0, err
-	}
-
-	queryGetOption := fmt.Sprintf("SELECT id FROM %s WHERE id = $1", database.OptionTable)
-	err = r.db.Get(&id, queryGetOption, optionId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, domain.NewErrorResponse(404, fmt.Sprintf("option with this id = %d not found", optionId))
-		}
-
-		return 0, err
-	}
-
 	queryAddOption := fmt.Sprintf("INSERT INTO %s (users_id, option_id)"+
 		"VALUES ($1, $2) RETURNING id", database.UsersOptionTable)
 	row := r.db.QueryRow(queryAddOption, masterId, optionId)
@@ -196,6 +179,20 @@ func (r *OptionPostgres) AddOptionForMaster(masterId, optionId int) (int, error)
 	}
 
 	return id, nil
+}
+
+func (r *OptionPostgres) RemoveOptionFromTheMaster(optionId, masterId int) error {
+	queryDeleteOption := fmt.Sprintf("DELETE FROM %s WHERE users_id = $1 AND option_id = $2", database.UsersOptionTable)
+	_, err := r.db.Exec(queryDeleteOption, masterId, optionId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (r *OptionPostgres) CheckingOptionsExistence(optionIds []int) error {
@@ -214,4 +211,38 @@ func (r *OptionPostgres) CheckingOptionsExistence(optionIds []int) error {
 	}
 
 	return nil
+}
+
+func (r *OptionPostgres) CheckingActiveOptionExistenceForAllUsers(optionId int) (bool, error) {
+	var exists bool
+
+	queryGetOption := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s AS app_opt
+		INNER JOIN %s AS app ON app.id = app_opt.master_appointment_id 
+		WHERE app_opt.option_id = $1 AND (
+                app.date > CURRENT_DATE OR 
+                (app.date = CURRENT_DATE AND app.start_time::time >= CURRENT_TIME)
+            ))`, database.MasterAppointmentOptionTable, database.MasterAppointmentTable)
+	err := r.db.Get(&exists, queryGetOption, optionId)
+	if err != nil {
+		return false, fmt.Errorf("failed to check active option with id = %d for all users: %w", optionId, err)
+	}
+
+	return exists, nil
+}
+
+func (r *OptionPostgres) CheckingActiveOptionExistenceForMaster(optionId, masterId int) (bool, error) {
+	var exists bool
+
+	queryGetOption := fmt.Sprintf(`SELECT EXISTS(SELECT 1 FROM %s AS app_opt
+		INNER JOIN %s AS app ON app.id = app_opt.master_appointment_id 
+		WHERE app_opt.option_id = $1 AND app.users_id = $2 AND (
+                app.date > CURRENT_DATE OR 
+                (app.date = CURRENT_DATE AND app.start_time::time >= CURRENT_TIME)
+            ))`, database.MasterAppointmentOptionTable, database.MasterAppointmentTable)
+	err := r.db.Get(&exists, queryGetOption, optionId, masterId)
+	if err != nil {
+		return false, fmt.Errorf("failed to check active option with id = %d for master with id = %d: %w", optionId, masterId, err)
+	}
+
+	return exists, nil
 }

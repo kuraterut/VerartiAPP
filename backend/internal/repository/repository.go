@@ -14,12 +14,17 @@ type Authorization interface {
 type Option interface {
 	CreateOption(option models.Option) (int, error)
 	GetAllOptions() ([]models.Option, error)
-	GetOptionsByMasterId(masterId int) ([]models.Option, error)
 	GetOptionById(optionId int) (models.Option, error)
 	UpdateOption(option models.OptionUpdate, optionId int) error
 	DeleteOption(optionId int) error
+
+	GetOptionsByMasterId(masterId int) ([]models.Option, error)
 	AddOptionForMaster(masterId, optionId int) (int, error)
+	RemoveOptionFromTheMaster(optionId, masterId int) error
+
 	CheckingOptionsExistence(optionIds []int) error
+	CheckingActiveOptionExistenceForMaster(optionId, masterId int) (bool, error)
+	CheckingActiveOptionExistenceForAllUsers(optionId int) (bool, error)
 }
 
 type Client interface {
@@ -58,16 +63,24 @@ type Transaction interface {
 type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
+	CancelMasterEntryForDate(masterId int, date string) error
+	CheckingActiveAppointmentExistenceByMasterId(masterId int) (bool, error)
+
+	CheckingAppointmentsExistence(appointmentIds []int) error
+
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
-	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
+
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
+	GetAllAppointmentsByDateAndMasterId(masterId int, date string) ([]models.AppointmentResponseForMaster, error)
+
+	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
 	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
+
 	GetMonthlySchedule(schedules []models.DaySchedule) ([]models.DaySchedule, error)
-	CancelMasterEntryForDate(masterId int, date string) error
 }
 
 type User interface {
@@ -77,11 +90,14 @@ type User interface {
 	GetAdminById(masterId int) (models.Users, error)
 	DeleteUser(userId int) error
 	CheckUsersRoles(userIds []int, role string) error
+	GetUserByPhone(phone string) (models.Users, error)
 }
 
 type Profile interface {
 	GetUserInfo(userId int) (models.Users, error)
 	UpdatePhoto(userId int, newPhoto []byte) error
+	UpdateInfo(userId int, info models.UpdateInfo) error
+	UpdatePassword(userId int, newPasswordHash, oldPasswordHash string) error
 }
 
 type Repository struct {

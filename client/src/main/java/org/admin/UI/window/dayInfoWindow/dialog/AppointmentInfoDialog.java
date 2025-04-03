@@ -66,7 +66,6 @@ public class AppointmentInfoDialog extends Main {
         commentsArea.setMaxWidth(400);
         commentsArea.setMaxHeight(200);
 
-        //TODO Оплата услуги
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
         Button cancelAppointmentBtn = new Button("Отмена Записи");
@@ -115,7 +114,6 @@ public class AppointmentInfoDialog extends Main {
             messageLabel.setText(response.getMsg());
         });
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn);
         if(appointment.getStatus() == AppointmentStatus.WAITING){
             bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
         }

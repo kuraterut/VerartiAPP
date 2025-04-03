@@ -123,6 +123,7 @@ public class AddNewClientDialog extends Main {
             if(name.isEmpty()) {errorMsg.setText("Имя не может быть пустым"); return;}
             if(surname.isEmpty()) {errorMsg.setText("Фамилия не может быть пустой"); return;}
             if(!new PhoneNumberValidation(phone).validate()) {errorMsg.setText("Некорректный формат номера телефона(+7...)"); return;}
+            if(birthday == null) {errorMsg.setText("Некорректная дата рождения"); return;}
 
             Client client = new Client();
             client.setName(name);

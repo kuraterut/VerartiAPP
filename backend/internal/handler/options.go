@@ -186,3 +186,31 @@ func (h *Handler) deleteOption(c *gin.Context) {
 
 	c.JSON(http.StatusOK, domain.StatusOK)
 }
+
+func (h *Handler) removeOptionFromTheMaster(c *gin.Context) {
+	optionId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is param")
+		return
+	}
+
+	masterId, err := strconv.Atoi(c.Query("master_id"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid is query, master_id is required")
+		return
+	}
+
+	err = h.services.Option.RemoveOptionFromTheMaster(optionId, masterId)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.StatusOK)
+}

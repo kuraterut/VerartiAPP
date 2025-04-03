@@ -26,8 +26,6 @@ import java.time.*;
 
 public class DayInfoWindow extends Main{
 	public static StackPane loadWindow(LocalDate date){
-            //TODO Протестировать транзакции
-        //TODO Обрабатывать 409 Conflict когда создается клиент, а телефон уже существует
         StackPane stackPane         = new StackPane();
         BorderPane root             = new BorderPane();
 

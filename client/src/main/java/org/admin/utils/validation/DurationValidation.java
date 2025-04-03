@@ -18,7 +18,6 @@ public class DurationValidation implements Validation {
 
         try {
             LocalTime durationLocalTime = LocalTime.of(Integer.parseInt(durationArr[0]), Integer.parseInt(durationArr[1]));
-            System.out.println(durationLocalTime);
             return durationLocalTime.getMinute() % 30 == 0 && durationLocalTime.getHour() < 14;
         } catch (DateTimeParseException e) {
             return false;

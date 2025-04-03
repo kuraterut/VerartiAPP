@@ -12,7 +12,6 @@ public class GetPhoto extends Connection {
             getConnection(avatarURL);
 
             String avatarFileName = properties.getProperty("path.avatar-photo");
-            //TODO получить filename из URL
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             BufferedWriter writer = new BufferedWriter(new FileWriter(avatarFileName));

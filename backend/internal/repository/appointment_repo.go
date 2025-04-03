@@ -315,6 +315,27 @@ func (r *AppointmentPostgres) GetAppointmentByClientId(clientId int) ([]models.M
 	return appointments, nil
 }
 
+func (r *AppointmentPostgres) CheckingActiveAppointmentExistenceByMasterId(masterId int) (bool, error) {
+	var exists bool
+
+	query := fmt.Sprintf(`
+        SELECT EXISTS (
+            SELECT 1 FROM %s 
+            WHERE users_id = $1 
+            AND (
+                date > CURRENT_DATE OR 
+                (date = CURRENT_DATE AND start_time::time >= CURRENT_TIME)
+            )
+        )`, database.MasterAppointmentTable)
+
+	err := r.db.Get(&exists, query, masterId)
+	if err != nil {
+		return false, fmt.Errorf("failed to check active appointments: %w", err)
+	}
+
+	return exists, nil
+}
+
 func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error) {
 	var (
 		appointments []models.MasterAppointment
@@ -378,6 +399,66 @@ func (r *AppointmentPostgres) GetAllAppointmentsByDate(date string) ([]models.Ma
 
 	if len(appointments) == 0 {
 		return []models.MasterAppointment{}, nil
+	}
+
+	return appointments, nil
+}
+
+func (r *AppointmentPostgres) GetAllAppointmentsByDateAndMasterId(masterId int, date string) ([]models.AppointmentResponseForMaster, error) {
+	var (
+		appointments []models.AppointmentResponseForMaster
+	)
+
+	query := fmt.Sprintf(`
+		SELECT app.id AS id, app.start_time AS start_time, TO_CHAR(app.date, 'YYYY-MM-DD') AS date, 
+		app.comment AS comment, app.client_id FROM %s AS app 
+		WHERE app.date = $1 AND app.users_id = $2`, database.MasterAppointmentTable)
+	rows, err := r.db.Query(query, date, masterId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			clientId      int
+			appointmentId int
+			appointment   models.AppointmentResponseForMaster
+			client        models.Client
+			optionNames   []string
+		)
+
+		err = rows.Scan(&appointmentId, &appointment.StartTime, &appointment.Date, &appointment.Comment, &clientId)
+		if err != nil {
+			return nil, err
+		}
+
+		client, err = r.clientPostgres.GetClientById(clientId)
+		if err != nil {
+			continue
+		}
+
+		queryGetOptions := fmt.Sprintf("SELECT opt.name "+
+			" FROM %s as opt "+
+			" INNER JOIN %s as app_opt on app_opt.option_id = opt.id"+
+			" WHERE app_opt.master_appointment_id = $1", database.OptionTable, database.MasterAppointmentOptionTable)
+		err = r.db.Select(&optionNames, queryGetOptions, appointmentId)
+		if err != nil {
+			continue
+		}
+
+		appointment.ClientName = client.Name
+		appointment.OptionNames = optionNames
+
+		appointments = append(appointments, appointment)
+	}
+
+	if len(appointments) == 0 {
+		return []models.AppointmentResponseForMaster{}, nil
 	}
 
 	return appointments, nil
@@ -590,4 +671,22 @@ func (r *AppointmentPostgres) GetMonthlySchedule(schedules []models.DaySchedule)
 func isEmptyUserStruct(user models.Users) bool {
 	zeroUser := models.Users{}
 	return reflect.DeepEqual(user, zeroUser)
+}
+
+func (r *AppointmentPostgres) CheckingAppointmentsExistence(appointmentIds []int) error {
+	var exists int
+
+	for _, appointmentId := range appointmentIds {
+		queryGetAppointment := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.MasterAppointmentTable)
+		err := r.db.Get(&exists, queryGetAppointment, appointmentId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.NewErrorResponse(404, fmt.Sprintf("appointment with this id = %d was not found", appointmentId))
+			}
+
+			return err
+		}
+	}
+
+	return nil
 }

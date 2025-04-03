@@ -81,7 +81,7 @@ public class MasterBotController extends TelegramLongPollingBot {
     private void handleMessage(Long chatId, String messageText) throws TelegramApiException {
         UserSession session = userSessionService.getSession(chatId);
 
-        if (messageText.equals("/start") || (session != null && userSessionService.isTokenExpired(session))) {
+        if (messageText.equals("/start") || (session != null && session.getAuthState() == AuthState.AUTHENTICATED && userSessionService.isTokenExpired(session, serverApiClient))) {
             startAuthentication(chatId);
             return;
         }
@@ -116,7 +116,6 @@ public class MasterBotController extends TelegramLongPollingBot {
                 try {
                     AuthResponse response = serverApiClient.authenticate(session.getPhone(), session.getPassword());
                     session.setToken(response.getToken());
-                    session.setTokenExpiration(response.getExpiresAt());
                     session.setAuthState(AuthState.AUTHENTICATED);
                     session.setCurrentMenu(BotMenu.MAIN);
                     showMainMenu(chatId);
@@ -185,7 +184,7 @@ public class MasterBotController extends TelegramLongPollingBot {
             session.setCurrentMenu(BotMenu.MAIN);
             showMainMenu(chatId);
         } catch (Exception e) {
-            sendMessage(chatId, "Не понимаю. Я жду от вас дату в формате dd.MM.yyyy", null);
+            sendMessage(chatId, "Не понимаю. Я жду от вас дату в формате dd.MM.yyyy. Ошибка: "+ e.getMessage(), null);
         }
     }
 
@@ -210,8 +209,8 @@ public class MasterBotController extends TelegramLongPollingBot {
             String[] fio = messageText.split(" ");
             if(fio.length != 3) throw new Exception("Неправильный формат ФИО");
             ProfileInfoRequest profileInfoRequest = new ProfileInfoRequest();
-            profileInfoRequest.setName(fio[0]);
-            profileInfoRequest.setSurname(fio[1]);
+            profileInfoRequest.setName(fio[1]);
+            profileInfoRequest.setSurname(fio[0]);
             if(!fio[2].equals("-")) profileInfoRequest.setPatronymic(fio[2]);
 
             serverApiClient.updateProfileInfo(session.getToken(), profileInfoRequest);

@@ -32,7 +32,6 @@ public class TransactionsInfoDialog extends Main {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Информация о Транзакциях");
 
-        //TODO протестировать инфу о транзакциях
         List<Transaction> totalTransactions = GetTransaction.getListByDate(token, date);
         List<Transaction> appointmentTransactions = GetTransaction.getListByDate(token, date, TransactionType.APPOINTMENT);
         List<Transaction> productTransactions = GetTransaction.getListByDate(token, date, TransactionType.PRODUCT);
@@ -58,7 +57,7 @@ public class TransactionsInfoDialog extends Main {
     public static Long calculateTotalAmount(List<Transaction> transactions){
         Long totalAmount = 0L;
         for(Transaction transaction : transactions){
-            totalAmount += transaction.getPurchaseAmount();
+            totalAmount += transaction.getPurchaseAmount()*transaction.getCount();
         }
         return totalAmount;
     }

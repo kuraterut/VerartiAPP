@@ -17,8 +17,8 @@ func NewTransactionService(repo *repository.Repository) *TransactionService {
 
 func (s *TransactionService) CreateTransactions(transactions []models.Transaction) error {
 	var (
-		adminIds, clientIds   []int
-		optionIds, productIds []int
+		adminIds, clientIds        []int
+		appointmentIds, productIds []int
 	)
 
 	for _, transaction := range transactions {
@@ -27,8 +27,8 @@ func (s *TransactionService) CreateTransactions(transactions []models.Transactio
 
 		if transaction.TransactionType == domain.TransactionProduct {
 			productIds = append(productIds, transaction.UnitId)
-		} else if transaction.TransactionType == domain.TransactionOption {
-			optionIds = append(optionIds, transaction.UnitId)
+		} else if transaction.TransactionType == domain.TransactionAppointment {
+			appointmentIds = append(appointmentIds, transaction.UnitId)
 		} else {
 			return domain.NewErrorResponse(400, fmt.Sprintf("invalid transaction type = %s", transaction.TransactionType))
 		}
@@ -42,7 +42,7 @@ func (s *TransactionService) CreateTransactions(transactions []models.Transactio
 		return err
 	}
 
-	if err := s.repo.Option.CheckingOptionsExistence(optionIds); err != nil {
+	if err := s.repo.Appointment.CheckingAppointmentsExistence(appointmentIds); err != nil {
 		return err
 	}
 

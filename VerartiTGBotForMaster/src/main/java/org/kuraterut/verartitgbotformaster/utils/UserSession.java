@@ -11,7 +11,6 @@ public class UserSession {
     private String phone;
     private String password;
     private String token;
-    private LocalDateTime tokenExpiration;
     private AuthState authState;
     private BotMenu currentMenu;
 

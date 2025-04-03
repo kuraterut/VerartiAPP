@@ -8,6 +8,28 @@ import (
 	"verarti/internal/domain"
 )
 
+func (h *Handler) getUserByPhone(c *gin.Context) {
+	phone := c.Query("phone")
+	if phone == "" {
+		newErrorResponse(c, http.StatusBadRequest, "phone number is required")
+		return
+	}
+
+	user, err := h.services.User.GetUserByPhone(phone)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
 func (h *Handler) getAllMasters(c *gin.Context) {
 	masters, err := h.services.User.GetAllMasters()
 	if err != nil {

@@ -23,7 +23,6 @@ public class GetUser extends Connection {
 
             List<User> admins = new ArrayList<>();
             JSONArray adminsJSON = (JSONArray) data.get("admins");
-            System.out.println(data);
             for(Object adminObj : adminsJSON){
                 JSONObject adminJSON = (JSONObject) adminObj;
                 User admin = User.fromJson(adminJSON);
@@ -104,7 +103,8 @@ public class GetUser extends Connection {
 
     public static User getByPhone(String token, String phone){
         try{
-            getConnection("http://localhost:8000/api/admin/users/phone?phone=" + phone+"&role=ADMIN");
+            String encodedPhone = URLEncoder.encode(phone, StandardCharsets.UTF_8);
+            getConnection("http://localhost:8000/api/admin/users/phone?phone=" + encodedPhone+"&role=ADMIN");
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

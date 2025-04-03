@@ -108,3 +108,11 @@ func daysInMonth(year int, monthNumber int) (int, error) {
 	month := time.Month(monthNumber)
 	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.UTC).Day(), nil
 }
+
+func (s *AppointmentService) GetAllAppointmentsByDateAndMasterId(masterId int, date string) ([]models.AppointmentResponseForMaster, error) {
+	if err := s.repo.User.CheckUsersRoles([]int{masterId}, domain.MasterRole); err != nil {
+		return nil, err
+	}
+
+	return s.repo.Appointment.GetAllAppointmentsByDateAndMasterId(masterId, date)
+}

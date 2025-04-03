@@ -14,11 +14,13 @@ type Authorization interface {
 type Option interface {
 	CreateOption(option models.Option) (int, error)
 	GetAllOptions() ([]models.Option, error)
-	GetOptionsByMasterId(masterId int) ([]models.Option, error)
 	GetOptionById(optionId int) (models.Option, error)
 	UpdateOption(option models.OptionUpdate, optionId int) error
 	DeleteOption(optionId int) error
+
+	GetOptionsByMasterId(masterId int) ([]models.Option, error)
 	AddOptionForMaster(masterId, optionId int) (int, error)
+	RemoveOptionFromTheMaster(optionId, masterId int) error
 }
 
 type Client interface {
@@ -60,6 +62,7 @@ type Appointment interface {
 	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
+	GetAllAppointmentsByDateAndMasterId(masterId int, date string) ([]models.AppointmentResponseForMaster, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
 	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
@@ -69,8 +72,8 @@ type Appointment interface {
 
 type Profile interface {
 	GetUserInfo(userId int) (models.Users, error)
-	//UpdateInfo(userId int, info models.Info) error
-	//UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
+	UpdateInfo(userId int, info models.UpdateInfo) error
+	UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
 	UpdatePhoto(userId int, newPhoto []byte) error
 }
 
@@ -80,6 +83,7 @@ type User interface {
 	GetAllAdmins() ([]models.Users, error)
 	GetAdminById(masterId int) (models.Users, error)
 	DeleteUser(userId int) error
+	GetUserByPhone(phone string) (models.Users, error)
 }
 
 type Service struct {

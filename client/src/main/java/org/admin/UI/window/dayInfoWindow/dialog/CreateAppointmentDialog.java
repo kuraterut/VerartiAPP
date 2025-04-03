@@ -99,6 +99,10 @@ public class CreateAppointmentDialog extends Main {
         cancelButton.setOnAction(event -> dialog.close());
         addServiceButton.setOnAction(event -> AddOptionToAppoinmentDialog.show(tableBox, appointment, options));
         createAppointmentButton.setOnAction(event -> {
+            if(appointment.getOptions().isEmpty()){
+                messageLabel.setText("Список услуг не может быть пустым");
+                return;
+            }
             if(DayInfoTable.calculateCellNumber(appointment.getOptions()) > calculatePossibleCellsCount(appointments, startCell)){
                 boolean userConfirmed = showTooCloseConfirmation();
                 if(!userConfirmed) return;

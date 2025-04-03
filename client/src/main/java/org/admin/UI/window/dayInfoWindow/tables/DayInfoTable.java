@@ -109,7 +109,6 @@ public class DayInfoTable extends Main {
                 if(CELLS_IN_COLUMN_COUNT - cellStart < cellNumber){cellNumber = CELLS_IN_COLUMN_COUNT - cellStart+1;}
                 Rectangle rectStart = new Rectangle(200, 40, Color.AQUAMARINE);
                 if(appointment.getStatus() == AppointmentStatus.COMPLETED) rectStart.setFill(Color.ORANGE);
-                if(appointment.getStatus() == AppointmentStatus.CANCELLED) rectStart.setFill(Color.YELLOW);
 
                 Rectangle clickRect = new Rectangle(200, 40, Color.TRANSPARENT);
                 clickRect.setOnMouseClicked(event -> AppointmentInfoDialog.show(id, clickRect));
