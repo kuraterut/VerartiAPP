@@ -66,7 +66,6 @@ public class AppointmentInfoDialog extends Main {
         commentsArea.setMaxWidth(400);
         commentsArea.setMaxHeight(200);
 
-        //TODO Оплата услуги
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
         Button cancelAppointmentBtn = new Button("Отмена Записи");

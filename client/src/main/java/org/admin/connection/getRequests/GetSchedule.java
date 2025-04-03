@@ -19,7 +19,6 @@ public class GetSchedule extends Connection {
             List<ScheduleDay> scheduleDays = new ArrayList<>();
 
             JSONObject data = getJson();
-            System.out.println(data);
             JSONArray jsonArr = (JSONArray) data.get("schedules");
 
             for(Object elemObj : jsonArr) {

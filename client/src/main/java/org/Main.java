@@ -13,7 +13,6 @@ import java.io.*;
 import java.util.*;
 import java.time.*;
 
-//TODO Проверять удаление услуги
 public class Main extends Application{
     public static Properties properties;
     public static String login;
