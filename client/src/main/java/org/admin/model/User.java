@@ -27,7 +27,6 @@ public class User extends Response {
     public User(int code, String message){
         super(code,message);
     }
-    //TODO Сделать все на Builder'ах
 
     @Override
     public String toString() {

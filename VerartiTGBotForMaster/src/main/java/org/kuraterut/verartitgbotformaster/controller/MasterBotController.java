@@ -184,7 +184,7 @@ public class MasterBotController extends TelegramLongPollingBot {
             session.setCurrentMenu(BotMenu.MAIN);
             showMainMenu(chatId);
         } catch (Exception e) {
-            sendMessage(chatId, "Не понимаю. Я жду от вас дату в формате dd.MM.yyyy", null);
+            sendMessage(chatId, "Не понимаю. Я жду от вас дату в формате dd.MM.yyyy. Ошибка: "+ e.getMessage(), null);
         }
     }
 
