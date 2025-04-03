@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"net/http"
+	"reflect"
 	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
@@ -24,26 +26,9 @@ func NewAppointmentPostgres(db *sqlx.DB, userPostgres *UserPostgres, clientPostg
 func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error {
 	var id int
 
-	queryGetAdmin := fmt.Sprintf(`
-		SELECT us.id FROM %s us
-		WHERE us.id = $1 AND EXISTS (
-			SELECT 1
-			FROM %s AS us_rl
-			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = '%s'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.AdminRole)
-	err := r.db.Get(&id, queryGetAdmin, adminShift.AdminId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.NewErrorResponse(404, "admin with this id was not found")
-		}
-
-		return err
-	}
-
 	queryGetAdminByDate := fmt.Sprintf("SELECT ad_sh.id FROM %s ad_sh "+
 		" WHERE ad_sh.date = $1", database.AdminShiftTable)
-	err = r.db.Get(&id, queryGetAdminByDate, adminShift.Date)
+	err := r.db.Get(&id, queryGetAdminByDate, adminShift.Date)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
@@ -67,23 +52,6 @@ func (r *AppointmentPostgres) PutAdminToDate(adminShift models.AdminShift) error
 func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) error {
 	var id int
 
-	queryGetMaster := fmt.Sprintf(`
-		SELECT us.id FROM %s us
-		WHERE us.id = $1 AND EXISTS (
-			SELECT 1
-			FROM %s AS us_rl
-			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = '%s'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
-	err := r.db.Get(&id, queryGetMaster, masterShift.MasterId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.NewErrorResponse(404, "master with this id was not found")
-		}
-
-		return err
-	}
-
 	query := fmt.Sprintf("INSERT INTO %s (users_id, date)"+
 		"VALUES ($1, $2) RETURNING id", database.MasterShiftTable)
 	row := r.db.QueryRow(query, masterShift.MasterId, masterShift.Date)
@@ -92,6 +60,25 @@ func (r *AppointmentPostgres) PutMasterToDate(masterShift models.MasterShift) er
 	}
 
 	return nil
+}
+
+func (r *AppointmentPostgres) CancelMasterEntryForDate(masterId int, date string) error {
+	var exists bool
+
+	queryCheckAppointmentForMaster := fmt.Sprintf(`
+		SELECT EXISTS( SELECT 1 FROM %s WHERE users_id = $1 AND date = $2)`, database.MasterAppointmentTable)
+	err := r.db.Get(&exists, queryCheckAppointmentForMaster, masterId, date)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return domain.NewErrorResponse(409, fmt.Sprintf("shift cannot be cancelled as this master = %d already has appointments", masterId))
+	}
+
+	query := fmt.Sprintf("DELETE FROM %s WHERE users_id = $1 AND date = $2", database.MasterShiftTable)
+	_, err = r.db.Exec(query, masterId, date)
+	return err
 }
 
 func (r *AppointmentPostgres) GetAdminByDate(date string) (models.Users, error) {
@@ -199,30 +186,13 @@ func (r *AppointmentPostgres) GetAllMastersByDate(date string, isAppointed bool)
 }
 
 func (r *AppointmentPostgres) CreateAppointment(appointment models.MasterAppointmentInput) (int, error) {
-	var id int
+	var id, exists int
 
-	queryGetMaster := fmt.Sprintf(`
-		SELECT us.id FROM %s us
-		WHERE us.id = $1 AND EXISTS (
-			SELECT 1
-			FROM %s AS us_rl
-			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
-			WHERE us_rl.users_id = us.id AND rl.name = '%s'
-		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, domain.MasterRole)
-	err := r.db.Get(&id, queryGetMaster, appointment.MasterId)
+	queryCheckMasterShiftByDate := fmt.Sprintf(`SELECT 1 FROM %s ms_sh WHERE ms_sh.date = $1 AND ms_sh.users_id = $2`, database.MasterShiftTable)
+	err := r.db.Get(&exists, queryCheckMasterShiftByDate, appointment.Date, appointment.MasterId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, domain.NewErrorResponse(404, "master with this id was not found")
-		}
-
-		return 0, err
-	}
-
-	queryGetClient := fmt.Sprintf(`SELECT id FROM %s WHERE id = $1`, database.ClientTable)
-	err = r.db.Get(&id, queryGetClient, appointment.ClientId)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return 0, domain.NewErrorResponse(404, "client with this id was not found")
+			return 0, domain.NewErrorResponse(409, fmt.Sprintf("master with id = %d is not assigned for this date", appointment.MasterId))
 		}
 
 		return 0, err
@@ -583,4 +553,41 @@ func (r *AppointmentPostgres) UpdateAppointmentById(appointmentId int, input mod
 	}
 
 	return tx.Commit()
+}
+
+func (r *AppointmentPostgres) GetMonthlySchedule(schedules []models.DaySchedule) ([]models.DaySchedule, error) {
+	var errorResponse *domain.ErrorResponse
+
+	for i, schedule := range schedules {
+		admin, err := r.GetAdminByDate(schedule.Date)
+		if err != nil && errors.As(err, &errorResponse) {
+			if errorResponse.Code != http.StatusNotFound {
+				return nil, err
+			}
+		}
+
+		if isEmptyUserStruct(admin) {
+			schedules[i].Admin = nil
+		} else {
+			schedules[i].Admin = &admin
+		}
+
+		masters, err := r.GetAllMastersByDate(schedule.Date, true)
+		if err != nil {
+			return nil, err
+		}
+
+		if masters != nil {
+			schedules[i].Masters = masters
+		} else {
+			schedules[i].Masters = []models.Users{}
+		}
+	}
+
+	return schedules, nil
+}
+
+func isEmptyUserStruct(user models.Users) bool {
+	zeroUser := models.Users{}
+	return reflect.DeepEqual(user, zeroUser)
 }

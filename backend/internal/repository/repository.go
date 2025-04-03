@@ -66,6 +66,8 @@ type Appointment interface {
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
 	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
+	GetMonthlySchedule(schedules []models.DaySchedule) ([]models.DaySchedule, error)
+	CancelMasterEntryForDate(masterId int, date string) error
 }
 
 type User interface {

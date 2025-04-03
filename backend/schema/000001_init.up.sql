@@ -15,7 +15,7 @@ CREATE TABLE users
     surname        varchar(255) not null,
     patronymic     varchar(255) default '',
     password_hash  varchar(255) not null,
-    email          varchar(255) unique,
+    email          varchar(255),
     phone          varchar(255) not null unique,
     bio            varchar(511) default '',
     photo          varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
