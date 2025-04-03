@@ -115,7 +115,6 @@ public class AppointmentInfoDialog extends Main {
             messageLabel.setText(response.getMsg());
         });
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn);
         if(appointment.getStatus() == AppointmentStatus.WAITING){
             bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
         }
