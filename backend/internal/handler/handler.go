@@ -63,13 +63,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				clients.PUT("/:id", h.updateClient)
 			}
 
-			feedback := admin.Group("/feedback")
-			{
-				feedback.GET("/")
-				feedback.GET("/:id")
-				feedback.POST("/")
-			}
-
 			product := admin.Group("/product")
 			{
 				product.POST("/", h.createProduct)

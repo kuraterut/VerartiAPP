@@ -96,6 +96,8 @@ type User interface {
 type Profile interface {
 	GetUserInfo(userId int) (models.Users, error)
 	UpdatePhoto(userId int, newPhoto []byte) error
+	UpdateInfo(userId int, info models.UpdateInfo) error
+	UpdatePassword(userId int, newPasswordHash, oldPasswordHash string) error
 }
 
 type Repository struct {
