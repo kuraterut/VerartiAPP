@@ -111,6 +111,10 @@ public class OptionInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
             else{messageLabel.setText(response.getMsg());}
         });
 
@@ -134,6 +138,10 @@ public class OptionInfoDialog extends Main {
 
             Response response = UpdateOption.updateInfo(token, newOption);
             if(response.getCode() == 200){messageLabel.setText("Сохранено");}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
             else{messageLabel.setText(response.getMsg());}
         });
 

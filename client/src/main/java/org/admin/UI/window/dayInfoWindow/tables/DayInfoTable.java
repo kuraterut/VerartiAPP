@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.Main;
+import org.admin.UI.window.dayInfoWindow.dialog.MasterInfoDialog;
 import org.admin.connection.getRequests.GetAppointment;
 import org.admin.UI.window.dayInfoWindow.dialog.AppointmentInfoDialog;
 import org.admin.UI.window.dayInfoWindow.dialog.CreateAppointmentDialog;
@@ -76,10 +77,19 @@ public class DayInfoTable extends Main {
             User master = GetUser.getById(token, masterId);
 
             Label masterSurnameLbl = new Label(master.getSurname());
+            Rectangle masterClieckRect = new Rectangle(200, 50, Color.TRANSPARENT);
+            masterClieckRect.setOnMouseClicked(event -> MasterInfoDialog.show(master.getId(), masterClieckRect, date));
+            masterClieckRect.setOnMouseEntered(event -> {
+                masterClieckRect.setStyle("-fx-cursor: hand; -fx-opacity: 0.2; -fx-fill: grey");
+            });
+            masterClieckRect.setOnMouseExited(event -> masterClieckRect.setStyle("-fx-fill: transparent;"));
 
             table.add(masterSurnameLbl, countColumn, 0);
+            table.add(masterClieckRect, countColumn, 0);
             GridPane.setHalignment(masterSurnameLbl, HPos.CENTER);
             GridPane.setValignment(masterSurnameLbl, VPos.CENTER);
+            GridPane.setHalignment(masterClieckRect, HPos.CENTER);
+            GridPane.setValignment(masterClieckRect, VPos.CENTER);
 
             List<Appointment> appointments = dayInfo.get(masterId);
             Set<Integer> startCellsSet = new HashSet<>();

@@ -55,9 +55,13 @@ public class PutMasterOnDateDialog extends Main {
                 if(response.getCode() == 200) {
                     dialog.close();
                     AdminController.loadDayInfoWindow(node, date);
-                } else {
-                    errorMsg.setText(response.getCode() + " " + response.getMsg());
                 }
+                if(response.getCode() == 401) {
+                    dialog.close();
+                    AdminController.loadAuthorizationWindow(node);
+                }
+                errorMsg.setText(response.getMsg());
+
             }
         });
 

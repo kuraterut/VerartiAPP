@@ -169,6 +169,9 @@ public class ProfileWindow extends Main{
                 if (file != null) {
                     System.out.println("Выбранный файл: " + file.getAbsolutePath());
                     Response response = UpdateProfile.updateProfilePhoto(token, file);
+                    if(response.getCode() == 401){
+                        AdminController.loadAuthorizationWindow(changeAvatarBtn);
+                    }
                     if(response.getCode() != 200) messageLabel.setText(response.getMsg()); return;
                 }
                 AdminController.loadProfileWindow(changeAvatarBtn);

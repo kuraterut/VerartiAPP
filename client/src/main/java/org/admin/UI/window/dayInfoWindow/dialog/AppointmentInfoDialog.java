@@ -84,7 +84,11 @@ public class AppointmentInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadDayInfoWindow(node, appointment.getDate());
             }
-            else messageLabel.setText(response.getMsg());
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
         addOptionBtn.setOnAction(event -> {
@@ -103,7 +107,11 @@ public class AppointmentInfoDialog extends Main {
 
             Response response = UpdateAppointment.updateInfo(token, appointment);
             if (response.getCode() == 200) messageLabel.setText("Сохранено");
-            else messageLabel.setText(response.getMsg());
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
         bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);

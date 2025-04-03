@@ -201,7 +201,11 @@ public class ClientInfoDialog extends Main {
             newClient.setComment(commentsArea.getText());
             Response response = UpdateClient.updateInfo(token, newClient);
             if(response.getCode() == 200){errorMsg.setText("Сохранено");}
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
         deleteButton.setOnAction(event -> {
             if(!showDeleteClientConfirmation()) return;
@@ -210,7 +214,11 @@ public class ClientInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
         appointmentsTable.setAlignment(Pos.CENTER);

@@ -1,4 +1,4 @@
-package org.admin.UI.window.enterpriseWindow.dialog.infos;
+package org.admin.UI.window.dayInfoWindow.dialog;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -10,24 +10,25 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.deleteRequests.DeleteUser;
-import org.admin.connection.getRequests.GetUser;
-import org.admin.controller.AdminController;
-import org.admin.connection.deleteRequests.DeleteOption;
-import org.admin.connection.getRequests.GetOption;
-import org.admin.connection.postRequests.AddOptionToMaster;
 import org.admin.UI.components.searchingStrings.SearchingStringOptions;
-import org.admin.model.Response;
+import org.admin.connection.deleteRequests.DeleteOption;
+import org.admin.connection.deleteRequests.DeleteUser;
+import org.admin.connection.getRequests.GetOption;
+import org.admin.connection.getRequests.GetUser;
+import org.admin.connection.postRequests.AddOptionToMaster;
+import org.admin.controller.AdminController;
 import org.admin.model.Option;
+import org.admin.model.Response;
 import org.admin.model.User;
 import org.admin.utils.HelpFuncs;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MasterInfoDialog extends Main {
-    public static void show(Long id, Node node){
+    public static void show(Long id, Node node, LocalDate date){
         User master = GetUser.getById(token, id);
 
         Stage dialog = new Stage();
@@ -39,6 +40,7 @@ public class MasterInfoDialog extends Main {
 
         Button cancelButton = new Button("Отмена");
         Button deleteMasterButton = new Button("Удалить мастера");
+        Button removeMasterFromDateButton = new Button("Снять с даты");
         Button addServiceButton = new Button("Добавить услугу");
 
         HBox btns = new HBox();
@@ -111,13 +113,13 @@ public class MasterInfoDialog extends Main {
         servicesScrollPane.setFitToHeight(true);
         servicesScrollPane.setPrefViewportHeight(300);
         servicesScrollPane.setPrefViewportWidth(500);
-        buildServiceTable(servicesScrollPane, master, dialog, node, messageLabel);
+        buildServiceTable(servicesScrollPane, master);
 
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(20);
 
-        btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton);
+        btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton, removeMasterFromDateButton);
         root.getChildren().addAll(masterInfoTabel, servicesLabel, servicesScrollPane, messageLabel, btns);
 
 
@@ -128,13 +130,22 @@ public class MasterInfoDialog extends Main {
             Response response = DeleteUser.deleteById(token, master.getId());
             if(response.getCode() == 200){
                 dialog.close();
-                AdminController.loadEnterpriseWindow(node);
+                AdminController.loadDayInfoWindow(node, date);
             }
-            if(response.getCode() == 401){
+            else{messageLabel.setText(response.getMsg());}
+        });
+
+        removeMasterFromDateButton.setOnAction(event -> {
+            if(!showRemoveMasterFromDateConfirmation(date)) return;
+            Response response = DeleteUser.removeMasterFromDate(token, id, date);
+            if(response.getCode() == 200){
                 dialog.close();
-                AdminController.loadAuthorizationWindow(node);
+                AdminController.loadDayInfoWindow(node, date);
             }
-            messageLabel.setText(response.getMsg());
+            else if(response.getCode() == 409){
+                messageLabel.setText("Нельзя снять админа пока у него есть записи!");
+            }
+            else {messageLabel.setText(response.getMsg());}
         });
 
         addServiceButton.setOnAction(event -> {
@@ -146,7 +157,7 @@ public class MasterInfoDialog extends Main {
                     notMasterOptions.add(option);
                 }
             }
-            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane, node);
+            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane);
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
@@ -155,7 +166,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<Option> options, User master, ScrollPane servicesScrollPane, Node node, Label messageLabel) {
+    private static void showChooseServiceDialog(List<Option> options, User master, ScrollPane servicesScrollPane) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -163,28 +174,24 @@ public class MasterInfoDialog extends Main {
         VBox root = new VBox();
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
+        Label errorMsg = new Label("");
         Label headerLabel = new Label("Выберите услугу");
         Button cancelButton = new Button("Отмена");
 
         VBox searchingStringServices = SearchingStringOptions.build(options, service->{
             Response response = AddOptionToMaster.post(token, master.getId(), service.getId());
             if(response.getCode() == 200){
-                buildServiceTable(servicesScrollPane, master, dialog, node, messageLabel);
+                buildServiceTable(servicesScrollPane, master);
                 dialog.close();
-            }
-            if(response.getCode() == 401){
-                dialog.close();
-                AdminController.loadAuthorizationWindow(node);
             }
             else{
-                dialog.close();
-                messageLabel.setText(response.getMsg());
+                errorMsg.setText(response.getMsg());
             }
         });
         searchingStringServices.setMaxWidth(500);
 
         cancelButton.setOnAction(event -> dialog.close());
-        root.getChildren().addAll(headerLabel, searchingStringServices, messageLabel, cancelButton);
+        root.getChildren().addAll(headerLabel, searchingStringServices, errorMsg, cancelButton);
 
         Scene dialogScene = new Scene(root, 800, 500);
 
@@ -193,7 +200,7 @@ public class MasterInfoDialog extends Main {
 
     }
 
-    private static void buildServiceTable(ScrollPane servicesScrollPane, User master, Stage dialog, Node node, Label errorMsg){
+    private static void buildServiceTable(ScrollPane servicesScrollPane, User master){
         //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
@@ -223,12 +230,8 @@ public class MasterInfoDialog extends Main {
 
             deleteService.setOnAction(event -> {
                 Response response = DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
-                if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master, dialog, node, errorMsg);}
-                if(response.getCode() == 401){
-                    dialog.close();
-                    AdminController.loadAuthorizationWindow(node);
-                }
-                errorMsg.setText(response.getMsg());
+                if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master);}
+                else{System.out.println(response.getMsg());}
             });
 
             servicesTable.addRow(index, serviceIdLabel, serviceNameLabel, servicePriceLabel, serviceDurationLabel, deleteService);
@@ -263,6 +266,24 @@ public class MasterInfoDialog extends Main {
         alert.setTitle("Предупреждение");
         alert.setHeaderText("Удаление мастера");
         alert.setContentText("Вы уверены, что хотите безвозвратно удалить мастера?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
+    }
+
+    public static boolean showRemoveMasterFromDateConfirmation(LocalDate date) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Снятие мастера с даты");
+        alert.setContentText("Вы уверены, что хотите снять мастера с даты?");
 
         // Настраиваем кнопки
         ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);

@@ -53,11 +53,14 @@ public class PutAdminOnDateDialog extends Main {
                 Long adminId = admin.getId();
                 Response response = PutAdminOnDate.post(token, adminId, date);
                 if(response.getCode() == 200) {
-                    AdminController.loadDayInfoWindow(node, date);
                     dialog.close();
-                } else {
-                    errorMsg.setText(response.getCode() + " " + response.getMsg());
+                    AdminController.loadDayInfoWindow(node, date);
                 }
+                if(response.getCode() == 401){
+                    dialog.close();
+                    AdminController.loadAuthorizationWindow(node);
+                }
+                errorMsg.setText(response.getMsg());
             }
         });
 

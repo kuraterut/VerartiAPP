@@ -155,10 +155,14 @@ public class CreateMasterDialog extends Main {
 
             Response response = CreateUser.post(token, master);
             if(response.getCode() == 200) {
-                AdminController.loadEnterpriseWindow(node);
                 dialog.close();
+                AdminController.loadEnterpriseWindow(node);
             }
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
 
