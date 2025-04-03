@@ -201,6 +201,10 @@ public class ClientInfoDialog extends Main {
             newClient.setComment(commentsArea.getText());
             Response response = UpdateClient.updateInfo(token, newClient);
             if(response.getCode() == 200){errorMsg.setText("Сохранено");}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
             else{errorMsg.setText(response.getMsg());}
         });
         deleteButton.setOnAction(event -> {

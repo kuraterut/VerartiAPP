@@ -121,10 +121,14 @@ public class CreateOptionDialog extends Main {
 
             Response response = CreateOption.post(token, option);
             if(response.getCode() == 200) {
-                AdminController.loadEnterpriseWindow(node);
                 dialog.close();
+                AdminController.loadEnterpriseWindow(node);
             }
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
 

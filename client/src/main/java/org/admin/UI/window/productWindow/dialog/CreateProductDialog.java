@@ -111,6 +111,10 @@ public class CreateProductDialog extends Main {
                 AdminController.loadProductsWindow(node);
                 dialog.close();
             }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
             else{errorMsg.setText(response.getMsg());}
         });
         btnsBox.getChildren().addAll(cancelBtn, addBtn);

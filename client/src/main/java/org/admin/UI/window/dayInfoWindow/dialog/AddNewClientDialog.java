@@ -127,6 +127,7 @@ public class AddNewClientDialog extends Main {
             client.setPhone(phone);
             client.setBirthday(birthday);
 
+            //TODO Убрать это
             Response checkInfo = client.checkInfo();
 
             if(checkInfo.getCode() == -1){
@@ -134,12 +135,16 @@ public class AddNewClientDialog extends Main {
                 return;
             }
 
-            Response addingClientResponse = CreateClient.post(token, client);
-            if(addingClientResponse.getCode() == 200) {
+            Response response = CreateClient.post(token, client);
+            if(response.getCode() == 200) {
                 AdminController.loadDayInfoWindow(node, date);
                 dialog.close();
             }
-            else{errorMsg.setText(addingClientResponse.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
 

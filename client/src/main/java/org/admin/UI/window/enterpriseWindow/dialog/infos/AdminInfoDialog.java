@@ -114,7 +114,11 @@ public class AdminInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
-            else{messageLabel.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
 

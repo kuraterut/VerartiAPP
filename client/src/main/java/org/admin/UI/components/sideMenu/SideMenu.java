@@ -95,7 +95,7 @@ public class SideMenu extends Main{
 
         mainSideMenuBtn[0].setOnAction(event -> AdminController.loadDayInfoWindow(mainSideMenuBtn[0], LocalDate.now()));
         mainSideMenuBtn[1].setOnAction(event -> AdminController.loadProductsWindow(mainSideMenuBtn[1]));
-        mainSideMenuBtn[2].setOnAction(event -> AdminController.loadCalendarOfEmployeesWindow(mainSideMenuBtn[2]));
+        mainSideMenuBtn[2].setOnAction(event -> AdminController.loadScheduleWindow(mainSideMenuBtn[2]));
         mainSideMenuBtn[3].setOnAction(event -> AdminController.loadProfileWindow(mainSideMenuBtn[3]));
         mainSideMenuBtn[4].setOnAction(event -> AdminController.loadEnterpriseWindow(mainSideMenuBtn[4]));
 

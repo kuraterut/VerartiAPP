@@ -115,7 +115,11 @@ public class CreateAppointmentDialog extends Main {
                 dialog.close();
                 AdminController.loadDayInfoWindow(node, date);
             }
-            else {messageLabel.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
         buttonsBox.getChildren().addAll(cancelButton, addServiceButton, createAppointmentButton);
