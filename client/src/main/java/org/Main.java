@@ -19,6 +19,7 @@ import java.time.*;
 //TODO Сделать ObjectMappers
 //TODO Расписать возможные действия
 //TODO В боте сделать корректную проверку на истечение токена(через запрос)
+//TODO Проверить Schedule
 public class Main extends Application{
     public static Properties properties;
     public static String login;

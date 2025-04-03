@@ -49,7 +49,7 @@ public class Transaction extends Response {
         TransactionType transactionType = TransactionType.valueOf((String) obj.get("transaction_type"));
         PaymentMethod paymentMethod = PaymentMethod.valueOf((String) obj.get("payment_method"));
         Long amount = (Long) obj.get("purchase_amount");
-        Integer count = (Integer) obj.get("count");
+        Integer count = ((Long) obj.get("count")).intValue();
         LocalDateTime timestamp = LocalDateTime.parse((String) obj.get("timestamp"));
         Long unitId = (Long) obj.get("unit_id");
         Long adminId = (Long) obj.get("admin_id");
