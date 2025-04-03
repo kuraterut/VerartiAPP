@@ -23,7 +23,6 @@ import org.admin.model.User;
 import java.io.*;
 
 
-//TODO Протестировать профиль
 public class ProfileWindow extends Main{
     public static BorderPane loadProfileWindow(){
         BorderPane root             = new BorderPane();
