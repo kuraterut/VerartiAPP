@@ -22,6 +22,7 @@ import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.putRequests.UpdateAppointment;
 import org.admin.controller.AdminController;
 import org.admin.model.*;
+import org.admin.utils.AppointmentStatus;
 import org.admin.utils.HelpFuncs;
 
 import java.time.LocalDateTime;
@@ -114,7 +115,13 @@ public class AppointmentInfoDialog extends Main {
             messageLabel.setText(response.getMsg());
         });
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
+        bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn);
+        if(appointment.getStatus() == AppointmentStatus.WAITING){
+            bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
+        }
+        else{
+            bottomBtnsBox.getChildren().addAll(closeBtn);
+        }
         bottomBtnsBox.setSpacing(50);
         bottomBtnsBox.setAlignment(Pos.CENTER);
 

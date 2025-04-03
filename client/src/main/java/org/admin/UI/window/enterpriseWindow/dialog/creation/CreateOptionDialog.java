@@ -18,6 +18,7 @@ import org.admin.controller.AdminController;
 import org.admin.connection.postRequests.CreateOption;
 import org.admin.model.Response;
 import org.admin.model.Option;
+import org.admin.utils.HelpFuncs;
 import org.admin.utils.validation.DurationValidation;
 import org.admin.utils.validation.PriceValidation;
 import org.admin.utils.validation.Validation;
@@ -107,8 +108,8 @@ public class CreateOptionDialog extends Main {
             if(!priceValidation.validate()) {errorMsg.setText("Неправильный формат прайса, должно быть целое число"); return;}
             if(!durationValidation.validate()) {errorMsg.setText("Неверный формат времени(ячейки по 30 минут)"); return;}
 
-            Long price = Long.parseLong(priceStr);;
-            LocalTime duration = LocalTime.parse(durationStr);
+            Long price = Long.parseLong(priceStr);
+            LocalTime duration = HelpFuncs.stringToLocalTime(durationStr);
 
             String description = descriptionTextArea.getText();
 

@@ -67,6 +67,12 @@ public class ChangePasswordDialog extends Main {
                 AdminController.loadProfileWindow(node);
                 return;
             }
+            if(response.getCode() == 401){messageLabel.setText("Старый пароль не подходит");}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+                return;
+            }
             messageLabel.setText(response.getMsg());
         });
 

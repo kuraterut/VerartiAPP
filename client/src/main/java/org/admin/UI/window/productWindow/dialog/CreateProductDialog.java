@@ -94,6 +94,7 @@ public class CreateProductDialog extends Main {
 
             Validation priceValidation = new PriceValidation(priceStr);
             Validation countValidation = new CountValidation(countStr);
+            if(name.isEmpty()) {errorMsg.setText("Название товара не может быть пустым");}
             if(!priceValidation.validate()) {errorMsg.setText("Неправильный формат прайса, должно быть целое число"); return;}
             if(!countValidation.validate()) {errorMsg.setText("Неправильный формат количества, должно быть целое число"); return;}
 

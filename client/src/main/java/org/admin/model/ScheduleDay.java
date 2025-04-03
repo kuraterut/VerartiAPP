@@ -42,6 +42,9 @@ public class ScheduleDay extends Response{
         if (adminJson != null){
             admin = User.fromJson(adminJson);
         }
+        else{
+            admin = new User(404, "Не назначен");
+        }
         scheduleDay.setDate(date);
         scheduleDay.setMasters(masters);
         scheduleDay.setAdmin(admin);

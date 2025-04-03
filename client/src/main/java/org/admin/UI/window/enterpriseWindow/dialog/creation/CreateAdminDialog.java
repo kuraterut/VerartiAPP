@@ -156,6 +156,10 @@ public class CreateAdminDialog extends Main {
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
+            if(response.getCode() == 409){
+                errorMsg.setText("Пользователь с таким номером уже существует");
+                return;
+            }
             if(response.getCode() == 401){
                 dialog.close();
                 AdminController.loadAuthorizationWindow(node);

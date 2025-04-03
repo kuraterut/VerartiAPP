@@ -57,11 +57,11 @@ public class MasterInfoDialog extends Main {
         Label servicesLabel     = new Label("Услуги: ");
 
         Label masterIdLabel             = new Label(master.getId().toString());
-        TextField nameTextField         = new TextField(master.getName());
-        TextField surnameTextField      = new TextField(master.getSurname());
-        TextField patronymicTextField   = new TextField(master.getPatronymic());
-        TextField phoneTextField        = new TextField(master.getPhone());
-        TextArea bioTextArea            = new TextArea(master.getBio());
+        Label nameTextField         = new Label(master.getName());
+        Label surnameTextField      = new Label(master.getSurname());
+        Label patronymicTextField   = new Label(master.getPatronymic());
+        Label phoneTextField        = new Label(master.getPhone());
+        Label bioTextArea            = new Label(master.getBio());
 
         masterInfoTabel.getColumnConstraints().add(new ColumnConstraints(150));
         masterInfoTabel.getColumnConstraints().add(new ColumnConstraints(200));
@@ -132,6 +132,14 @@ public class MasterInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadDayInfoWindow(node, date);
             }
+            if(response.getCode() == 409){
+                messageLabel.setText("Нельзя удалить мастера пока у него есть записи!");
+                return;
+            }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
             else{messageLabel.setText(response.getMsg());}
         });
 
@@ -142,9 +150,15 @@ public class MasterInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadDayInfoWindow(node, date);
             }
-            else if(response.getCode() == 409){
-                messageLabel.setText("Нельзя снять админа пока у него есть записи!");
+            if(response.getCode() == 409){
+                messageLabel.setText("Нельзя снять мастера пока у него есть записи!");
+                return;
             }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+
             else {messageLabel.setText(response.getMsg());}
         });
 

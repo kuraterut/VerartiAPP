@@ -72,7 +72,10 @@ public class AuthorizationWindow extends Main {
                 }
 
                 AuthResponse authResponse = Connection.checkAuthAndGetToken(login, password, UserRole.ADMIN);
-
+                if(authResponse.getCode() == 401){
+                        lblErr.setText("Неверный логин или пароль");
+                        return;
+                }
                 if(authResponse.getCode() != 200){
                     lblErr.setText(authResponse.getMsg());
                     return;

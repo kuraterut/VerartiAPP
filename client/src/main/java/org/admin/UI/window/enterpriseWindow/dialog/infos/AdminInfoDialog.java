@@ -46,11 +46,11 @@ public class AdminInfoDialog extends Main {
         Label bioLabel          = new Label("Биография: ");
 
         Label adminIdLabel             = new Label(admin.getId().toString());
-        TextField nameTextField         = new TextField(admin.getName());
-        TextField surnameTextField      = new TextField(admin.getSurname());
-        TextField patronymicTextField   = new TextField(admin.getPatronymic());
-        TextField phoneTextField        = new TextField(admin.getPhone());
-        TextArea bioTextArea            = new TextArea(admin.getBio());
+        Label nameTextField         = new Label(admin.getName());
+        Label surnameTextField      = new Label(admin.getSurname());
+        Label patronymicTextField   = new Label(admin.getPatronymic());
+        Label phoneTextField        = new Label(admin.getPhone());
+        Label bioTextArea            = new Label(admin.getBio());
 
         infoTable.getColumnConstraints().add(new ColumnConstraints(150));
         infoTable.getColumnConstraints().add(new ColumnConstraints(200));

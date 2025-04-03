@@ -128,12 +128,12 @@ public class OptionInfoDialog extends Main {
             Validation priceValidation = new PriceValidation(newPriceStr);
             Validation durationValidation = new DurationValidation(newDurationStr);
             if(!priceValidation.validate()) {messageLabel.setText("Неправильный формат прайса, должно быть целое число"); return;}
-            if(!durationValidation.validate()) {messageLabel.setText("Неправильный формат количества, должно быть целое число"); return;}
+            if(!durationValidation.validate()) {messageLabel.setText("Неправильный формат времени, должно быть HH:mm"); return;}
 
             newOption.setId(option.getId());
             newOption.setName(newName);
             newOption.setPrice(Long.valueOf(newPriceStr));
-            newOption.setDuration(LocalTime.parse(newDurationStr));
+            newOption.setDuration(HelpFuncs.stringToLocalTime(newDurationStr));
             newOption.setDescription(newDescription);
 
             Response response = UpdateOption.updateInfo(token, newOption);

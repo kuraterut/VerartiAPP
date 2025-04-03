@@ -23,21 +23,11 @@ public class HelpFuncs {
         return dateTime.format(formatter);
     }
 
-    public static boolean checkPhone(String phone) {
-        if (phone.length() == 12 && phone.startsWith("+7")){
-            for(int i = 1; i < 12; i++){
-                if(!Character.isDigit(phone.charAt(i))){
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
+    public static LocalTime stringToLocalTime(String time) {
+        String[] times = time.split(":");
+        return LocalTime.of(Integer.parseInt(times[0]), Integer.parseInt(times[1]));
     }
 
-    public static Boolean checkEmail(String email) {
-        return email.contains("@");
-    }
 
     public static int getDayOfWeekByStr(String date){
         int year = Integer.parseInt(date.split("-")[0]);
