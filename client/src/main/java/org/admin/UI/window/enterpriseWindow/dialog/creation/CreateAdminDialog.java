@@ -16,6 +16,7 @@ import org.admin.controller.AdminController;
 import org.admin.model.Response;
 import org.admin.model.User;
 import org.admin.utils.UserRole;
+import org.admin.utils.validation.PhoneNumberValidation;
 
 import java.util.HashSet;
 
@@ -134,6 +135,10 @@ public class CreateAdminDialog extends Main {
             String password = passwordTextField.getText();
             String bio = bioTextArea.getText();
 
+            if(name.isEmpty()) {errorMsg.setText("Имя не может быть пустым"); return;}
+            if(surname.isEmpty()) {errorMsg.setText("Фамилия не может быть пустой"); return;}
+            if(!new PhoneNumberValidation(phone).validate()) {errorMsg.setText("Некорректный формат номера телефона(+7...)"); return;}
+
             User admin = new User();
 
             admin.setName(name);
@@ -145,14 +150,6 @@ public class CreateAdminDialog extends Main {
             admin.addRole(UserRole.ADMIN);
             if(isMasterYesRadioButton.isSelected())admin.addRole(UserRole.MASTER);
             admin.setBio(bio);
-
-            Response checkInfo = admin.checkInfo();
-
-            if(checkInfo.getCode() == -1){
-                errorMsg.setText(checkInfo.getMsg());
-                return;
-            }
-
 
             Response response = CreateUser.post(token, admin);
             if(response.getCode() == 200) {
