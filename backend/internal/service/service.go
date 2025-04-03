@@ -14,11 +14,13 @@ type Authorization interface {
 type Option interface {
 	CreateOption(option models.Option) (int, error)
 	GetAllOptions() ([]models.Option, error)
-	GetOptionsByMasterId(masterId int) ([]models.Option, error)
 	GetOptionById(optionId int) (models.Option, error)
 	UpdateOption(option models.OptionUpdate, optionId int) error
 	DeleteOption(optionId int) error
+
+	GetOptionsByMasterId(masterId int) ([]models.Option, error)
 	AddOptionForMaster(masterId, optionId int) (int, error)
+	RemoveOptionFromTheMaster(optionId, masterId int) error
 }
 
 type Client interface {
