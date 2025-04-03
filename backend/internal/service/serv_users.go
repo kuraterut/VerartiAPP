@@ -1,34 +1,48 @@
 package service
 
 import (
+	"verarti/internal/domain"
 	"verarti/internal/repository"
 	"verarti/models"
 )
 
 type UserService struct {
-	repo repository.User
+	repo *repository.Repository
 }
 
-func NewUserService(repo repository.User) *UserService {
+func NewUserService(repo *repository.Repository) *UserService {
 	return &UserService{repo: repo}
 }
 
 func (s *UserService) GetAllMasters() ([]models.Users, error) {
-	return s.repo.GetAllMasters()
+	return s.repo.User.GetAllMasters()
 }
 
 func (s *UserService) GetMasterById(masterId int) (models.Users, error) {
-	return s.repo.GetMasterById(masterId)
+	return s.repo.User.GetMasterById(masterId)
 }
 
 func (s *UserService) GetAllAdmins() ([]models.Users, error) {
-	return s.repo.GetAllAdmins()
+	return s.repo.User.GetAllAdmins()
 }
 
 func (s *UserService) GetAdminById(masterId int) (models.Users, error) {
-	return s.repo.GetAdminById(masterId)
+	return s.repo.User.GetAdminById(masterId)
 }
 
 func (s *UserService) DeleteUser(userId int) error {
-	return s.repo.DeleteUser(userId)
+	exists, err := s.repo.Appointment.CheckingActiveAppointmentExistenceByMasterId(userId)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return domain.NewErrorResponse(409, "The master cannot be deleted because he has active records")
+	}
+
+	return s.repo.User.DeleteUser(userId)
+}
+
+func (s *UserService) GetUserByPhone(phone string) (models.Users, error) {
+	return s.repo.User.GetUserByPhone(phone)
 }

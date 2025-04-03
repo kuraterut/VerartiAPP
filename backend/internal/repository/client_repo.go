@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"strings"
 	"verarti/internal/domain"
 	"verarti/models"
@@ -31,6 +32,15 @@ func (r *ClientPostgres) CreateClient(client models.Client) (int, error) {
 	row := r.db.QueryRow(queryCreateUser, client.Name, client.Surname, client.Patronymic,
 		client.Email, client.Phone, client.Comment, client.Birthday)
 	if err := row.Scan(&id); err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				if strings.Contains(pqErr.Message, "phone") {
+					return 0, domain.NewErrorResponse(409, "client with this phone number already exists")
+				}
+			}
+		}
+
 		return 0, err
 	}
 

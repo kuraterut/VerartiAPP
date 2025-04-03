@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"strings"
 	"verarti/internal/domain"
 	"verarti/models"
@@ -25,6 +26,15 @@ func (r *ProductPostgres) Create(product models.Product) (int, error) {
 		"VALUES ($1, $2, $3) RETURNING id", database.ProductTable)
 	row := r.db.QueryRow(createProductQuery, product.Name, product.Price, product.Count)
 	if err := row.Scan(&id); err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				if strings.Contains(pqErr.Message, "name") {
+					return 0, domain.NewErrorResponse(409, "product with this name already exists")
+				}
+			}
+		}
+
 		return 0, err
 	}
 

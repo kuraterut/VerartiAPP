@@ -60,6 +60,7 @@ type Appointment interface {
 	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
+	GetAllAppointmentsByDateAndMasterId(masterId int, date string) ([]models.AppointmentResponseForMaster, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
 	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
@@ -80,6 +81,7 @@ type User interface {
 	GetAllAdmins() ([]models.Users, error)
 	GetAdminById(masterId int) (models.Users, error)
 	DeleteUser(userId int) error
+	GetUserByPhone(phone string) (models.Users, error)
 }
 
 type Service struct {

@@ -11,6 +11,14 @@ type MasterAppointment struct {
 	Comment   string   `json:"comment" db:"comment"`
 }
 
+type AppointmentResponseForMaster struct {
+	ClientName  string   `json:"client_name"`
+	OptionNames []string `json:"option_names"`
+	StartTime   string   `json:"start_time" db:"start_time"`
+	Date        string   `json:"date" db:"date"`
+	Comment     string   `json:"comment" db:"comment"`
+}
+
 type MasterAppointmentInput struct {
 	Id        int    `json:"-"`
 	ClientId  int    `json:"client_id" binding:"required"`

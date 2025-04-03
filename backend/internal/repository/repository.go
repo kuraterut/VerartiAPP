@@ -58,16 +58,22 @@ type Transaction interface {
 type Appointment interface {
 	PutAdminToDate(adminShift models.AdminShift) error
 	PutMasterToDate(masterShift models.MasterShift) error
+	CancelMasterEntryForDate(masterId int, date string) error
+	CheckingActiveAppointmentExistenceByMasterId(masterId int) (bool, error)
+
 	GetAdminByDate(date string) (models.Users, error)
 	GetAllMastersByDate(date string, isAppointed bool) ([]models.Users, error)
-	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
+
 	GetAppointmentByClientId(clientId int) ([]models.MasterAppointment, error)
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
+	GetAllAppointmentsByDateAndMasterId(masterId int, date string) ([]models.AppointmentResponseForMaster, error)
+
+	CreateAppointment(appointment models.MasterAppointmentInput) (int, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
 	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
+
 	GetMonthlySchedule(schedules []models.DaySchedule) ([]models.DaySchedule, error)
-	CancelMasterEntryForDate(masterId int, date string) error
 }
 
 type User interface {
@@ -77,6 +83,7 @@ type User interface {
 	GetAdminById(masterId int) (models.Users, error)
 	DeleteUser(userId int) error
 	CheckUsersRoles(userIds []int, role string) error
+	GetUserByPhone(phone string) (models.Users, error)
 }
 
 type Profile interface {
