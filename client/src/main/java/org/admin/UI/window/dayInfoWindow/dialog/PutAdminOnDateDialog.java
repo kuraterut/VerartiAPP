@@ -37,7 +37,6 @@ public class PutAdminOnDateDialog extends Main {
 
 
         Button cancelBtn = new Button("Отмена");
-        Button createAdminBtn = new Button("Создать Админа");
         HBox btnsBox = new HBox();
 
         btnsBox.setSpacing(50);
@@ -66,14 +65,10 @@ public class PutAdminOnDateDialog extends Main {
 
 
 
-        btnsBox.getChildren().addAll(cancelBtn, createAdminBtn);
+        btnsBox.getChildren().addAll(cancelBtn);
         root.getChildren().addAll(dateLbl, choosingAdmin, errorMsg, btnsBox);
 
         cancelBtn.setOnAction(event -> dialog.close());
-        createAdminBtn.setOnAction(event -> {
-            dialog.close();
-            CreateAdminDialog.show(node);
-        });
 
         Scene dialogScene = new Scene(root, 1200, 600);
         dialog.setScene(dialogScene);

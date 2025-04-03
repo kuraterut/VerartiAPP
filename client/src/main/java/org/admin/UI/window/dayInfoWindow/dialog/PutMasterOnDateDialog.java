@@ -36,7 +36,6 @@ public class PutMasterOnDateDialog extends Main {
 
 
         Button cancelBtn = new Button("Отмена");
-        Button createMasterBtn = new Button("Создать нового мастера");
         HBox btnsBox = new HBox();
 
         btnsBox.setSpacing(50);
@@ -67,14 +66,10 @@ public class PutMasterOnDateDialog extends Main {
 
 
 
-        btnsBox.getChildren().addAll(cancelBtn, createMasterBtn);
+        btnsBox.getChildren().addAll(cancelBtn);
         root.getChildren().addAll(dateLbl, choosingMaster, errorMsg, btnsBox);
 
         cancelBtn.setOnAction(event -> dialog.close());
-        createMasterBtn.setOnAction(event -> {
-            dialog.close();
-            CreateMasterDialog.show(node);
-        });
 
 
 

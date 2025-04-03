@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetSchedule extends Connection {
-    public static List<ScheduleDay> getListByMonthAndYear(String token, int month, int year) {
+    public static List<ScheduleDay> getListByMonthAndYear(String token, int year, int month) {
         try{
-            getConnection("http://localhost:8000/api/admin/schedule?month=" + month + "&year=" + year);
+            getConnection("http://localhost:8000/api/admin/appointment/schedule?month=" + month + "&year=" + year);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -19,7 +19,8 @@ public class GetSchedule extends Connection {
             List<ScheduleDay> scheduleDays = new ArrayList<>();
 
             JSONObject data = getJson();
-            JSONArray jsonArr = (JSONArray) data.get("schedule");
+            System.out.println(data);
+            JSONArray jsonArr = (JSONArray) data.get("schedules");
 
             for(Object elemObj : jsonArr) {
                 JSONObject elem = (JSONObject)elemObj;

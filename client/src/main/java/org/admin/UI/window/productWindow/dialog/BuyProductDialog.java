@@ -81,10 +81,13 @@ public class BuyProductDialog extends Main {
             }
             User admin = GetUser.getByPhone(token, Main.login);
             if(admin.getCode() != 200) {
-                messageLabel.setText(admin.getMsg());
+                messageLabel.setText("Админ не назначен");
                 return;
             }
-
+            if(chosenProducts.isEmpty()){
+                messageLabel.setText("Список товаров для покупки не может быть пустым");
+                return;
+            }
             ProductsPaymentDialog.show(chosenProducts, admin, client, node, dialog);
         });
 

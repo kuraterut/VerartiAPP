@@ -13,9 +13,12 @@ public class DurationValidation implements Validation {
     @Override
     public boolean validate() {
         if(duration == null || duration.isEmpty()) return false;
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String[] durationArr = duration.split(":");
+        if(durationArr.length != 2) return false;
+
         try {
-            LocalTime durationLocalTime = LocalTime.parse(duration, inputFormatter);
+            LocalTime durationLocalTime = LocalTime.of(Integer.parseInt(durationArr[0]), Integer.parseInt(durationArr[1]));
+            System.out.println(durationLocalTime);
             return durationLocalTime.getMinute() % 30 == 0 && durationLocalTime.getHour() < 14;
         } catch (DateTimeParseException e) {
             return false;
