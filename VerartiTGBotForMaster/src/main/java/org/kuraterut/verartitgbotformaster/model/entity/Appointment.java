@@ -38,7 +38,8 @@ public class Appointment {
         for (String optionName : optionNames){
             str.append(optionName).append(";\n");
         }
-        str.append(comment).append("\n\n");
+        str.append("\n");
+        str.append("Комментарий: ").append(comment).append("\n\n");
         return str.toString();
     }
 }
