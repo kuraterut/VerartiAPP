@@ -104,7 +104,8 @@ public class GetUser extends Connection {
 
     public static User getByPhone(String token, String phone){
         try{
-            getConnection("http://localhost:8000/api/admin/users/phone?phone=" + phone+"&role=ADMIN");
+            String encodedPhone = URLEncoder.encode(phone, StandardCharsets.UTF_8);
+            getConnection("http://localhost:8000/api/admin/users/phone?phone=" + encodedPhone+"&role=ADMIN");
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
