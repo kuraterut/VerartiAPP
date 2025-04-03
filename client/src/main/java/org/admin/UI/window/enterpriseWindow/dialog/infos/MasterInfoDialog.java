@@ -10,25 +10,25 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.deleteRequests.DeleteUser;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.deleteRequests.DeleteMaster;
 import org.admin.connection.deleteRequests.DeleteOption;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.postRequests.AddOptionToMaster;
-import org.admin.connection.putRequests.UpdateMaster;
 import org.admin.UI.components.searchingStrings.SearchingStringOptions;
-import org.admin.model.Master;
 import org.admin.model.Response;
 import org.admin.model.Option;
+import org.admin.model.User;
 import org.admin.utils.HelpFuncs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MasterInfoDialog extends Main {
     public static void show(Long id, Node node){
-        Master master = GetMaster.getById(token, id);
+        User master = GetUser.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -55,11 +55,11 @@ public class MasterInfoDialog extends Main {
         Label servicesLabel     = new Label("Услуги: ");
 
         Label masterIdLabel             = new Label(master.getId().toString());
-        TextField nameTextField         = new TextField(master.getName());
-        TextField surnameTextField      = new TextField(master.getSurname());
-        TextField patronymicTextField   = new TextField(master.getPatronymic());
-        TextField phoneTextField        = new TextField(master.getPhone());
-        TextArea bioTextArea            = new TextArea(master.getBio());
+        Label nameTextField         = new Label(master.getName());
+        Label surnameTextField      = new Label(master.getSurname());
+        Label patronymicTextField   = new Label(master.getPatronymic());
+        Label phoneTextField        = new Label(master.getPhone());
+        Label bioTextArea            = new Label(master.getBio());
 
         masterInfoTabel.getColumnConstraints().add(new ColumnConstraints(150));
         masterInfoTabel.getColumnConstraints().add(new ColumnConstraints(200));
@@ -68,7 +68,7 @@ public class MasterInfoDialog extends Main {
         masterInfoTabel.getRowConstraints().add(new RowConstraints(50));
         masterInfoTabel.getRowConstraints().add(new RowConstraints(50));
         masterInfoTabel.getRowConstraints().add(new RowConstraints(50));
-        masterInfoTabel.getRowConstraints().add(new RowConstraints(150));
+        masterInfoTabel.getRowConstraints().add(new RowConstraints(100));
 
         masterInfoTabel.addColumn(0,
                 idLabel, nameLabel, surnameLabel, patronymicLabel, phoneLabel, bioLabel);
@@ -101,32 +101,40 @@ public class MasterInfoDialog extends Main {
         GridPane.setValignment(phoneTextField, VPos.CENTER);
         GridPane.setHalignment(bioTextArea, HPos.CENTER);
         GridPane.setValignment(bioTextArea, VPos.CENTER);
+
         masterInfoTabel.setAlignment(Pos.CENTER);
 
 
-        VBox servicesBox = new VBox();
-        servicesBox.setSpacing(20);
-        servicesBox.setAlignment(Pos.CENTER);
 
-        servicesBox.getChildren().addAll(servicesLabel, buildServiceTable(master, servicesBox));
+        ScrollPane servicesScrollPane = new ScrollPane();
+        servicesScrollPane.setFitToWidth(true);
+        servicesScrollPane.setFitToHeight(true);
+        servicesScrollPane.setPrefViewportHeight(300);
+        servicesScrollPane.setPrefViewportWidth(500);
+        buildServiceTable(servicesScrollPane, master, dialog, node, messageLabel);
+
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(20);
 
         btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton);
-        root.getChildren().addAll(masterInfoTabel, servicesBox, messageLabel, btns);
+        root.getChildren().addAll(masterInfoTabel, servicesLabel, servicesScrollPane, messageLabel, btns);
 
 
         cancelButton.setOnAction(event -> dialog.close());
 
         deleteMasterButton.setOnAction(event -> {
-            //TODO ALERT DELETE
-            Response response = DeleteMaster.deleteById(token, master.getId());
+            if(!showDeleteMasterConfirmation()) return;
+            Response response = DeleteUser.deleteById(token, master.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
-            else{messageLabel.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
         addServiceButton.setOnAction(event -> {
@@ -138,7 +146,7 @@ public class MasterInfoDialog extends Main {
                     notMasterOptions.add(option);
                 }
             }
-            showChooseServiceDialog(notMasterOptions, master, servicesBox);
+            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane, node, messageLabel);
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
@@ -147,7 +155,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<Option> options, Master master, VBox servicesBox) {
+    private static void showChooseServiceDialog(List<Option> options, User master, ScrollPane servicesScrollPane, Node node, Label messageLabel) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -155,26 +163,28 @@ public class MasterInfoDialog extends Main {
         VBox root = new VBox();
         root.setSpacing(50);
         root.setAlignment(Pos.CENTER);
-        Label errorMsg = new Label("");
         Label headerLabel = new Label("Выберите услугу");
         Button cancelButton = new Button("Отмена");
 
         VBox searchingStringServices = SearchingStringOptions.build(options, service->{
             Response response = AddOptionToMaster.post(token, master.getId(), service.getId());
             if(response.getCode() == 200){
-                Label servicesBoxLabel = new Label("Услуги");
-                servicesBox.getChildren().clear();
-                servicesBox.getChildren().addAll(servicesBoxLabel, buildServiceTable(master, servicesBox));
+                buildServiceTable(servicesScrollPane, master, dialog, node, messageLabel);
                 dialog.close();
             }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
             else{
-                errorMsg.setText(response.getMsg());
+                dialog.close();
+                messageLabel.setText(response.getMsg());
             }
         });
         searchingStringServices.setMaxWidth(500);
 
         cancelButton.setOnAction(event -> dialog.close());
-        root.getChildren().addAll(headerLabel, searchingStringServices, errorMsg, cancelButton);
+        root.getChildren().addAll(headerLabel, searchingStringServices, messageLabel, cancelButton);
 
         Scene dialogScene = new Scene(root, 800, 500);
 
@@ -183,7 +193,7 @@ public class MasterInfoDialog extends Main {
 
     }
 
-    private static ScrollPane buildServiceTable(Master master, VBox tableVBox){
+    private static void buildServiceTable(ScrollPane servicesScrollPane, User master, Stage dialog, Node node, Label errorMsg){
         //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
@@ -212,10 +222,17 @@ public class MasterInfoDialog extends Main {
             Button deleteService = new Button("Удалить");
 
             deleteService.setOnAction(event -> {
-                DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
-                tableVBox.getChildren().clear();
-                Label servicesHeadLabel = new Label("Услуги: ");
-                tableVBox.getChildren().addAll(servicesHeadLabel, buildServiceTable(master, tableVBox));
+                Response response = DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
+                if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master, dialog, node, errorMsg);}
+                if(response.getCode() == 401){
+                    dialog.close();
+                    AdminController.loadAuthorizationWindow(node);
+                }
+                if(response.getCode() == 409){
+                    errorMsg.setText("Нельзя удалить мастера пока у него есть записи!");
+                    return;
+                }
+                errorMsg.setText(response.getMsg());
             });
 
             servicesTable.addRow(index, serviceIdLabel, serviceNameLabel, servicePriceLabel, serviceDurationLabel, deleteService);
@@ -237,13 +254,29 @@ public class MasterInfoDialog extends Main {
         servicesTable.getColumnConstraints().add(new ColumnConstraints(100));
         servicesTable.getColumnConstraints().add(new ColumnConstraints(100));
         servicesTable.setGridLinesVisible(true);
+        servicesTable.setAlignment(Pos.CENTER);
 
+        servicesScrollPane.setContent(servicesTable);
         ScrollPane root = new ScrollPane(servicesTable);
         root.setFitToHeight(true);
         root.setFitToWidth(true);
-        root.setPrefViewportHeight(300);
-        root.setPrefViewportWidth(500);
-        servicesTable.setAlignment(Pos.CENTER);
-        return root;
+    }
+
+    public static boolean showDeleteMasterConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Удаление мастера");
+        alert.setContentText("Вы уверены, что хотите безвозвратно удалить мастера?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
     }
 }

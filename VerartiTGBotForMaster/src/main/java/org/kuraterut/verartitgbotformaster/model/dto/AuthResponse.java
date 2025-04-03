@@ -1,11 +1,17 @@
 package org.kuraterut.verartitgbotformaster.model.dto;
 
-import lombok.Data;
+import lombok.*;
+import org.kuraterut.verartitgbotformaster.model.entity.Response;
 
 import java.time.LocalDateTime;
 
-@Data
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthResponse {
     private String token;
-    private LocalDateTime expiryDateTime;
+    private LocalDateTime expiresAt;
 }

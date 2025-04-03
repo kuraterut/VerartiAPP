@@ -33,7 +33,7 @@ public class SearchingStringProducts extends Main {
 
             ObservableList<Product> filteredListObservable = FXCollections.observableArrayList(filterClients);
             listView.setItems(filteredListObservable);
-            if(!filterClients.isEmpty() && !newValue.isEmpty()){
+            if(!filterClients.isEmpty()){
                 root.getChildren().add(listView);
             }
         });

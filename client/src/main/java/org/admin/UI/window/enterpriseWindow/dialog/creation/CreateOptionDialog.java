@@ -18,6 +18,10 @@ import org.admin.controller.AdminController;
 import org.admin.connection.postRequests.CreateOption;
 import org.admin.model.Response;
 import org.admin.model.Option;
+import org.admin.utils.HelpFuncs;
+import org.admin.utils.validation.DurationValidation;
+import org.admin.utils.validation.PriceValidation;
+import org.admin.utils.validation.Validation;
 
 import java.time.LocalTime;
 
@@ -96,23 +100,16 @@ public class CreateOptionDialog extends Main {
         cancelBtn.setOnAction(event -> dialog.close());
         addBtn.setOnAction(event -> {
             String name = nameTextField.getText();
-            //TODO Сделать нормальную проверку
-            Long price = 0L;
-            try{price = Long.parseLong(priceTextField.getText());}
-            catch (Exception e){errorMsg.setText("Неверно указана цена"); return;}
+            String priceStr = priceTextField.getText();
+            String durationStr = durationTextField.getText();
 
-            LocalTime duration = null;
-            try{
-                String durationHoursStr = durationTextField.getText().split(":")[0];
-                String durationMinutesStr = durationTextField.getText().split(":")[1];
-                Integer durationHours = Integer.parseInt(durationHoursStr);
-                Integer durationMinutes = Integer.parseInt(durationMinutesStr);
-                if(durationMinutes % 30 != 0){errorMsg.setText("Неверный формат времени(ячейки по 30 минут)"); return;}
-                duration = LocalTime.of(durationHours, durationMinutes);
-            }catch (Exception e){
-                errorMsg.setText("Неверный формат времени(ячейки по 30 минут)");
-                return;
-            }
+            Validation priceValidation = new PriceValidation(priceStr);
+            Validation durationValidation = new DurationValidation(durationStr);
+            if(!priceValidation.validate()) {errorMsg.setText("Неправильный формат прайса, должно быть целое число"); return;}
+            if(!durationValidation.validate()) {errorMsg.setText("Неверный формат времени(ячейки по 30 минут)"); return;}
+
+            Long price = Long.parseLong(priceStr);
+            LocalTime duration = HelpFuncs.stringToLocalTime(durationStr);
 
             String description = descriptionTextArea.getText();
 
@@ -125,10 +122,14 @@ public class CreateOptionDialog extends Main {
 
             Response response = CreateOption.post(token, option);
             if(response.getCode() == 200) {
-                AdminController.loadEnterpriseWindow(node);
                 dialog.close();
+                AdminController.loadEnterpriseWindow(node);
             }
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
 

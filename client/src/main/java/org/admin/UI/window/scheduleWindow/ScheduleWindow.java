@@ -3,8 +3,6 @@ package org.admin.UI.window.scheduleWindow;
 import org.Main;
 import org.admin.connection.getRequests.GetSchedule;
 import org.admin.controller.AdminController;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.UI.components.sideMenu.SideMenu;
 
 import javafx.scene.control.*;
@@ -15,10 +13,11 @@ import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 import javafx.geometry.*;
 import javafx.collections.*;
-import org.admin.model.Admin;
-import org.admin.model.Master;
 import org.admin.model.ScheduleDay;
+import org.admin.model.User;
 import org.admin.utils.HelpFuncs;
+import org.admin.utils.validation.Validation;
+import org.admin.utils.validation.YearValidation;
 
 import java.io.*;
 import java.util.*;
@@ -68,15 +67,15 @@ public class ScheduleWindow extends Main{
             Label dayLbl = new Label(String.valueOf(day));
 
             LocalDate date = scheduleDay.getDate();
-            Admin admin = scheduleDay.getAdmin();
-            List<Master> masters = scheduleDay.getMasters();
+            User admin = scheduleDay.getAdmin();
+            List<User> masters = scheduleDay.getMasters();
             VBox cellInfo = new VBox();
             cellInfo.setAlignment(Pos.CENTER);
 
             Label adminLbl = new Label(admin.getCode()!=200?"Не назначен":admin.getSmallFio());
             adminLbl.setFont(Font.font("Open Sans Bold"));
             cellInfo.getChildren().add(adminLbl);
-            for(Master master: masters){
+            for(User master: masters){
                 Label masterLbl = new Label(master.getSurname() + " " + master.getName().charAt(0) + ".");
                 cellInfo.getChildren().add(masterLbl);
             }
@@ -167,7 +166,8 @@ public class ScheduleWindow extends Main{
         
         monthsComboBox.setValue(monthsList.get(month));
         yearField.setText(String.valueOf(year));
-        
+
+        if(!new YearValidation(yearField.getText()).validate()) {error.setText("Некорректный год");}
         Main.calendar = buildCalendarByYM(Integer.parseInt(yearField.getText()), monthsList.indexOf(monthsComboBox.getValue())+1);
 
         centerBox.setAlignment(Pos.TOP_CENTER);
@@ -175,97 +175,61 @@ public class ScheduleWindow extends Main{
         centerBox.setSpacing(20);
 
         confirmBtn.setOnAction(event ->  {
-                centerBox.getChildren().remove(calendarBox);
-                error.setText("");
-                try{
-                    int newYear = Integer.parseInt(yearField.getText());
-                    int newMonth = monthsList.indexOf(monthsComboBox.getValue());
-                    if(newYear <= 3000 && newYear >= 2000){
-                        year = newYear;
-                        month = newMonth;
+            error.setText("");
 
-                        monthsComboBox.setValue(monthsList.get(month));
-                        yearField.setText(String.valueOf(year));
-                        Main.calendar = buildCalendarByYM(year, month+1);
-                        calendarBox.getChildren().clear();
-                        calendarBox.getChildren().addAll(prevBtn, Main.calendar, nextBtn);
-                        centerBox.getChildren().add(calendarBox);
-                    }
-                    else{
-                        error.setText("Введите корректные месяц и год");
-                    }
-                }
-                catch(Exception ex){
-                    System.out.println(ex);
-                    error.setText("Введите корректные месяц и год");
-                }
+            if(!new YearValidation(yearField.getText()).validate()) {error.setText("Некорректный год"); return;}
+            centerBox.getChildren().remove(calendarBox);
+            int newYear = Integer.parseInt(yearField.getText());
+            int newMonth = monthsList.indexOf(monthsComboBox.getValue());
+
+            year = newYear;
+            month = newMonth;
+
+            Main.calendar = buildCalendarByYM(year, month+1);
+
+            calendarBox.getChildren().clear();
+            calendarBox.getChildren().addAll(prevBtn, Main.calendar, nextBtn);
+            centerBox.getChildren().add(calendarBox);
         });
-
-
 
         nextBtn.setOnAction(event -> {
-                if(month == 11){
-                    month = 0;
-                    year++;
-                }
-                else{
-                    month++;
-                }
+            if(month == 11){
+                month = 0;
+                year++;
+            }
+            else{
+                month++;
+            }
+            if(!new YearValidation(yearField.getText()).validate()) {error.setText("Некорректный год"); return;}
+            centerBox.getChildren().remove(calendarBox);
+            error.setText("");
+            monthsComboBox.setValue(monthsList.get(month));
+            yearField.setText(String.valueOf(year));
 
-                centerBox.getChildren().remove(calendarBox);
-                error.setText("");
-                try{
-                    if(year <= 3000 && year >= 2000){
-                        monthsComboBox.setValue(monthsList.get(month));
-                        yearField.setText(String.valueOf(year));
-
-                        Main.calendar = buildCalendarByYM(year, month+1);
-                        calendarBox.getChildren().clear();
-                        calendarBox.getChildren().addAll(prevBtn, Main.calendar, nextBtn);
-                        centerBox.getChildren().add(calendarBox);
-                        monthsComboBox.setValue(monthsList.get(month));
-                        yearField.setText(String.valueOf(year));
-                    }
-                    else{
-                        error.setText("Введите корректные месяц и год");
-                    }
-                }
-                catch(Exception ex){
-                    System.out.println(ex);
-                    error.setText("Введите корректные месяц и год");
-                }
+            Main.calendar = buildCalendarByYM(year, month+1);
+            calendarBox.getChildren().clear();
+            calendarBox.getChildren().addAll(prevBtn, Main.calendar, nextBtn);
+            centerBox.getChildren().add(calendarBox);
         });
         prevBtn.setOnAction(event ->  {
-                if(month == 0){
-                    month = 11;
-                    year--;
-                }
-                else{
-                    month--;
-                }
+            if(month == 0){
+                month = 11;
+                year--;
+            }
+            else{
+                month--;
+            }
 
-                centerBox.getChildren().remove(calendarBox);
-                error.setText("");
-                try{
-                    if(year <= 3000 && year >= 2000){
-                        monthsComboBox.setValue(monthsList.get(month));
-                        yearField.setText(String.valueOf(year));
+            if(!new YearValidation(yearField.getText()).validate()) {error.setText("Некорректный год"); return;}
+            centerBox.getChildren().remove(calendarBox);
+            error.setText("");
+            monthsComboBox.setValue(monthsList.get(month));
+            yearField.setText(String.valueOf(year));
 
-                        Main.calendar = buildCalendarByYM(year, month+1);
-                        calendarBox.getChildren().clear();
-                        calendarBox.getChildren().addAll(prevBtn, Main.calendar, nextBtn);
-                        centerBox.getChildren().add(calendarBox);
-                        monthsComboBox.setValue(monthsList.get(month));
-                        yearField.setText(String.valueOf(year));
-                    }
-                    else{
-                        error.setText("Введите корректные месяц и год");
-                    }
-                }
-                catch(Exception ex){
-                    System.out.println(ex);
-                    error.setText("Введите корректные месяц и год");
-                }
+            Main.calendar = buildCalendarByYM(year, month+1);
+            calendarBox.getChildren().clear();
+            calendarBox.getChildren().addAll(prevBtn, Main.calendar, nextBtn);
+            centerBox.getChildren().add(calendarBox);
         });
 
         chooseMY.getChildren().addAll(monthsComboBox, yearField, confirmBtn);

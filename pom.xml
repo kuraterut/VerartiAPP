@@ -1,0 +1,17 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.kuraterut</groupId>
+    <artifactId>VerartiAPP</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging> <!-- Важно! -->
+
+    <modules>
+        <module>client</module>
+        <module>VerartiTGBotForMaster</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+</project>

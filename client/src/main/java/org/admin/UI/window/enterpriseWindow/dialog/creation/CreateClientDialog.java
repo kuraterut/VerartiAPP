@@ -18,6 +18,7 @@ import org.admin.controller.AdminController;
 import org.admin.connection.postRequests.CreateClient;
 import org.admin.model.Client;
 import org.admin.model.Response;
+import org.admin.utils.validation.PhoneNumberValidation;
 
 import java.time.LocalDate;
 
@@ -109,27 +110,31 @@ public class CreateClientDialog extends Main {
             String phone = phoneTextField.getText();
             LocalDate birthday = birthdayDatePicker.getValue();
 
-            Client client = new Client();
+            if(name.isEmpty()) {errorMsg.setText("Имя не может быть пустым"); return;}
+            if(surname.isEmpty()) {errorMsg.setText("Фамилия не может быть пустой"); return;}
+            if(!new PhoneNumberValidation(phone).validate()) {errorMsg.setText("Некорректный формат номера телефона(+7...)"); return;}
 
+            Client client = new Client();
             client.setName(name);
             client.setSurname(surname);
             client.setPatronymic(patronymic);
             client.setPhone(phone);
             client.setBirthday(birthday);
 
-            Response checkInfo = client.checkInfo();
-
-            if(checkInfo.getCode() == -1){
-                errorMsg.setText(checkInfo.getMsg());
-                return;
-            }
-
             Response response = CreateClient.post(token, client);
             if(response.getCode() == 200) {
-                AdminController.loadEnterpriseWindow(node);
                 dialog.close();
+                AdminController.loadEnterpriseWindow(node);
             }
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 409){
+                errorMsg.setText("Пользователь с таким номером уже существует");
+                return;
+            }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
 

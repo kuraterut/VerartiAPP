@@ -13,12 +13,11 @@ import java.io.*;
 import java.util.*;
 import java.time.*;
 
-//INSERT INTO users (name, surname, patronymic, password_hash, email, phone) VALUES ('Ilia', 'Kurylin', 'Artemovich', '6e73766e6a6e75347538393438767568323968726866656276383339346876756233758758c5deb39e2e1c2077a3999e1cc77b2ed109ea', 'kuraterut@yandex.ru', '+79092762462');
-
-
+//TODO Протестировать отмену назначения мастера на дату
+//TODO Сделать ObjectMappers
+//TODO В боте сделать корректную проверку на истечение токена(через запрос)
 public class Main extends Application{
     public static Properties properties;
-
     public static String login;
     public static String token; 
     public static GridPane calendar;

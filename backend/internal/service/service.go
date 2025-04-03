@@ -32,12 +32,24 @@ type Client interface {
 type Feedback interface {
 }
 
-type Resource interface {
-	Create(resource models.Resource) (int, error)
-	GetAll() ([]models.Resource, error)
-	GetById(resourceId int) (models.Resource, error)
-	GetByMasterId(masterId int) ([]models.Resource, error)
-	Add(masterId, resourceId int) (int, error)
+type Product interface {
+	Create(product models.Product) (int, error)
+	GetAll() ([]models.Product, error)
+	GetById(productId int) (models.Product, error)
+	UpdateProduct(productId int, newProduct models.ProductUpdate) error
+	DeleteProduct(productId int) error
+}
+
+type Transaction interface {
+	CreateTransactions(transactions []models.Transaction) error
+	GetAllTransactions() ([]models.Transaction, error)
+	GetTransactionById(transactionId int) (models.Transaction, error)
+	DeleteTransaction(transactionId int) error
+	GetTransactionByDate(date string) ([]models.Transaction, error)
+	GetTransactionByDateAndMethod(date, paymentMethod string) ([]models.Transaction, error)
+	GetTransactionByDateAndType(date, transactionType string) ([]models.Transaction, error)
+	GetPaymentMethods() []*models.PaymentMethod
+	GetTransactionTypes() []*models.TransactionType
 }
 
 type Appointment interface {
@@ -50,6 +62,9 @@ type Appointment interface {
 	GetAllAppointmentsByDate(date string) ([]models.MasterAppointment, error)
 	GetAppointmentById(appointmentId int) (models.MasterAppointment, error)
 	DeleteAppointmentById(appointmentId int) error
+	UpdateAppointmentById(appointmentId int, input models.MasterAppointmentUpdate) error
+	GetMonthlySchedule(year, month int) ([]models.DaySchedule, error)
+	CancelMasterEntryForDate(masterId int, date string) error
 }
 
 type Profile interface {
@@ -72,20 +87,22 @@ type Service struct {
 	Authorization
 	Client
 	Feedback
-	Resource
+	Product
 	Appointment
 	User
 	Profile
+	Transaction
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Resource:      NewResourceService(repos),
+		Product:       NewProductService(repos),
 		Authorization: NewAuthService(repos),
 		Profile:       NewProfileService(repos),
 		Client:        NewClientService(repos),
 		User:          NewUserService(repos),
 		Option:        NewOptionService(repos),
 		Appointment:   NewAppointmentService(repos),
+		Transaction:   NewTransactionService(repos),
 	}
 }

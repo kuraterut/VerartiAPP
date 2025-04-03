@@ -198,3 +198,28 @@ func (r *UserPostgres) DeleteUser(userId int) error {
 
 	return nil
 }
+
+func (r *UserPostgres) CheckUsersRoles(userIds []int, role string) error {
+	var exists int
+
+	for _, userId := range userIds {
+		queryGetUser := fmt.Sprintf(`
+		SELECT 1 FROM %s us
+		WHERE us.id = $1 AND EXISTS (
+			SELECT 1
+			FROM %s AS us_rl
+			LEFT JOIN %s AS rl ON rl.id = us_rl.role_id
+			WHERE us_rl.users_id = us.id AND rl.name = '%s'
+		)`, database.UserTable, database.UsersRoleTable, database.RoleTable, role)
+		err := r.db.Get(&exists, queryGetUser, userId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.NewErrorResponse(404, fmt.Sprintf("user with this id = %d and with role = %s was not found", userId, role))
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}

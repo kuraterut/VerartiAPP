@@ -1,10 +1,10 @@
 package org.admin.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class Response{
 	private Integer code;
 	private String msg;
@@ -12,10 +12,5 @@ public class Response{
 	public Response(){
 		this.code = 404;
 		this.msg = "Ошибка подключения";
-	}
-
-	public Response(Integer code, String msg){
-		this.code = code;
-		this.msg = msg;
 	}
 }

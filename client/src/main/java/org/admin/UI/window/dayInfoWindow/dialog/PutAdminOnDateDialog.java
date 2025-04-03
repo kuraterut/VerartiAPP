@@ -10,13 +10,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.postRequests.PutAdminOnDate;
 import org.admin.UI.components.searchingStrings.SearchingStringAdmins;
 import org.admin.UI.window.enterpriseWindow.dialog.creation.CreateAdminDialog;
-import org.admin.model.Admin;
 import org.admin.model.Response;
+import org.admin.model.User;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +37,6 @@ public class PutAdminOnDateDialog extends Main {
 
 
         Button cancelBtn = new Button("Отмена");
-        Button createAdminBtn = new Button("Создать Админа");
         HBox btnsBox = new HBox();
 
         btnsBox.setSpacing(50);
@@ -47,30 +46,29 @@ public class PutAdminOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
-        List<Admin> adminsNotOnDate = GetAdmin.getAll(token);
+        List<User> adminsNotOnDate = GetUser.getAllAdmins(token);
         VBox choosingAdmin = SearchingStringAdmins.build(adminsNotOnDate, admin -> {
             if(admin != null) {
                 Long adminId = admin.getId();
                 Response response = PutAdminOnDate.post(token, adminId, date);
                 if(response.getCode() == 200) {
-                    AdminController.loadDayInfoWindow(node, date);
                     dialog.close();
-                } else {
-                    errorMsg.setText(response.getCode() + " " + response.getMsg());
+                    AdminController.loadDayInfoWindow(node, date);
                 }
+                if(response.getCode() == 401){
+                    dialog.close();
+                    AdminController.loadAuthorizationWindow(node);
+                }
+                errorMsg.setText(response.getMsg());
             }
         });
 
 
 
-        btnsBox.getChildren().addAll(cancelBtn, createAdminBtn);
+        btnsBox.getChildren().addAll(cancelBtn);
         root.getChildren().addAll(dateLbl, choosingAdmin, errorMsg, btnsBox);
 
         cancelBtn.setOnAction(event -> dialog.close());
-        createAdminBtn.setOnAction(event -> {
-            dialog.close();
-            CreateAdminDialog.show(node);
-        });
 
         Scene dialogScene = new Scene(root, 1200, 600);
         dialog.setScene(dialogScene);

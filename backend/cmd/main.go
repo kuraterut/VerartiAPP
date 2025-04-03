@@ -41,7 +41,10 @@ func main() {
 		logrus.Fatalf("failed to initialize minio client: %s", err.Error())
 	}
 
-	repos := repository.NewRepository(db, minio)
+	repos, err := repository.NewRepository(db, minio)
+	if err != nil {
+		logrus.Fatalf("repository initialization error: %s", err.Error())
+	}
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 

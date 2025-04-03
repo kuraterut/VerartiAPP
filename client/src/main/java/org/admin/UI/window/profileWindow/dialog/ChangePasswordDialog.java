@@ -14,11 +14,11 @@ import javafx.stage.Stage;
 import org.Main;
 import org.admin.connection.putRequests.UpdateProfile;
 import org.admin.controller.AdminController;
-import org.admin.model.Admin;
 import org.admin.model.Response;
+import org.admin.model.User;
 
 public class ChangePasswordDialog extends Main {
-    public static void show(Admin admin, Node node){
+    public static void show(User admin, Node node){
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Смена пароля");
@@ -65,6 +65,12 @@ public class ChangePasswordDialog extends Main {
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadProfileWindow(node);
+                return;
+            }
+            if(response.getCode() == 401){messageLabel.setText("Старый пароль не подходит");}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
                 return;
             }
             messageLabel.setText(response.getMsg());

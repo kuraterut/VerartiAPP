@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.UI.components.searchingStrings.SearchingStringClients;
 import org.admin.controller.AdminController;
 import org.admin.connection.getRequests.GetClient;
 import org.admin.connection.getRequests.GetOption;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CreateAppointmentDialog extends Main {
-    public static void show(Master master, LocalDate date, Integer startCell, List<Appointment> appointments, Node node){
+    public static void show(User master, LocalDate date, Integer startCell, List<Appointment> appointments, Node node){
         Appointment appointment = new Appointment();
         appointment.setOptions(new ArrayList<>());
 
@@ -59,10 +60,25 @@ public class CreateAppointmentDialog extends Main {
         commentsArea.setPrefWidth(400);
         commentsArea.setPrefHeight(200);
 
-        TextField clientPhoneTextField = new TextField();
+//        TextField clientPhoneTextField = new TextField();
 
         HBox clientPhoneBox = new HBox(20);
-        clientPhoneBox.getChildren().addAll(clientPhoneLabel, clientPhoneTextField);
+        Client client = new Client();
+        client.setCode(404);
+        client.setMsg("Клиент не выбран");
+        VBox searchingStringClient = SearchingStringClients.build(GetClient.getAll(token), chosenClient -> {
+            client.setId(chosenClient.getId());
+            client.setName(chosenClient.getName());
+            client.setSurname(chosenClient.getSurname());
+            client.setPatronymic(chosenClient.getPatronymic());
+            client.setPhone(chosenClient.getPhone());
+            client.setBirthday(chosenClient.getBirthday());
+            client.setComment(chosenClient.getComment());
+            client.setCode(200);
+        });
+        searchingStringClient.setMaxHeight(100);
+
+        clientPhoneBox.getChildren().addAll(clientPhoneLabel, searchingStringClient);
         clientPhoneBox.setAlignment(Pos.CENTER);
 
         ScrollPane table = new ScrollPane();
@@ -84,15 +100,10 @@ public class CreateAppointmentDialog extends Main {
         addServiceButton.setOnAction(event -> AddOptionToAppoinmentDialog.show(tableBox, appointment, options));
         createAppointmentButton.setOnAction(event -> {
             if(DayInfoTable.calculateCellNumber(appointment.getOptions()) > calculatePossibleCellsCount(appointments, startCell)){
-                //TODO ALERT Ячеек для записи недостаточно
                 boolean userConfirmed = showTooCloseConfirmation();
                 if(!userConfirmed) return;
             }
 
-            String clientPhone = clientPhoneTextField.getText();
-            if(!HelpFuncs.checkPhone(clientPhone)){messageLabel.setText("Некорректный номер телефона"); return;}
-            Client client = GetClient.getByPhone(token, clientPhone);
-            if(client.getCode() == 404){messageLabel.setText("Номер клиента не найден"); return;}
             if(client.getCode() != 200){messageLabel.setText(client.getMsg()); return;}
             appointment.setClient(client);
             appointment.setMaster(master);
@@ -104,7 +115,11 @@ public class CreateAppointmentDialog extends Main {
                 dialog.close();
                 AdminController.loadDayInfoWindow(node, date);
             }
-            else {messageLabel.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
         buttonsBox.getChildren().addAll(cancelButton, addServiceButton, createAppointmentButton);

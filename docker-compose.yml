@@ -68,8 +68,10 @@ services:
     build: ./VerartiTGBotForMaster
     container_name: telegram-bot
     environment:
-      - SPRING_PROFILES_ACTIVE=local # Активируем нужный профиль
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN} # Переменные из .env
+      - SPRING_PROFILES_ACTIVE=local
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN} # Обязательно
+      - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME:-Verarti_ForMaster} # Опционально
+      - SERVER_API_URL=http://backend:8000
     restart: unless-stopped
     depends_on:
       - backend # Если бот зависит от API

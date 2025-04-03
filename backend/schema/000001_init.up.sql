@@ -15,7 +15,7 @@ CREATE TABLE users
     surname        varchar(255) not null,
     patronymic     varchar(255) default '',
     password_hash  varchar(255) not null,
-    email          varchar(255) not null unique,
+    email          varchar(255),
     phone          varchar(255) not null unique,
     bio            varchar(511) default '',
     photo          varchar(511) default 'http://localhost:9000/photo/default/avatar.png',
@@ -48,7 +48,7 @@ CREATE TABLE option
     name        varchar(255) not null unique,
     description varchar(255) not null,
     duration    VARCHAR(5)   not null,
-    price       int          not null
+    price       int          not null CHECK (price >= 0)
 );
 
 CREATE TABLE users_option
@@ -68,8 +68,7 @@ CREATE TABLE status
 INSERT INTO status (name)
 VALUES ('WAITING'),   -- ждет подтверждения
        ('CONFIRMED'), -- подтвержденный
-       ('COMPLETED'), -- завершенный
-       ('CANCELLED'); -- отмененный
+       ('COMPLETED'); -- завершенный
 
 CREATE TABLE master_appointment
 (
@@ -90,24 +89,27 @@ CREATE TABLE master_appointment_option
     CONSTRAINT unique_option_master_appointment UNIQUE (option_id, master_appointment_id)
 );
 
-CREATE OR REPLACE FUNCTION clean_orphaned_appointments()
+CREATE
+OR REPLACE FUNCTION clean_orphaned_appointments()
 RETURNS TRIGGER AS $$
 BEGIN
-    DELETE FROM master_appointment
-        WHERE id IN (
-            SELECT OLD.master_appointment_id
-            WHERE NOT EXISTS (
-                SELECT 1 FROM master_appointment_option mao
-                WHERE mao.master_appointment_id = OLD.master_appointment_id
-            )
-        );
-    RETURN NULL;
+DELETE
+FROM master_appointment
+WHERE id IN (SELECT OLD.master_appointment_id
+WHERE NOT EXISTS (
+    SELECT 1 FROM master_appointment_option mao
+    WHERE mao.master_appointment_id = OLD.master_appointment_id
+    )
+    );
+RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$
+LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_clean_orphaned_appointments
-AFTER DELETE ON master_appointment_option
-FOR EACH ROW EXECUTE FUNCTION clean_orphaned_appointments();
+    AFTER DELETE
+    ON master_appointment_option
+    FOR EACH ROW EXECUTE FUNCTION clean_orphaned_appointments();
 
 CREATE TABLE admin_shift
 (
@@ -124,19 +126,12 @@ CREATE TABLE master_shift
     CONSTRAINT unique_user_date UNIQUE (users_id, date)
 );
 
-CREATE TABLE resource
+CREATE TABLE product
 (
-    id          serial       not null unique,
-    name        varchar(255) not null unique,
-    description varchar(255) not null
-);
-
-CREATE TABLE users_resource
-(
-    id          serial                                         not null unique,
-    users_id    int references users (id) on delete cascade    not null,
-    resource_id int references resource (id) on delete cascade not null,
-    CONSTRAINT unique_user_resource UNIQUE (users_id, resource_id)
+    id    serial       not null unique,
+    name  varchar(255) not null unique,
+    price int          not null CHECK (price >= 0),
+    count int default 0 CHECK (count >= 0)
 );
 
 CREATE TABLE feedback
@@ -146,4 +141,42 @@ CREATE TABLE feedback
     client_id int references client (id) on delete cascade not null,
     message   varchar(255)                                 not null,
     date      date
+);
+
+CREATE TABLE payment_method
+(
+    id   serial      not null unique,
+    name varchar(20) not null unique
+);
+
+INSERT INTO payment_method (name)
+VALUES ('CARD'),
+       ('CASH');
+
+CREATE TABLE transaction_type
+(
+    id   serial      not null unique,
+    name varchar(20) not null unique
+);
+
+INSERT INTO transaction_type (name)
+VALUES ('PRODUCT'),
+       ('OPTION');
+
+CREATE TABLE transaction
+(
+    id               serial                                       not null unique,
+    users_id         int references users (id) on delete cascade  not null,
+    client_id        int references client (id) on delete cascade not null,
+    option_id        int references option (id) on delete cascade          default NULL,
+    product_id       int references product (id) on delete cascade         default NULL,
+    payment_method   varchar(255)                                 not null,
+    transaction_type varchar(255)                                 not null,
+    purchase_amount  int                                          not null default 0 CHECK (purchase_amount >= 0),
+    count            int                                          not null default 0 CHECK (count >= 0),
+    date_and_time    timestamp                                    not null default NOW(),
+    CONSTRAINT only_one_not_null CHECK (
+        (option_id IS NOT NULL AND product_id IS NULL) OR
+        (option_id IS NULL AND product_id IS NOT NULL)
+        )
 );

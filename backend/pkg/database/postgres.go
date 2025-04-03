@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	ResourceTable                = "resource"
+	ProductTable                 = "product"
 	UserTable                    = "users"
-	UserResourceTable            = "users_resource"
+	UserProductTable             = "users_product"
 	RoleTable                    = "role"
 	UsersRoleTable               = "users_role"
 	ClientTable                  = "client"
@@ -19,6 +19,9 @@ const (
 	MasterAppointmentTable       = "master_appointment"
 	MasterAppointmentOptionTable = "master_appointment_option"
 	StatusTable                  = "status"
+	TransactionTable             = "transaction"
+	TransactionTypeTable         = "transaction_type"
+	PaymentMethodTable           = "payment_method"
 )
 
 type Config struct {

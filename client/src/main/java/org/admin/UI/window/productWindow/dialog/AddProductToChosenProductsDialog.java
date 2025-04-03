@@ -26,6 +26,7 @@ public class AddProductToChosenProductsDialog {
         Label headerLabel = new Label("Добавьте товар");
         VBox searchingStringBox = SearchingStringProducts.build(notChosenProducts, product->{
             if(product != null){
+                product.setCount(1);
                 chosenProducts.add(product);
                 dialog.close();
             }

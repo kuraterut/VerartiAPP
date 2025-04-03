@@ -22,6 +22,7 @@ import org.admin.model.Client;
 import org.admin.model.Option;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ClientInfoDialog extends Main {
     public static void show(Long clientId, Node node){
@@ -200,16 +201,24 @@ public class ClientInfoDialog extends Main {
             newClient.setComment(commentsArea.getText());
             Response response = UpdateClient.updateInfo(token, newClient);
             if(response.getCode() == 200){errorMsg.setText("Сохранено");}
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
         deleteButton.setOnAction(event -> {
-            //TODO ALERT DELETE
+            if(!showDeleteClientConfirmation()) return;
             Response response = DeleteClient.deleteById(token, client.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
-            else{errorMsg.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            errorMsg.setText(response.getMsg());
         });
 
         appointmentsTable.setAlignment(Pos.CENTER);
@@ -223,5 +232,23 @@ public class ClientInfoDialog extends Main {
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
+    }
+
+    public static boolean showDeleteClientConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Удаление клиента");
+        alert.setContentText("Вы уверены, что хотите безвозвратно удалить клиента?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
     }
 }

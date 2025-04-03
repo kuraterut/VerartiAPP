@@ -1,5 +1,6 @@
 package org.admin.controller;
 
+import org.admin.UI.window.authorizationWindow.AuthorizationWindow;
 import org.admin.UI.window.scheduleWindow.ScheduleWindow;
 import org.admin.UI.window.enterpriseWindow.EnterpriseWindow;
 import org.admin.UI.window.profileWindow.ProfileWindow;
@@ -27,7 +28,10 @@ public class AdminController {
 		node.getScene().setRoot(DayInfoWindow.loadWindow(date));	
 	}
 
-	public static void loadCalendarOfEmployeesWindow(Node node){
+	public static void loadScheduleWindow(Node node){
 		node.getScene().setRoot(ScheduleWindow.loadCalendarWindow());
+	}
+	public static void loadAuthorizationWindow(Node node){
+		node.getScene().setRoot(AuthorizationWindow.loadAuthorizationWindow());
 	}
 }

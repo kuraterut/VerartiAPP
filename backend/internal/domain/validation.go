@@ -3,11 +3,14 @@ package domain
 import (
 	"errors"
 	"time"
+	"verarti/models"
 )
 
 var (
-	ErrInvalidDateFormat = errors.New("invalid date format, expected YYYY-MM-DD")
-	ErrInvalidTimeFormat = errors.New("invalid time format, expected HH:MM")
+	ErrInvalidDateFormat      = errors.New("invalid date format, expected YYYY-MM-DD")
+	ErrInvalidTimeFormat      = errors.New("invalid time format, expected HH:MM")
+	ErrInvalidPaymentMethod   = errors.New("invalid payment method")
+	ErrInvalidTransactionType = errors.New("invalid transaction type")
 )
 
 func ValidateDateOnly(date string) error {
@@ -34,4 +37,24 @@ func ValidateTimeOnly(timeStr string) error {
 	}
 
 	return nil
+}
+
+func ValidatePaymentMethod(paymentMethod string, availablePaymentMethods []*models.PaymentMethod) error {
+	for _, p := range availablePaymentMethods {
+		if p.Name == paymentMethod {
+			return nil
+		}
+	}
+
+	return ErrInvalidPaymentMethod
+}
+
+func ValidateTransactionType(transactionType string, availableTransactionType []*models.TransactionType) error {
+	for _, t := range availableTransactionType {
+		if t.Name == transactionType {
+			return nil
+		}
+	}
+
+	return ErrInvalidTransactionType
 }

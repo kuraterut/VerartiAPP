@@ -22,6 +22,7 @@ import org.admin.connection.getRequests.GetOption;
 import org.admin.connection.putRequests.UpdateAppointment;
 import org.admin.controller.AdminController;
 import org.admin.model.*;
+import org.admin.utils.AppointmentStatus;
 import org.admin.utils.HelpFuncs;
 
 import java.time.LocalDateTime;
@@ -34,7 +35,7 @@ public class AppointmentInfoDialog extends Main {
         dialog.setTitle("Информация о записи");
 
         Appointment appointment = GetAppointment.getById(token, appointmentId);
-        Master master = appointment.getMaster();
+        User master = appointment.getMaster();
         Client client = appointment.getClient();
         LocalDateTime dateTime = LocalDateTime.of(appointment.getDate(), appointment.getStartTime());
 
@@ -65,9 +66,7 @@ public class AppointmentInfoDialog extends Main {
         commentsArea.setMaxWidth(400);
         commentsArea.setMaxHeight(200);
 
-        //TODO Отмена услуги
         //TODO Оплата услуги
-        //TODO Обновить инфу о записи
         HBox bottomBtnsBox = new HBox();
         Button closeBtn = new Button("Закрыть");
         Button cancelAppointmentBtn = new Button("Отмена Записи");
@@ -86,7 +85,11 @@ public class AppointmentInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadDayInfoWindow(node, appointment.getDate());
             }
-            else messageLabel.setText(response.getMsg());
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
         addOptionBtn.setOnAction(event -> {
@@ -97,13 +100,28 @@ public class AppointmentInfoDialog extends Main {
         paymentBtn.setOnAction(event -> AppointmentPaymentDialog.show(appointment, node, dialog));
 
         saveAppointmentBtn.setOnAction(event -> {
+            if(appointment.getOptions().isEmpty()){
+                messageLabel.setText("Список услуг не может быть пустым");
+                return;
+            }
             appointment.setComment(commentsArea.getText());
+
             Response response = UpdateAppointment.updateInfo(token, appointment);
             if (response.getCode() == 200) messageLabel.setText("Сохранено");
-            else messageLabel.setText(response.getMsg());
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
+        bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn);
+        if(appointment.getStatus() == AppointmentStatus.WAITING){
+            bottomBtnsBox.getChildren().addAll(closeBtn, cancelAppointmentBtn, addOptionBtn, saveAppointmentBtn, paymentBtn);
+        }
+        else{
+            bottomBtnsBox.getChildren().addAll(closeBtn);
+        }
         bottomBtnsBox.setSpacing(50);
         bottomBtnsBox.setAlignment(Pos.CENTER);
 

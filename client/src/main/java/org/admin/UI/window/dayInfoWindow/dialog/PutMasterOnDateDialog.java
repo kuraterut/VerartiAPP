@@ -9,13 +9,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.getRequests.GetMaster;
 import org.admin.connection.postRequests.PutMasterOnDate;
 import org.admin.UI.components.searchingStrings.SearchingStringMasters;
 import org.admin.UI.window.enterpriseWindow.dialog.creation.CreateMasterDialog;
-import org.admin.model.Master;
 import org.admin.model.Response;
+import org.admin.model.User;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +36,6 @@ public class PutMasterOnDateDialog extends Main {
 
 
         Button cancelBtn = new Button("Отмена");
-        Button createMasterBtn = new Button("Создать нового мастера");
         HBox btnsBox = new HBox();
 
         btnsBox.setSpacing(50);
@@ -46,7 +45,7 @@ public class PutMasterOnDateDialog extends Main {
         root.setAlignment(Pos.CENTER);
         root.setSpacing(50);
 
-        List<Master> mastersNotOnDate = GetMaster.getListByDate(token, date, false);
+        List<User> mastersNotOnDate = GetUser.getMastersByDate(token, date, false);
 
         VBox choosingMaster = SearchingStringMasters.build(mastersNotOnDate, masterInfo -> {
             if(masterInfo != null) {
@@ -55,22 +54,22 @@ public class PutMasterOnDateDialog extends Main {
                 if(response.getCode() == 200) {
                     dialog.close();
                     AdminController.loadDayInfoWindow(node, date);
-                } else {
-                    errorMsg.setText(response.getCode() + " " + response.getMsg());
                 }
+                if(response.getCode() == 401) {
+                    dialog.close();
+                    AdminController.loadAuthorizationWindow(node);
+                }
+                errorMsg.setText(response.getMsg());
+
             }
         });
 
 
 
-        btnsBox.getChildren().addAll(cancelBtn, createMasterBtn);
+        btnsBox.getChildren().addAll(cancelBtn);
         root.getChildren().addAll(dateLbl, choosingMaster, errorMsg, btnsBox);
 
         cancelBtn.setOnAction(event -> dialog.close());
-        createMasterBtn.setOnAction(event -> {
-            dialog.close();
-            CreateMasterDialog.show(node);
-        });
 
 
 

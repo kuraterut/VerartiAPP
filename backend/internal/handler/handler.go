@@ -33,15 +33,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				profile.PUT("/password", h.updatePassword)
 			}
 
-			resource := master.Group("/resource")
+			product := master.Group("/product")
 			{
-				resource.GET("/", h.getResourcesByMasterId)
-				resource.GET("/all", h.getAllResources)
-				resource.GET("/:id", h.getResourceById)
-				resource.POST("/:id", h.addResource)
-				resource.POST("/request", h.createRequest)
-				resource.GET("/request", h.getRequests)
-				resource.GET("/response", h.getResponseByRequestId)
+				product.GET("/", h.getAllProducts)
+				product.GET("/:id", h.getProductById)
 			}
 
 			appointment := master.Group("/appointment")
@@ -108,14 +103,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				feedback.POST("/")
 			}
 
-			resource := admin.Group("/resource")
+			product := admin.Group("/product")
 			{
-				resource.POST("/", h.createResource)
-				resource.GET("/", h.getAllResources)
-				resource.GET("/:id", h.getResourceById)
-				//resource.POST("/response", h.createResponse) // todo
-				//resource.GET("/request", h.getRequests)
-				//resource.GET("/response", h.getResponseByRequestId)
+				product.POST("/", h.createProduct)
+				product.GET("/", h.getAllProducts)
+				product.GET("/:id", h.getProductById)
+				product.PUT("/:id", h.updateProduct)
+				product.DELETE("/:id", h.deleteProduct)
 			}
 
 			option := admin.Group("/option")
@@ -133,7 +127,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				appointment.POST("/", h.createAppointment)
 				appointment.DELETE("/:id", h.deleteAppointmentById)
-				//appointment.PUT("/:id", h.updateAppointmentById)
+				appointment.PUT("/:id", h.updateAppointmentById)
 				appointment.GET("/:id", h.getAppointmentById)
 
 				appointment.GET("/date", h.getAllAppointmentsByDate)
@@ -141,8 +135,22 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 				appointment.POST("/admin", h.putAdminToDate)
 				appointment.POST("/master", h.putMasterToDate)
+				appointment.DELETE("/master", h.cancelMasterEntryForDate)
 				appointment.GET("/admin", h.getAdminByDate)
 				appointment.GET("/master", h.getAllMastersByDate)
+
+				appointment.GET("/schedule", h.getMonthlySchedule)
+			}
+
+			transaction := admin.Group("/transaction")
+			{
+				transaction.POST("/", h.createTransaction)
+				transaction.GET("/", h.getAllTransactions)
+				transaction.GET("/:id", h.getTransactionById)
+				transaction.GET("/date-only", h.getTransactionByDate)
+				transaction.GET("/method", h.getTransactionByDateAndMethod)
+				transaction.GET("/type", h.getTransactionByDateAndType)
+				transaction.DELETE("/:id", h.deleteTransaction)
 			}
 		}
 

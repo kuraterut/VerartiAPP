@@ -5,10 +5,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,8 +17,12 @@ import org.admin.connection.putRequests.UpdateOption;
 import org.admin.model.Response;
 import org.admin.model.Option;
 import org.admin.utils.HelpFuncs;
+import org.admin.utils.validation.DurationValidation;
+import org.admin.utils.validation.PriceValidation;
+import org.admin.utils.validation.Validation;
 
 import java.time.LocalTime;
+import java.util.Optional;
 
 public class OptionInfoDialog extends Main {
     public static void show(Long id, Node node){
@@ -104,33 +105,67 @@ public class OptionInfoDialog extends Main {
         cancelButton.setOnAction(event -> dialog.close());
 
         deleteButton.setOnAction(event -> {
-            //TODO ALERT DELETE
+            if(!showDeleteOptionConfirmation()) return;
             Response response = DeleteOption.deleteById(token, option.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
+            }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
             }
             else{messageLabel.setText(response.getMsg());}
         });
 
         saveButton.setOnAction(event -> {
             Option newOption = new Option();
-            try {
-                newOption.setName(nameTextField.getText());
-                newOption.setPrice(Long.parseLong(priceTextField.getText()));
-                newOption.setDuration(LocalTime.parse(durationTextField.getText()));
-                newOption.setDescription(descriptionTextArea.getText());
+            String newName = nameTextField.getText();
+            String newPriceStr = priceTextField.getText();
+            String newDurationStr = durationTextField.getText();
+            String newDescription = descriptionTextArea.getText();
 
-                Response response = UpdateOption.updateInfo(token, newOption);
-                if(response.getCode() == 200){messageLabel.setText("Сохранено");}
-                else{messageLabel.setText(response.getMsg());}
-            } catch (NumberFormatException e) {messageLabel.setText("Введите число в прайс");}
-            catch (Exception e) {messageLabel.setText(e.getMessage());}
+            Validation priceValidation = new PriceValidation(newPriceStr);
+            Validation durationValidation = new DurationValidation(newDurationStr);
+            if(!priceValidation.validate()) {messageLabel.setText("Неправильный формат прайса, должно быть целое число"); return;}
+            if(!durationValidation.validate()) {messageLabel.setText("Неправильный формат времени, должно быть HH:mm"); return;}
+
+            newOption.setId(option.getId());
+            newOption.setName(newName);
+            newOption.setPrice(Long.valueOf(newPriceStr));
+            newOption.setDuration(HelpFuncs.stringToLocalTime(newDurationStr));
+            newOption.setDescription(newDescription);
+
+            Response response = UpdateOption.updateInfo(token, newOption);
+            if(response.getCode() == 200){messageLabel.setText("Сохранено");}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            else{messageLabel.setText(response.getMsg());}
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
+    }
+
+    public static boolean showDeleteOptionConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Удаление услуги");
+        alert.setContentText("Вы уверены что хотите безвозвратно удалить услугу?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
     }
 }

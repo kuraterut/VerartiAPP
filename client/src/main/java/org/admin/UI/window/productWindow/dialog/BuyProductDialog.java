@@ -11,11 +11,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.UI.components.searchingStrings.SearchingStringClients;
 import org.admin.connection.deleteRequests.DeleteClient;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetAppointment;
-import org.admin.connection.getRequests.GetClient;
-import org.admin.connection.getRequests.GetProduct;
+import org.admin.connection.getRequests.*;
 import org.admin.connection.putRequests.UpdateClient;
 import org.admin.controller.AdminController;
 import org.admin.model.*;
@@ -38,8 +36,22 @@ public class BuyProductDialog extends Main {
 
         HBox clientPhoneBox = new HBox(20);
         Label clientPhoneLabel = new Label("Номер телефона покупателя: ");
-        TextField clientPhoneTextField = new TextField();
-        clientPhoneBox.getChildren().addAll(clientPhoneLabel, clientPhoneTextField);
+
+        Client client = new Client();
+        client.setCode(404);
+        client.setMsg("Клиент не выбран");
+        VBox searchingStringClient = SearchingStringClients.build(GetClient.getAll(token), chosenClient -> {
+            client.setId(chosenClient.getId());
+            client.setName(chosenClient.getName());
+            client.setSurname(chosenClient.getSurname());
+            client.setPatronymic(chosenClient.getPatronymic());
+            client.setPhone(chosenClient.getPhone());
+            client.setBirthday(chosenClient.getBirthday());
+            client.setComment(chosenClient.getComment());
+            client.setCode(200);
+        });
+        searchingStringClient.setMaxHeight(100);
+        clientPhoneBox.getChildren().addAll(clientPhoneLabel, searchingStringClient);
         clientPhoneBox.setAlignment(Pos.CENTER);
 
         Label adminPhoneLabel = new Label("Номер телефона администратора: " + Main.login);
@@ -50,7 +62,7 @@ public class BuyProductDialog extends Main {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        buildProductsTable(scrollPane, chosenProducts, allProducts);
+        buildProductsTable(scrollPane, chosenProducts);
 
         Button closeDialogBtn = new Button("Закрыть");
         Button addChosenProductBtn = new Button("Добавить товар");
@@ -60,25 +72,22 @@ public class BuyProductDialog extends Main {
         addChosenProductBtn.setOnAction(event -> {
             List<Product> notChosenProducts = allProducts.stream().filter(product -> !chosenProducts.contains(product)).toList();
             AddProductToChosenProductsDialog.show(chosenProducts, notChosenProducts);
-            buildProductsTable(scrollPane, chosenProducts, allProducts);
+            buildProductsTable(scrollPane, chosenProducts);
         });
         paymentBtn.setOnAction(event -> {
-            Validation clientPhoneValidation = new PhoneNumberValidation(clientPhoneTextField.getText());
-            if(!clientPhoneValidation.validate()) {
-                messageLabel.setText("Некорректный номер клиента");
-                return;
-            }
-            Client client = GetClient.getByPhone(token, clientPhoneTextField.getText());
-            if(client.getCode() != 200) {
+            if(client.getCode() != 200){
                 messageLabel.setText(client.getMsg());
                 return;
             }
-            Admin admin = GetAdmin.getByPhone(token, Main.login);
+            User admin = GetUser.getByPhone(token, Main.login);
             if(admin.getCode() != 200) {
-                messageLabel.setText(admin.getMsg());
+                messageLabel.setText("Админ не назначен");
                 return;
             }
-
+            if(chosenProducts.isEmpty()){
+                messageLabel.setText("Список товаров для покупки не может быть пустым");
+                return;
+            }
             ProductsPaymentDialog.show(chosenProducts, admin, client, node, dialog);
         });
 
@@ -97,7 +106,8 @@ public class BuyProductDialog extends Main {
         dialog.showAndWait();
     }
 
-    public static void buildProductsTable(ScrollPane scrollPane, List<Product> chosenProducts, List<Product> allProducts){
+    public static void buildProductsTable(ScrollPane scrollPane, List<Product> chosenProducts){
+        List<Product> allProducts = GetProduct.getAll(token);
         GridPane table = new GridPane();
 
         Label productIdHeadLabel = new Label("ID");
@@ -141,15 +151,15 @@ public class BuyProductDialog extends Main {
             final int productNum = numRow-1;
             deleteProductButton.setOnAction(event -> {
                 chosenProducts.remove(productNum);
-                buildProductsTable(scrollPane, chosenProducts, allProducts);
+                buildProductsTable(scrollPane, chosenProducts);
             });
             addProductButton.setOnAction(event -> {
                 product.setCount(product.getCount()+1);
-                buildProductsTable(scrollPane, chosenProducts, allProducts);
+                buildProductsTable(scrollPane, chosenProducts);
             });
             removeProductButton.setOnAction(event -> {
                 product.setCount(product.getCount()-1);
-                buildProductsTable(scrollPane, chosenProducts, allProducts);
+                buildProductsTable(scrollPane, chosenProducts);
             });
 
 

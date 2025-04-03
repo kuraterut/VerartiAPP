@@ -32,14 +32,15 @@ public class TransactionsInfoDialog extends Main {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Информация о Транзакциях");
 
+        //TODO протестировать инфу о транзакциях
         List<Transaction> totalTransactions = GetTransaction.getListByDate(token, date);
-        List<Transaction> optionTransactions = GetTransaction.getListByDate(token, date, TransactionType.OPTION);
+        List<Transaction> appointmentTransactions = GetTransaction.getListByDate(token, date, TransactionType.APPOINTMENT);
         List<Transaction> productTransactions = GetTransaction.getListByDate(token, date, TransactionType.PRODUCT);
         List<Transaction> cardTransactions = GetTransaction.getListByDate(token, date, PaymentMethod.CARD);
         List<Transaction> cashTransactions = GetTransaction.getListByDate(token, date, PaymentMethod.CASH);
 
         Label totalAmountLabel = new Label("Всего: " + calculateTotalAmount(totalTransactions));
-        Label optionAmountLabel = new Label("Услуги: " + calculateTotalAmount(optionTransactions));
+        Label optionAmountLabel = new Label("Услуги: " + calculateTotalAmount(appointmentTransactions));
         Label productAmountLabel = new Label("Товары: " + calculateTotalAmount(productTransactions));
         Label cardAmountLabel = new Label("Картой: " + calculateTotalAmount(cardTransactions));
         Label cashAmountLabel = new Label("Наличными: " + calculateTotalAmount(cashTransactions));

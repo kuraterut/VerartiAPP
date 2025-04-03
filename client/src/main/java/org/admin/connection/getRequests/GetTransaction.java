@@ -19,7 +19,7 @@ public class GetTransaction extends Connection {
         try{
             String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/transaction/date?date=" + encodedDate);
+            getConnection("http://localhost:8000/api/admin/transaction/date-only?date=" + encodedDate);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -43,7 +43,7 @@ public class GetTransaction extends Connection {
         try{
             String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/transaction/date?date=" + encodedDate + "&transaction_type=" + transactionType.toString());
+            getConnection("http://localhost:8000/api/admin/transaction/type?date=" + encodedDate + "&transaction_type=" + transactionType.toString());
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 
@@ -67,7 +67,7 @@ public class GetTransaction extends Connection {
         try{
             String dateStr = HelpFuncs.localDateToString(date, "yyyy-MM-dd");
             String encodedDate = URLEncoder.encode(dateStr, StandardCharsets.UTF_8);
-            getConnection("http://localhost:8000/api/admin/transaction/date?date=" + encodedDate + "&payment_method=" + paymentMethod.toString());
+            getConnection("http://localhost:8000/api/admin/transaction/method?date=" + encodedDate + "&payment_method=" + paymentMethod.toString());
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", "Bearer " + token);
 

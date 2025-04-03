@@ -8,20 +8,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.Main;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.getRequests.GetClient;
-import org.admin.connection.getRequests.GetMaster;
-import org.admin.connection.getRequests.GetOption;
+import org.admin.connection.getRequests.*;
 import org.admin.UI.window.enterpriseWindow.dialog.creation.*;
 
 import org.admin.UI.window.enterpriseWindow.dialog.infos.*;
 
 import org.admin.UI.components.searchingStrings.*;
 import org.admin.UI.components.sideMenu.SideMenu;
-import org.admin.model.Admin;
-import org.admin.model.Client;
-import org.admin.model.Master;
-import org.admin.model.Option;
+import org.admin.model.*;
 
 import java.util.List;
 
@@ -47,8 +41,8 @@ public class EnterpriseWindow extends Main {
 
 
 
-        List<Admin> admins = GetAdmin.getAll(token);
-        List<Master> masters = GetMaster.getAll(token);
+        List<User> admins = GetUser.getAllAdmins(token);
+        List<User> masters = GetUser.getAllMasters(token);
         List<Option> options = GetOption.getAll(token);
         List<Client> clients = GetClient.getAll(token);
 

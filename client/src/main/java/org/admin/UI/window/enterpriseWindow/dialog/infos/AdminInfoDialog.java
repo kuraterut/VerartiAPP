@@ -5,24 +5,22 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
+import org.admin.connection.deleteRequests.DeleteUser;
+import org.admin.connection.getRequests.GetUser;
 import org.admin.controller.AdminController;
-import org.admin.connection.deleteRequests.DeleteAdmin;
-import org.admin.connection.getRequests.GetAdmin;
-import org.admin.connection.putRequests.UpdateProfile;
-import org.admin.model.Admin;
 import org.admin.model.Response;
+import org.admin.model.User;
+
+import java.util.Optional;
 
 public class AdminInfoDialog extends Main {
     public static void show(Long id, Node node){
-        Admin admin = GetAdmin.getById(token, id);
+        User admin = GetUser.getById(token, id);
 
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -48,11 +46,11 @@ public class AdminInfoDialog extends Main {
         Label bioLabel          = new Label("Биография: ");
 
         Label adminIdLabel             = new Label(admin.getId().toString());
-        TextField nameTextField         = new TextField(admin.getName());
-        TextField surnameTextField      = new TextField(admin.getSurname());
-        TextField patronymicTextField   = new TextField(admin.getPatronymic());
-        TextField phoneTextField        = new TextField(admin.getPhone());
-        TextArea bioTextArea            = new TextArea(admin.getBio());
+        Label nameTextField         = new Label(admin.getName());
+        Label surnameTextField      = new Label(admin.getSurname());
+        Label patronymicTextField   = new Label(admin.getPatronymic());
+        Label phoneTextField        = new Label(admin.getPhone());
+        Label bioTextArea            = new Label(admin.getBio());
 
         infoTable.getColumnConstraints().add(new ColumnConstraints(150));
         infoTable.getColumnConstraints().add(new ColumnConstraints(200));
@@ -110,13 +108,17 @@ public class AdminInfoDialog extends Main {
         cancelButton.setOnAction(event -> dialog.close());
 
         deleteButton.setOnAction(event -> {
-            //TODO ALERT DELETE
-            Response response = DeleteAdmin.deleteById(token, admin.getId());
+            if(!showDeleteAdminConfirmation()) return;
+            Response response = DeleteUser.deleteById(token, admin.getId());
             if(response.getCode() == 200){
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
-            else{messageLabel.setText(response.getMsg());}
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
+            }
+            messageLabel.setText(response.getMsg());
         });
 
 
@@ -124,5 +126,23 @@ public class AdminInfoDialog extends Main {
 
         dialog.setScene(dialogScene);
         dialog.showAndWait();
+    }
+
+    public static boolean showDeleteAdminConfirmation() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Предупреждение");
+        alert.setHeaderText("Удаление администратора");
+        alert.setContentText("Вы уверены, что хотите безвозвратно удалить администратора?");
+
+        // Настраиваем кнопки
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeCancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeCancel);
+
+        // Ждём выбора пользователя
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Возвращаем true, если нажата OK
+        return result.isPresent() && result.get() == buttonTypeOk;
     }
 }

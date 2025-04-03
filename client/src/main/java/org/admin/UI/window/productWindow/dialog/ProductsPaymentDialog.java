@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.Main;
-import org.admin.connection.getRequests.GetAdmin;
 import org.admin.connection.postRequests.CreateTransaction;
 import org.admin.controller.AdminController;
 import org.admin.model.*;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductsPaymentDialog extends Main {
-    public static void show(List<Product> chosenProducts, Admin admin, Client client, Node productWindow, Stage buyProductDialog) {
+    public static void show(List<Product> chosenProducts, User admin, Client client, Node productWindow, Stage buyProductDialog) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Оплата услуг");
