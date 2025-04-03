@@ -13,5 +13,4 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AuthResponse {
     private String token;
-    private LocalDateTime expiresAt;
 }

@@ -113,7 +113,7 @@ public class MasterInfoDialog extends Main {
         servicesScrollPane.setFitToHeight(true);
         servicesScrollPane.setPrefViewportHeight(300);
         servicesScrollPane.setPrefViewportWidth(500);
-        buildServiceTable(servicesScrollPane, master);
+        buildServiceTable(servicesScrollPane, master, node, dialog, messageLabel);
 
 
         root.setAlignment(Pos.CENTER);
@@ -171,7 +171,7 @@ public class MasterInfoDialog extends Main {
                     notMasterOptions.add(option);
                 }
             }
-            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane);
+            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane, node, dialog, messageLabel);
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
@@ -180,7 +180,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<Option> options, User master, ScrollPane servicesScrollPane) {
+    private static void showChooseServiceDialog(List<Option> options, User master, ScrollPane servicesScrollPane, Node node, Stage mainDialog, Label messageLabel) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -195,8 +195,12 @@ public class MasterInfoDialog extends Main {
         VBox searchingStringServices = SearchingStringOptions.build(options, service->{
             Response response = AddOptionToMaster.post(token, master.getId(), service.getId());
             if(response.getCode() == 200){
-                buildServiceTable(servicesScrollPane, master);
+                buildServiceTable(servicesScrollPane, master, node, mainDialog, messageLabel);
                 dialog.close();
+            }
+            if(response.getCode() == 401){
+                dialog.close();
+                AdminController.loadAuthorizationWindow(node);
             }
             else{
                 errorMsg.setText(response.getMsg());
@@ -214,7 +218,7 @@ public class MasterInfoDialog extends Main {
 
     }
 
-    private static void buildServiceTable(ScrollPane servicesScrollPane, User master){
+    private static void buildServiceTable(ScrollPane servicesScrollPane, User master, Node node, Stage dialog, Label messageLabel) {
         //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
@@ -244,8 +248,15 @@ public class MasterInfoDialog extends Main {
 
             deleteService.setOnAction(event -> {
                 Response response = DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
-                if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master);}
-                else{System.out.println(response.getMsg());}
+                if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master, node, dialog, messageLabel);}
+                if(response.getCode() == 401){
+                    dialog.close();
+                    AdminController.loadAuthorizationWindow(node);
+                }
+                if(response.getCode() == 409){
+                    messageLabel.setText("Нельзя удалить услугу пока существуют записи у мастера с этой услугой");
+                }
+                messageLabel.setText(response.getMsg());
             });
 
             servicesTable.addRow(index, serviceIdLabel, serviceNameLabel, servicePriceLabel, serviceDurationLabel, deleteService);

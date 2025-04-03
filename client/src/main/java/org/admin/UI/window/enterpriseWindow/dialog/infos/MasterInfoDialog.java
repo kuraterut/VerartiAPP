@@ -130,6 +130,10 @@ public class MasterInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
+            if(response.getCode() == 409){
+                messageLabel.setText("Нельзя удалить мастера пока у него есть записи!");
+                return;
+            }
             if(response.getCode() == 401){
                 dialog.close();
                 AdminController.loadAuthorizationWindow(node);
@@ -229,8 +233,7 @@ public class MasterInfoDialog extends Main {
                     AdminController.loadAuthorizationWindow(node);
                 }
                 if(response.getCode() == 409){
-                    errorMsg.setText("Нельзя удалить мастера пока у него есть записи!");
-                    return;
+                    errorMsg.setText("Нельзя удалить услугу пока существуют записи у мастера с этой услугой");
                 }
                 errorMsg.setText(response.getMsg());
             });

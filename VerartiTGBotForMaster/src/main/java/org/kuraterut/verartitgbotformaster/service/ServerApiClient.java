@@ -2,11 +2,8 @@ package org.kuraterut.verartitgbotformaster.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.kuraterut.verartitgbotformaster.exception.AuthException;
-import org.kuraterut.verartitgbotformaster.exception.AuthenticationFailedException;
-import org.kuraterut.verartitgbotformaster.exception.ServiceUnavailableException;
+import org.kuraterut.verartitgbotformaster.exception.*;
 import org.kuraterut.verartitgbotformaster.model.dto.*;
-import org.kuraterut.verartitgbotformaster.exception.BadRequestException;
 import org.kuraterut.verartitgbotformaster.model.entity.MasterInfo;
 import org.kuraterut.verartitgbotformaster.model.entity.Response;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -44,6 +41,22 @@ public class ServerApiClient {
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new AuthException("Неверный телефон или пароль");
+        }
+    }
+
+    public void validateToken(String token) throws UnauthorizedException {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + token);
+
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    apiUrl + "/api/master/token",
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Void.class
+            );
+        } catch (Exception e) {
+            throw new UnauthorizedException("Token is invalid");
         }
     }
 
