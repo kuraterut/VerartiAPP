@@ -13,8 +13,6 @@ import java.io.*;
 import java.util.*;
 import java.time.*;
 
-//TODO В боте сделать корректную проверку на истечение токена(через запрос)
-//TODO Протестировать корректное удаление сотрудника(мастера)
 //TODO Проверять удаление услуги
 public class Main extends Application{
     public static Properties properties;
