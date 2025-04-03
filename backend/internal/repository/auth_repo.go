@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"strings"
 	"verarti/internal/domain"
 	"verarti/models"
 	"verarti/pkg/database"
@@ -37,6 +38,15 @@ func (r *AuthPostgres) CreateUser(user models.Users, roleIds []int) (int, error)
 	row := tx.QueryRow(queryCreateUser, user.Name, user.Surname, user.Patronymic,
 		user.Password, user.Email, user.Phone)
 	if err := row.Scan(&userId); err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				if strings.Contains(pqErr.Message, "phone") {
+					return 0, domain.NewErrorResponse(409, "user with this phone number already exists")
+				}
+			}
+		}
+
 		return 0, err
 	}
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"strings"
 	"verarti/internal/domain"
 	"verarti/models"
@@ -25,6 +26,15 @@ func (r *OptionPostgres) CreateOption(option models.Option) (int, error) {
 		"VALUES ($1, $2, $3, $4) RETURNING id", database.OptionTable)
 	row := r.db.QueryRow(query, option.Name, option.Description, option.Duration, option.Price)
 	if err := row.Scan(&id); err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				if strings.Contains(pqErr.Message, "name") {
+					return 0, domain.NewErrorResponse(409, "option with this name already exists")
+				}
+			}
+		}
+
 		return 0, err
 	}
 
