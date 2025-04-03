@@ -25,6 +25,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		master := api.Group("/master", h.masterIdentity)
 		{
+			master.GET("token")
+
 			profile := master.Group("/profile")
 			{
 				profile.GET("/", h.getUserInfo)
