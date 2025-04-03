@@ -63,7 +63,8 @@ public class ServerApiClient {
     public ScheduleResponse getSchedule(String token, String date) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
-
+        System.out.println(date);
+        System.out.println(token);
         ResponseEntity<ScheduleResponse> response = restTemplate.exchange(
                 apiUrl + "/api/master/appointment?date=" + date,
                 HttpMethod.GET,
