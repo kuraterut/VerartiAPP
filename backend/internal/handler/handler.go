@@ -43,6 +43,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		admin := api.Group("/admin", h.adminIdentity)
 		{
+			profile := master.Group("/profile")
+			{
+				profile.GET("/", h.getUserInfo)
+				profile.PUT("/photo", h.updatePhoto)
+				profile.PUT("/info", h.updateInfo)
+				profile.PUT("/password", h.updatePassword)
+			}
+
 			users := admin.Group("/users")
 			{
 				users.POST("/signup", h.signUp)
