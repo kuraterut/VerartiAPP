@@ -13,9 +13,9 @@ import java.io.*;
 import java.util.*;
 import java.time.*;
 
-//TODO Протестировать отмену назначения мастера на дату
-//TODO Сделать ObjectMappers
 //TODO В боте сделать корректную проверку на истечение токена(через запрос)
+//TODO Протестировать корректное удаление сотрудника(мастера)
+//TODO Проверять удаление услуги
 public class Main extends Application{
     public static Properties properties;
     public static String login;

@@ -81,7 +81,7 @@ public class MasterBotController extends TelegramLongPollingBot {
     private void handleMessage(Long chatId, String messageText) throws TelegramApiException {
         UserSession session = userSessionService.getSession(chatId);
 
-        if (messageText.equals("/start") || (session != null && userSessionService.isTokenExpired(session))) {
+        if (messageText.equals("/start") || (session != null && userSessionService.isTokenExpired(session, serverApiClient) && session.getAuthState() == AuthState.AUTHENTICATED)) {
             startAuthentication(chatId);
             return;
         }
@@ -116,7 +116,6 @@ public class MasterBotController extends TelegramLongPollingBot {
                 try {
                     AuthResponse response = serverApiClient.authenticate(session.getPhone(), session.getPassword());
                     session.setToken(response.getToken());
-                    session.setTokenExpiration(response.getExpiresAt());
                     session.setAuthState(AuthState.AUTHENTICATED);
                     session.setCurrentMenu(BotMenu.MAIN);
                     showMainMenu(chatId);
