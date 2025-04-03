@@ -167,7 +167,7 @@ public class ServerApiClient {
 
 
         ResponseEntity<MasterInfo> response = restTemplate.exchange(
-                apiUrl + "/api/master/profile/info",
+                apiUrl + "/api/master/profile/",
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 MasterInfo.class
