@@ -111,10 +111,10 @@ public class OptionInfoDialog extends Main {
                 dialog.close();
                 AdminController.loadEnterpriseWindow(node);
             }
-            if(response.getCode() == 409){
+            else if(response.getCode() == 409){
                 messageLabel.setText("Нельзя удалить услугу пока есть записи с этой услугой");
             }
-            if(response.getCode() == 401){
+            else if(response.getCode() == 401){
                 dialog.close();
                 AdminController.loadAuthorizationWindow(node);
             }

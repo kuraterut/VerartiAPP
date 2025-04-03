@@ -198,7 +198,6 @@ public class MasterInfoDialog extends Main {
     }
 
     private static void buildServiceTable(ScrollPane servicesScrollPane, User master, Stage dialog, Node node, Label errorMsg){
-        //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
         servicesTableHeaders[0] = new Label("ID услуги");
@@ -228,14 +227,14 @@ public class MasterInfoDialog extends Main {
             deleteService.setOnAction(event -> {
                 Response response = DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
                 if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master, dialog, node, errorMsg);}
-                if(response.getCode() == 401){
+                else if(response.getCode() == 401){
                     dialog.close();
                     AdminController.loadAuthorizationWindow(node);
                 }
-                if(response.getCode() == 409){
+                else if(response.getCode() == 409){
                     errorMsg.setText("Нельзя удалить услугу пока существуют записи у мастера с этой услугой");
                 }
-                errorMsg.setText(response.getMsg());
+                else{errorMsg.setText(response.getMsg());}
             });
 
             servicesTable.addRow(index, serviceIdLabel, serviceNameLabel, servicePriceLabel, serviceDurationLabel, deleteService);

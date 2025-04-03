@@ -23,7 +23,6 @@ public class GetUser extends Connection {
 
             List<User> admins = new ArrayList<>();
             JSONArray adminsJSON = (JSONArray) data.get("admins");
-            System.out.println(data);
             for(Object adminObj : adminsJSON){
                 JSONObject adminJSON = (JSONObject) adminObj;
                 User admin = User.fromJson(adminJSON);

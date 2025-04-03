@@ -15,8 +15,6 @@ public class UpdateProduct extends Connection {
             connection.setDoOutput(true);
 
             JSONObject out = product.toJson();
-
-            System.out.println(out.toJSONString());
             sendJson(out);
 
             int status = connection.getResponseCode();
