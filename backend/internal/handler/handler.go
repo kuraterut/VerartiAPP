@@ -43,7 +43,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		admin := api.Group("/admin", h.adminIdentity)
 		{
-			profile := master.Group("/profile")
+			profile := admin.Group("/profile")
 			{
 				profile.GET("/", h.getUserInfo)
 				profile.PUT("/photo", h.updatePhoto)
