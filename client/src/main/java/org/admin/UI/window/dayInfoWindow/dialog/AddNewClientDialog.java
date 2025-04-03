@@ -18,6 +18,7 @@ import org.admin.controller.AdminController;
 import org.admin.connection.postRequests.CreateClient;
 import org.admin.model.Client;
 import org.admin.model.Response;
+import org.admin.utils.validation.PhoneNumberValidation;
 
 import java.time.LocalDate;
 
@@ -119,21 +120,16 @@ public class AddNewClientDialog extends Main {
             String phone = phoneTextField.getText();
             LocalDate birthday = birthdayDatePicker.getValue();
 
-            Client client = new Client();
+            if(name.isEmpty()) {errorMsg.setText("Имя не может быть пустым"); return;}
+            if(surname.isEmpty()) {errorMsg.setText("Фамилия не может быть пустой"); return;}
+            if(!new PhoneNumberValidation(phone).validate()) {errorMsg.setText("Некорректный формат номера телефона(+7...)"); return;}
 
+            Client client = new Client();
             client.setName(name);
             client.setSurname(surname);
             client.setPatronymic(patronymic);
             client.setPhone(phone);
             client.setBirthday(birthday);
-
-            //TODO Убрать это
-            Response checkInfo = client.checkInfo();
-
-            if(checkInfo.getCode() == -1){
-                errorMsg.setText(checkInfo.getMsg());
-                return;
-            }
 
             Response response = CreateClient.post(token, client);
             if(response.getCode() == 200) {

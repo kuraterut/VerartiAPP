@@ -28,12 +28,6 @@ public class User extends Response {
         super(code,message);
     }
     //TODO Сделать все на Builder'ах
-    public Response checkInfo(){
-        if (this.name.equals("")) return new Response(-1, "Введите имя");
-        if (this.surname.equals("")) return new Response(-1, "Введите фамилию");
-        if (!HelpFuncs.checkPhone(this.phone)) return new Response(-1, "Неверный формат телефона (+7...)");
-        return new Response(200, "OK");
-    }
 
     @Override
     public String toString() {

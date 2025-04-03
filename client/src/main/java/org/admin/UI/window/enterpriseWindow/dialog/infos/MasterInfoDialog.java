@@ -146,7 +146,7 @@ public class MasterInfoDialog extends Main {
                     notMasterOptions.add(option);
                 }
             }
-            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane, node);
+            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane, node, messageLabel);
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
