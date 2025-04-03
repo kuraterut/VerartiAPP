@@ -36,19 +36,20 @@ public class AppointmentPaymentDialog extends Main {
 
         Long totalPrice = 0L;
         List<Transaction> transactions = new ArrayList<>();
+        Transaction transaction = new Transaction();
+
+        transaction.setTransactionType(TransactionType.APPOINTMENT);
+        transaction.setCount(1);
+        transaction.setAdminId(admin.getId());
+        transaction.setClientId(appointment.getClient().getId());
+        transaction.setUnitId(appointment.getId());
+
+
+        transactions.add(transaction);
         for(Option option : appointment.getOptions()) {
-            Transaction transaction = new Transaction();
-
-            transaction.setPurchaseAmount(option.getPrice());
-            transaction.setTransactionType(TransactionType.OPTION);
-            transaction.setCount(1);
-            transaction.setAdminId(admin.getId());
-            transaction.setClientId(appointment.getClient().getId());
-            transaction.setUnitId(option.getId());
-
             totalPrice += option.getPrice();
-            transactions.add(transaction);
         }
+        transaction.setPurchaseAmount(totalPrice);
 
 
         User master = appointment.getMaster();
@@ -74,6 +75,8 @@ public class AppointmentPaymentDialog extends Main {
         paymentMethodCard.setToggleGroup(toggleGroup);
         paymentMethodCash.setToggleGroup(toggleGroup);
         paymentMethodCard.setSelected(true);
+
+
 
         paymentMethodBox.getChildren().addAll(paymentMethodLbl, paymentMethodCard, paymentMethodCash);
         paymentMethodBox.setAlignment(Pos.CENTER);
@@ -110,8 +113,8 @@ public class AppointmentPaymentDialog extends Main {
             PaymentMethod paymentMethod;
             if(selectedPaymentMethod.getText().equals("Карта")) paymentMethod = PaymentMethod.CARD;
             else paymentMethod = PaymentMethod.CASH;
-            for(Transaction transaction : transactions) {
-                transaction.setPaymentMethod(paymentMethod);
+            for(Transaction trans : transactions) {
+                trans.setPaymentMethod(paymentMethod);
             }
             Response response = CreateTransaction.post(token, transactions);
             if(response.getCode() == 200) {
@@ -122,7 +125,14 @@ public class AppointmentPaymentDialog extends Main {
             else messageLabel.setText(response.getMsg());
         });
 
-        bottomBtnsBox.getChildren().addAll(closeBtn, paymentBtn);
+        if(admin.getId() == -1) {
+            messageLabel.setText("Админ не назначен");
+            bottomBtnsBox.getChildren().addAll(closeBtn);
+        }
+        else{
+            bottomBtnsBox.getChildren().addAll(closeBtn, paymentBtn);
+        }
+
         bottomBtnsBox.setSpacing(50);
         bottomBtnsBox.setAlignment(Pos.CENTER);
 
