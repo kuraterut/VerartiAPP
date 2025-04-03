@@ -18,6 +18,9 @@ import org.admin.controller.AdminController;
 import org.admin.connection.postRequests.CreateProduct;
 import org.admin.model.Response;
 import org.admin.model.Product;
+import org.admin.utils.validation.CountValidation;
+import org.admin.utils.validation.PriceValidation;
+import org.admin.utils.validation.Validation;
 
 public class CreateProductDialog extends Main {
     public static void show(Node node){
@@ -86,15 +89,16 @@ public class CreateProductDialog extends Main {
         cancelBtn.setOnAction(event -> dialog.close());
         addBtn.setOnAction(event -> {
             String name = nameTextField.getText();
+            String priceStr = priceTextField.getText();
+            String countStr = countTextField.getText();
 
-            Long price = 0L;
-            try{price = Long.parseLong(priceTextField.getText());}
-            catch (NumberFormatException e){errorMsg.setText("Неправильный формат прайса, должно быть целое число");}
+            Validation priceValidation = new PriceValidation(priceStr);
+            Validation countValidation = new CountValidation(countStr);
+            if(!priceValidation.validate()) {errorMsg.setText("Неправильный формат прайса, должно быть целое число"); return;}
+            if(!countValidation.validate()) {errorMsg.setText("Неправильный формат количества, должно быть целое число"); return;}
 
-            Integer count = 0;
-            try{count = Integer.parseInt(countTextField.getText());}
-            catch (NumberFormatException e){errorMsg.setText("Неправильный формат количества, должно быть целое число");}
-
+            Long price = Long.parseLong(priceStr);
+            Integer count = Integer.parseInt(countStr);
 
             Product product = new Product();
 

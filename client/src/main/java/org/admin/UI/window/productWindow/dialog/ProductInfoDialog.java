@@ -15,6 +15,9 @@ import org.admin.connection.putRequests.UpdateProduct;
 import org.admin.controller.AdminController;
 import org.admin.model.Product;
 import org.admin.model.Response;
+import org.admin.utils.validation.CountValidation;
+import org.admin.utils.validation.PriceValidation;
+import org.admin.utils.validation.Validation;
 
 import java.util.Optional;
 
@@ -100,15 +103,13 @@ public class ProductInfoDialog extends Main {
             String priceStr = priceTextField.getText();
             String countStr = countTextField.getText();
 
-            //TODO Внедрить валидацию разных сущностей
-            Long price = 0L;
-            try{price = Long.parseLong(priceStr);}
-            catch(NumberFormatException e){messageLabel.setText("Прайс должен быть числом"); return;}
+            Validation priceValidation = new PriceValidation(priceStr);
+            Validation countValidation = new CountValidation(countStr);
+            if(!priceValidation.validate()) {messageLabel.setText("Прайс должен быть числом"); return;}
+            if(!countValidation.validate()) {messageLabel.setText("Количество должно быть числом"); return;}
 
-            Integer count = 0;
-            try{count = Integer.parseInt(countStr);} catch (NumberFormatException e) {
-                messageLabel.setText("Количество должно быть числом"); return;
-            }
+            Long price = Long.parseLong(priceStr);
+            Integer count = Integer.parseInt(countStr);;
 
             Product newProduct = new Product();
             newProduct.setId(product.getId());

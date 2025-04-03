@@ -105,17 +105,20 @@ public class MasterInfoDialog extends Main {
         masterInfoTabel.setAlignment(Pos.CENTER);
 
 
-        VBox servicesBox = new VBox();
-        servicesBox.setSpacing(20);
-        servicesBox.setAlignment(Pos.CENTER);
 
-        servicesBox.getChildren().addAll(servicesLabel, buildServiceTable(master, servicesBox));
+        ScrollPane servicesScrollPane = new ScrollPane();
+        servicesScrollPane.setFitToWidth(true);
+        servicesScrollPane.setFitToHeight(true);
+        servicesScrollPane.setPrefViewportHeight(300);
+        servicesScrollPane.setPrefViewportWidth(500);
+        buildServiceTable(servicesScrollPane, master);
+
 
         root.setAlignment(Pos.CENTER);
         root.setSpacing(20);
 
         btns.getChildren().addAll(cancelButton, deleteMasterButton, addServiceButton);
-        root.getChildren().addAll(masterInfoTabel, servicesBox, messageLabel, btns);
+        root.getChildren().addAll(masterInfoTabel, servicesLabel, servicesScrollPane, messageLabel, btns);
 
 
         cancelButton.setOnAction(event -> dialog.close());
@@ -139,7 +142,7 @@ public class MasterInfoDialog extends Main {
                     notMasterOptions.add(option);
                 }
             }
-            showChooseServiceDialog(notMasterOptions, master, servicesBox);
+            showChooseServiceDialog(notMasterOptions, master, servicesScrollPane);
         });
 
         Scene dialogScene = new Scene(root, 1200, 600);
@@ -148,7 +151,7 @@ public class MasterInfoDialog extends Main {
         dialog.showAndWait();
     }
 
-    private static void showChooseServiceDialog(List<Option> options, User master, VBox servicesBox) {
+    private static void showChooseServiceDialog(List<Option> options, User master, ScrollPane servicesScrollPane) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Выберите услугу");
@@ -163,9 +166,7 @@ public class MasterInfoDialog extends Main {
         VBox searchingStringServices = SearchingStringOptions.build(options, service->{
             Response response = AddOptionToMaster.post(token, master.getId(), service.getId());
             if(response.getCode() == 200){
-                Label servicesBoxLabel = new Label("Услуги");
-                servicesBox.getChildren().clear();
-                servicesBox.getChildren().addAll(servicesBoxLabel, buildServiceTable(master, servicesBox));
+                buildServiceTable(servicesScrollPane, master);
                 dialog.close();
             }
             else{
@@ -184,7 +185,7 @@ public class MasterInfoDialog extends Main {
 
     }
 
-    private static ScrollPane buildServiceTable(User master, VBox tableVBox){
+    private static void buildServiceTable(ScrollPane servicesScrollPane, User master){
         //TODO Удаление услуги у мастера
         GridPane servicesTable = new GridPane();
         Label[] servicesTableHeaders = new Label[4];
@@ -213,10 +214,9 @@ public class MasterInfoDialog extends Main {
             Button deleteService = new Button("Удалить");
 
             deleteService.setOnAction(event -> {
-                DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
-                tableVBox.getChildren().clear();
-                Label servicesHeadLabel = new Label("Услуги: ");
-                tableVBox.getChildren().addAll(servicesHeadLabel, buildServiceTable(master, tableVBox));
+                Response response = DeleteOption.deleteByMasterId(token, option.getId(), master.getId());
+                if(response.getCode() == 200){buildServiceTable(servicesScrollPane, master);}
+                else{System.out.println(response.getMsg());}
             });
 
             servicesTable.addRow(index, serviceIdLabel, serviceNameLabel, servicePriceLabel, serviceDurationLabel, deleteService);
@@ -238,14 +238,12 @@ public class MasterInfoDialog extends Main {
         servicesTable.getColumnConstraints().add(new ColumnConstraints(100));
         servicesTable.getColumnConstraints().add(new ColumnConstraints(100));
         servicesTable.setGridLinesVisible(true);
+        servicesTable.setAlignment(Pos.CENTER);
 
+        servicesScrollPane.setContent(servicesTable);
         ScrollPane root = new ScrollPane(servicesTable);
         root.setFitToHeight(true);
         root.setFitToWidth(true);
-        root.setPrefViewportHeight(300);
-        root.setPrefViewportWidth(500);
-        servicesTable.setAlignment(Pos.CENTER);
-        return root;
     }
 
     public static boolean showDeleteMasterConfirmation() {
