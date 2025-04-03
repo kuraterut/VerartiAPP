@@ -672,3 +672,21 @@ func isEmptyUserStruct(user models.Users) bool {
 	zeroUser := models.Users{}
 	return reflect.DeepEqual(user, zeroUser)
 }
+
+func (r *AppointmentPostgres) CheckingAppointmentsExistence(appointmentIds []int) error {
+	var exists int
+
+	for _, appointmentId := range appointmentIds {
+		queryGetAppointment := fmt.Sprintf(`SELECT 1 FROM %s WHERE id = $1`, database.MasterAppointmentTable)
+		err := r.db.Get(&exists, queryGetAppointment, appointmentId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.NewErrorResponse(404, fmt.Sprintf("appointment with this id = %d was not found", appointmentId))
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}

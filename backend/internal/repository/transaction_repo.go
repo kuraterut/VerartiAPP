@@ -92,20 +92,21 @@ func (r *TransactionPostgres) GetPaymentMethods() []*models.PaymentMethod {
 
 func (r *TransactionPostgres) CreateTransactions(transactions []models.Transaction) error {
 	var (
-		productPlaceholders []string
-		optionPlaceholders  []string
-		productQueryArgs    []interface{}
-		optionQueryArgs     []interface{}
+		productPlaceholders     []string
+		appointmentPlaceholders []string
+		productQueryArgs        []interface{}
+		appointmentQueryArgs    []interface{}
+		appointmentIds          []int
 	)
 
 	updateProducts := make(map[int]int)
 
 	productQuery := fmt.Sprintf("INSERT INTO %s (users_id, client_id, product_id, payment_method,"+
 		" transaction_type, purchase_amount, count) VALUES ", database.TransactionTable)
-	optionQuery := fmt.Sprintf("INSERT INTO %s (users_id, client_id, option_id, payment_method,"+
+	appointmentQuery := fmt.Sprintf("INSERT INTO %s (users_id, client_id, appointment_id, payment_method,"+
 		" transaction_type, purchase_amount, count) VALUES ", database.TransactionTable)
 
-	productArgIdx, optionArgIdx := 1, 1
+	productArgIdx, appointmentArgIdx := 1, 1
 	for _, transaction := range transactions {
 		args := []interface{}{
 			transaction.AdminId,
@@ -124,12 +125,13 @@ func (r *TransactionPostgres) CreateTransactions(transactions []models.Transacti
 
 			productArgIdx += 7
 			updateProducts[transaction.UnitId] += transaction.Count
-		} else if transaction.TransactionType == domain.TransactionOption {
-			optionPlaceholders = append(optionPlaceholders, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d)",
-				optionArgIdx, optionArgIdx+1, optionArgIdx+2, optionArgIdx+3, optionArgIdx+4, optionArgIdx+5, optionArgIdx+6))
-			optionQueryArgs = append(optionQueryArgs, args...)
+		} else if transaction.TransactionType == domain.TransactionAppointment {
+			appointmentPlaceholders = append(appointmentPlaceholders, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+				appointmentArgIdx, appointmentArgIdx+1, appointmentArgIdx+2, appointmentArgIdx+3, appointmentArgIdx+4, appointmentArgIdx+5, appointmentArgIdx+6))
+			appointmentQueryArgs = append(appointmentQueryArgs, args...)
 
-			optionArgIdx += 7
+			appointmentArgIdx += 7
+			appointmentIds = append(appointmentIds, transaction.UnitId)
 		} else {
 			return domain.NewErrorResponse(400, fmt.Sprintf("invalid transaction type: %s", transaction.TransactionType))
 		}
@@ -149,9 +151,9 @@ func (r *TransactionPostgres) CreateTransactions(transactions []models.Transacti
 		}
 	}
 
-	if len(optionPlaceholders) > 0 {
-		finalOptionQuery := optionQuery + strings.Join(optionPlaceholders, ",")
-		_, err = tx.Exec(finalOptionQuery, optionQueryArgs...)
+	if len(appointmentPlaceholders) > 0 {
+		finalAppointmentQuery := appointmentQuery + strings.Join(appointmentPlaceholders, ",")
+		_, err = tx.Exec(finalAppointmentQuery, appointmentQueryArgs...)
 		if err != nil {
 			return domain.NewErrorResponse(500, fmt.Sprintf("failed to create transactions: %v", err))
 		}
@@ -165,13 +167,28 @@ func (r *TransactionPostgres) CreateTransactions(transactions []models.Transacti
 		}
 	}
 
+	var statusId int
+	queryGetCompletedStatusId := fmt.Sprintf("SELECT id FROM %s WHERE name = $1", database.StatusTable)
+	err = tx.QueryRow(queryGetCompletedStatusId, domain.StatusCompleted).Scan(&statusId)
+	if err != nil {
+		return domain.NewErrorResponse(500, fmt.Sprintf("failed to get completed status id: %v", err))
+	}
+
+	for _, appointmentId := range appointmentIds {
+		queryUpdateAppointment := fmt.Sprintf("UPDATE %s SET status_id = $1 WHERE id = $2", database.MasterAppointmentTable)
+		_, err = tx.Exec(queryUpdateAppointment, statusId, appointmentId)
+		if err != nil {
+			return domain.NewErrorResponse(500, fmt.Sprintf("failed to update appointment status_id: %v", err))
+		}
+	}
+
 	return tx.Commit()
 }
 
 func (r *TransactionPostgres) GetAllTransactions() ([]models.Transaction, error) {
 	var transactions []models.Transaction
 
-	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, option_id, product_id, 
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method, transaction_type, purchase_amount, count, 
     TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions)
@@ -186,18 +203,18 @@ func (r *TransactionPostgres) GetAllTransactions() ([]models.Transaction, error)
 
 	for rows.Next() {
 		var (
-			optionId, productId sql.NullInt64
-			transaction         models.Transaction
+			appointmentId, productId sql.NullInt64
+			transaction              models.Transaction
 		)
 
-		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &optionId, &productId,
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
 			&transaction.PaymentMethod, &transaction.TransactionType, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
 		}
 
-		if optionId.Valid {
-			transaction.UnitId = int(optionId.Int64)
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
 		} else if productId.Valid {
 			transaction.UnitId = int(productId.Int64)
 		} else {
@@ -217,7 +234,7 @@ func (r *TransactionPostgres) GetAllTransactions() ([]models.Transaction, error)
 func (r *TransactionPostgres) GetTransactionById(transactionId int) (models.Transaction, error) {
 	var transactions []models.Transaction
 
-	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, option_id, product_id, 
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method, transaction_type, purchase_amount, count, 
     TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE id = $1`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions, transactionId)
@@ -232,18 +249,18 @@ func (r *TransactionPostgres) GetTransactionById(transactionId int) (models.Tran
 
 	for rows.Next() {
 		var (
-			optionId, productId sql.NullInt64
-			transaction         models.Transaction
+			appointmentId, productId sql.NullInt64
+			transaction              models.Transaction
 		)
 
-		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &optionId, &productId,
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
 			&transaction.PaymentMethod, &transaction.TransactionType, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return models.Transaction{}, err
 		}
 
-		if optionId.Valid {
-			transaction.UnitId = int(optionId.Int64)
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
 		} else if productId.Valid {
 			transaction.UnitId = int(productId.Int64)
 		} else {
@@ -296,6 +313,21 @@ func (r *TransactionPostgres) DeleteTransaction(transactionId int) error {
 		if err != nil {
 			return domain.NewErrorResponse(500, fmt.Sprintf("failed to update product count: %v", err))
 		}
+	} else if transaction.TransactionType == domain.TransactionAppointment {
+		var statusId int
+		queryGetCompletedStatusId := fmt.Sprintf("SELECT id FROM %s WHERE name = $1", database.StatusTable)
+		err = tx.QueryRow(queryGetCompletedStatusId, domain.StatusWaiting).Scan(&statusId)
+		if err != nil {
+			return domain.NewErrorResponse(500, fmt.Sprintf("failed to get completed status id: %v", err))
+		}
+
+		queryUpdateAppointment := fmt.Sprintf("UPDATE %s SET status_id = $1 WHERE id = $2", database.MasterAppointmentTable)
+		_, err = tx.Exec(queryUpdateAppointment, statusId, transaction.UnitId)
+		if err != nil {
+			return domain.NewErrorResponse(500, fmt.Sprintf("failed to update appointment status_id: %v", err))
+		}
+	} else {
+		return domain.NewErrorResponse(500, "invalid transaction type")
 	}
 
 	return tx.Commit()
@@ -304,7 +336,7 @@ func (r *TransactionPostgres) DeleteTransaction(transactionId int) error {
 func (r *TransactionPostgres) GetTransactionByDate(date string) ([]models.Transaction, error) {
 	var transactions []models.Transaction
 
-	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, option_id, product_id, 
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method, transaction_type, purchase_amount, count, 
     TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE DATE(date_and_time) = $1`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions, date)
@@ -319,18 +351,18 @@ func (r *TransactionPostgres) GetTransactionByDate(date string) ([]models.Transa
 
 	for rows.Next() {
 		var (
-			optionId, productId sql.NullInt64
-			transaction         models.Transaction
+			appointmentId, productId sql.NullInt64
+			transaction              models.Transaction
 		)
 
-		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &optionId, &productId,
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
 			&transaction.PaymentMethod, &transaction.TransactionType, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
 		}
 
-		if optionId.Valid {
-			transaction.UnitId = int(optionId.Int64)
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
 		} else if productId.Valid {
 			transaction.UnitId = int(productId.Int64)
 		} else {
@@ -350,7 +382,7 @@ func (r *TransactionPostgres) GetTransactionByDate(date string) ([]models.Transa
 func (r *TransactionPostgres) GetTransactionByDateAndMethod(date, paymentMethod string) ([]models.Transaction, error) {
 	var transactions []models.Transaction
 
-	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, option_id, product_id, 
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method, transaction_type, purchase_amount, count, 
     TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE DATE(date_and_time) = $1 AND payment_method = $2`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions, date, paymentMethod)
@@ -365,18 +397,18 @@ func (r *TransactionPostgres) GetTransactionByDateAndMethod(date, paymentMethod 
 
 	for rows.Next() {
 		var (
-			optionId, productId sql.NullInt64
-			transaction         models.Transaction
+			appointmentId, productId sql.NullInt64
+			transaction              models.Transaction
 		)
 
-		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &optionId, &productId,
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
 			&transaction.PaymentMethod, &transaction.TransactionType, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
 		}
 
-		if optionId.Valid {
-			transaction.UnitId = int(optionId.Int64)
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
 		} else if productId.Valid {
 			transaction.UnitId = int(productId.Int64)
 		} else {
@@ -396,7 +428,7 @@ func (r *TransactionPostgres) GetTransactionByDateAndMethod(date, paymentMethod 
 func (r *TransactionPostgres) GetTransactionByDateAndType(date, transactionType string) ([]models.Transaction, error) {
 	var transactions []models.Transaction
 
-	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, option_id, product_id, 
+	queryGetAllTransactions := fmt.Sprintf(`SELECT id, users_id, client_id, appointment_id, product_id, 
     payment_method, transaction_type, purchase_amount, count, 
     TO_CHAR(date_and_time, 'YYYY-MM-DD HH24:MI:SS') AS date_and_time FROM %s WHERE DATE(date_and_time) = $1 AND transaction_type = $2`, database.TransactionTable)
 	rows, err := r.db.Query(queryGetAllTransactions, date, transactionType)
@@ -411,18 +443,18 @@ func (r *TransactionPostgres) GetTransactionByDateAndType(date, transactionType 
 
 	for rows.Next() {
 		var (
-			optionId, productId sql.NullInt64
-			transaction         models.Transaction
+			appointmentId, productId sql.NullInt64
+			transaction              models.Transaction
 		)
 
-		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &optionId, &productId,
+		err = rows.Scan(&transaction.Id, &transaction.AdminId, &transaction.ClientId, &appointmentId, &productId,
 			&transaction.PaymentMethod, &transaction.TransactionType, &transaction.PurchaseAmount, &transaction.Count, &transaction.Timestamp)
 		if err != nil {
 			return nil, domain.NewErrorResponse(500, fmt.Sprintf("error scanning row: %v", err))
 		}
 
-		if optionId.Valid {
-			transaction.UnitId = int(optionId.Int64)
+		if appointmentId.Valid {
+			transaction.UnitId = int(appointmentId.Int64)
 		} else if productId.Valid {
 			transaction.UnitId = int(productId.Int64)
 		} else {
