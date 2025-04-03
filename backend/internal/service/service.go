@@ -72,8 +72,8 @@ type Appointment interface {
 
 type Profile interface {
 	GetUserInfo(userId int) (models.Users, error)
-	//UpdateInfo(userId int, info models.Info) error
-	//UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
+	UpdateInfo(userId int, info models.UpdateInfo) error
+	UpdatePassword(userId int, passwords models.UpdatePasswordInput) error
 	UpdatePhoto(userId int, newPhoto []byte) error
 }
 

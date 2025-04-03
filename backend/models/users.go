@@ -23,6 +23,13 @@ type Info struct {
 	Bio        string `json:"bio" binding:"required" db:"bio"`
 }
 
+type UpdateInfo struct {
+	Name       *string `json:"name"`
+	Surname    *string `json:"surname"`
+	Patronymic *string `json:"patronymic"`
+	Bio        *string `json:"bio"`
+}
+
 type UpdatePasswordInput struct {
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`
