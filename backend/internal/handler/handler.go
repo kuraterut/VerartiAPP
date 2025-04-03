@@ -33,46 +33,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				profile.PUT("/password", h.updatePassword)
 			}
 
-			product := master.Group("/product")
-			{
-				product.GET("/", h.getAllProducts)
-				product.GET("/:id", h.getProductById)
-			}
-
 			appointment := master.Group("/appointment")
 			{
-				appointment.GET("/admin", h.getAdminByDate)
-				appointment.GET("/master", h.getAllMastersByDate)
+				appointment.GET("/", h.GetAppointmentsForMasterByDate)
 			}
-
-			option := master.Group("/option")
-			{
-				option.GET("/", h.getAllOptions)
-				option.GET("/:id", h.getOptionById)
-			}
-
-			users := master.Group("/users")
-			{
-				users.GET("/master", h.getAllMasters)
-				users.GET("/master/:id", h.getMasterById)
-				users.GET("/admin", h.getAllAdmins)
-				users.GET("/admin/:id", h.getAdminById)
-			}
-
-			clients := master.Group("/clients")
-			{
-				clients.GET("/", h.getAllClients)
-				clients.GET("/:id", h.getClientById)
-				clients.GET("/phone", h.getClientByPhone)
-			}
-
-			feedback := master.Group("/feedback")
-			{
-				feedback.GET("/", h.getAllFeedbacks)
-				feedback.GET("/:id", h.getFeedbackById)
-				feedback.PATCH("/", h.sortFeedbacks) // todo не помню зачем это нужно, мб поменять тип запроса
-			}
-
 		}
 
 		admin := api.Group("/admin", h.adminIdentity)
@@ -84,6 +48,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				users.GET("/master/:id", h.getMasterById)
 				users.GET("/admin", h.getAllAdmins)
 				users.GET("/admin/:id", h.getAdminById)
+				users.GET("/phone", h.getUserByPhone)
 				users.DELETE("/:id", h.deleteUser)
 			}
 

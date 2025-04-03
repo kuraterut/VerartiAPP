@@ -377,3 +377,38 @@ func (h *Handler) getMonthlySchedule(c *gin.Context) {
 		"schedules": schedules,
 	})
 }
+
+func (h *Handler) GetAppointmentsForMasterByDate(c *gin.Context) {
+	masterId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	date := c.Query("date")
+	if date == "" {
+		newErrorResponse(c, http.StatusBadRequest, "date is required")
+		return
+	}
+
+	err = domain.ValidateDateOnly(date)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	appointments, err := h.services.Appointment.GetAllAppointmentsByDateAndMasterId(masterId, date)
+	if err != nil {
+		var errResp *domain.ErrorResponse
+		if errors.As(err, &errResp) {
+			newErrorResponse(c, errResp.Code, errResp.Text)
+			return
+		}
+
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"appointments": appointments,
+	})
+}
