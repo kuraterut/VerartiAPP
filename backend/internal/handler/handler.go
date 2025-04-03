@@ -135,8 +135,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 				appointment.POST("/admin", h.putAdminToDate)
 				appointment.POST("/master", h.putMasterToDate)
+				appointment.DELETE("/master", h.cancelMasterEntryForDate)
 				appointment.GET("/admin", h.getAdminByDate)
 				appointment.GET("/master", h.getAllMastersByDate)
+
+				appointment.GET("/schedule", h.getMonthlySchedule)
 			}
 
 			transaction := admin.Group("/transaction")
