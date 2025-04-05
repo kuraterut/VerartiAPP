@@ -39,6 +39,7 @@ public class ProfileWindow extends Main{
         Button changeAvatarBtn      = new Button();
         Button changePasswordBtn    = new Button();
         Button changeInfoBtn        = new Button();
+        Button changeAccountBtn     = new Button("Сменить аккаунт");
 
         Label nameHeadLbl               = new Label();
         Label surnameHeadLbl            = new Label();
@@ -153,6 +154,7 @@ public class ProfileWindow extends Main{
 
         changeInfoBtn.setOnAction(event -> ChangeProfileInfoDialog.show(admin, changeInfoBtn));
         changePasswordBtn.setOnAction(event -> ChangePasswordDialog.show(admin, changePasswordBtn));
+        changeAccountBtn.setOnAction(event -> AdminController.loadAuthorizationWindow(changeAccountBtn));
 
         changeAvatarBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -180,7 +182,7 @@ public class ProfileWindow extends Main{
         });
 
         avatarBox.getChildren().addAll(avatarImageView, changeAvatarBtn);
-        changeInfoBtnsBox.getChildren().addAll(changePasswordBtn, changeInfoBtn);
+        changeInfoBtnsBox.getChildren().addAll(changePasswordBtn, changeInfoBtn, changeAccountBtn);
         profileInfoBox.getChildren().addAll(avatarBox, table);
         centerBox.getChildren().addAll(title, profileInfoBox, messageLabel, changeInfoBtnsBox);
         root.setCenter(centerBox);
